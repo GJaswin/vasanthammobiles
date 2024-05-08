@@ -78,7 +78,29 @@ function removeItemFromBill(id) {
   document.getElementById(id).remove();
 }
 
-function printPageArea() {
+function searchCustomer() {
+  var customerPhone = document.getElementById("customer-ph-input").value;
+  var docRef = db.collection("customers").doc(customerPhone);
+
+  docRef
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        document.getElementById("customer-name-input").value = doc.data().name;
+        document.getElementById("customer-name").textContent = doc.data().name;
+        document.getElementById("customer-ph").textContent = customerPhone;
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+      }
+    })
+    .catch((error) => {
+      console.log("Error getting document:", error);
+    });
+}
+
+const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
+async function printPageArea() {
   const elements = document.getElementsByClassName("delete-ico-bill");
   while (elements.length > 0) {
     elements[0].parentNode.removeChild(elements[0]);
@@ -89,6 +111,7 @@ function printPageArea() {
   var printContent = document.getElementById("printing-bill").innerHTML;
   var originalContent = document.body.innerHTML;
   document.body.innerHTML = printContent;
+  await sleep(1000);
   window.print();
   document.body.innerHTML = originalContent;
 }
@@ -106,30 +129,34 @@ function printPageArea() {
 // console.log(formattedDate);
 
 // Create a new Date object
-const date = new Date();
 
-// Get the individual components of the date and time
-const year = date.getFullYear();
-const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Month is zero-indexed, so add 1
-const day = date.getDate().toString().padStart(2, '0');
-const hours = date.getHours().toString().padStart(2, '0');
-const minutes = date.getMinutes().toString().padStart(2, '0');
-const seconds = date.getSeconds().toString().padStart(2, '0');
-const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
+function updateClock() {
+  const date = new Date();
 
-// Determine if it's AM or PM
-const period = hours >= 12 ? 'PM' : 'AM';
+  // Get the individual components of the date and time
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Month is zero-indexed, so add 1
+  const day = date.getDate().toString().padStart(2, "0");
+  const hours = date.getHours().toString().padStart(2, "0");
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  const seconds = date.getSeconds().toString().padStart(2, "0");
+  const milliseconds = date.getMilliseconds().toString().padStart(3, "0");
 
-// Convert hours to 12-hour format
-const formattedHours = (hours % 12 || 12).toString().padStart(2, '0'); // If hours is 0, convert to 12
+  // Determine if it's AM or PM
+  const period = hours >= 12 ? "PM" : "AM";
 
-// Construct the formatted date and time string
-const formattedDateTime = `${year}-${month}-${day} ${formattedHours}:${minutes}:${seconds}.${milliseconds} ${period}`;
+  // Convert hours to 12-hour format
+  const formattedHours = (hours % 12 || 12).toString().padStart(2, "0"); // If hours is 0, convert to 12
 
-console.log(formattedDateTime);
+  // Construct the formatted date and time string
+  const formattedDateTime = `${day}-${month}-${year} ${formattedHours}:${minutes}:${seconds} ${period}`;
+  const formattedBillId = `${day}-${month}-${year}-${hours}-${minutes}-${seconds}`;
 
+  document.getElementById("customer-date-time").textContent = formattedDateTime;
+  document.getElementById("customer-billid").textContent = formattedBillId;
+}
 
-
+setInterval(updateClock, 1);
 
 // var docData = {
 //   [formattedDateTime]: {
