@@ -111,8 +111,8 @@ async function printPageArea() {
   var printContent = document.getElementById("printing-bill").innerHTML;
   var originalContent = document.body.innerHTML;
   document.body.innerHTML = printContent;
-  await sleep(1000);
   window.print();
+  await sleep(1000);
   document.body.innerHTML = originalContent;
 }
 
