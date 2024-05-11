@@ -400,6 +400,7 @@
                 </center>
                 <hr />
                 <div id="print-bill-cus">
+                  <p>Seller: <span id="seller-name">Mohan</span></p>
                   <p>To: <span id="customer-name"></span></p>
                   <p>Mob: <span id="customer-ph"></span></p>
                   <p>Bill Id: <span id="customer-billid"></span></p>
@@ -409,7 +410,7 @@
                   <div class="table-responsive">
                     <table class="table" id="billingTable">
                       <thead>
-                        <tr>
+                        <tr id="billing-table-head">
                           <th scope="col">Item</th>
                           <th scope="col">Rate</th>
                           <th scope="col">Qty</th>
@@ -443,12 +444,37 @@
                   </p>
                   <p>Balance Kept: <span id="customer-balance-kept"></span></p>
                 </div>
+                <hr>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-auto">
+                <form action="javascript:amountCheck()" novalidate>
+                  <div class="input-group mb-3">
+                    <input
+                      type="number"
+                      class="form-control border-0"
+                      placeholder="Amt"
+                      aria-label="amt"
+                      minlength="1"
+                      required
+                      id="customer-pay-input"
+                    />
+                    <button
+                      class="input-group-text btn btn-outline-primary"
+                      type="submit"
+                    >
+                      Check
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
             <center>
-              <button class="btn btn-primary" onclick="printPageArea()">
+              <button id="printBtn" class="btn btn-primary" onclick="printPageArea()">
                 Print
-              </button>
+              </button><br>
+              <a href="javascript:whatsappBill()" class="invisible" id="whatsappLink">Send the Whatsapp Bill</a>
             </center>
           </div>
 

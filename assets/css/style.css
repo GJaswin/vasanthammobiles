@@ -234,17 +234,20 @@ h6 {
 
 .card-title {
   padding: 15px 0 5px 0;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 500;
   color: #012970;
+  margin-bottom: 0px;
+  padding-bottom: 0px;
   font-family: "Poppins", sans-serif;
 }
 
-.card-title span {
-  color: #899bbd;
-  font-size: 14px;
-  font-weight: 400;
+
+.head{
+  font-size: 18px;
 }
+
+
 
 .card-body {
   padding: 0 20px 15px 20px;
@@ -1275,4 +1278,8 @@ h6 {
  #dummy-print{
   margin:30px;
  }
+}
+
+.invisible{
+  visibility: hidden;
 }

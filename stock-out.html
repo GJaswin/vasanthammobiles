@@ -54,14 +54,17 @@
         <form
           class="search-form d-flex align-items-center"
           method="POST"
-          action="#"
+          action="javascript:searchDate()"
         >
           <input
             type="text"
             name="query"
-            placeholder="Search"
+            placeholder="Enter Date"
             title="Enter search keyword"
-          />
+            minlength="10"
+            maxlength="10"
+            id="searchDateStockOut"
+            />
           <button type="submit" title="Search">
             <i class="bi bi-search"></i>
           </button>
@@ -213,11 +216,10 @@
 
     <main id="main" class="main">
       <div class="pagetitle">
-        <h1>Sample Section</h1>
+        <h1>Stock Out</h1>
         <nav>
           <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-            <li class="breadcrumb-item active">Sample Section</li>
+            <li class="breadcrumb-item active" id="stock-out-date">Date</li>
           </ol>
         </nav>
       </div>
@@ -225,7 +227,7 @@
 
       <section class="section">
         <div class="row align-items-top">
-          <div class="col-lg-3">
+          <!-- <div class="col-lg-3">
             <div class="card">
               <div class="card-body">
                 <h5 class="card-title">Date</h5>
@@ -243,196 +245,13 @@
                 </p>
               </div>
             </div>
+          </div> -->
+
+          <div class="col-12" id="stockout-section">
+            
+
           </div>
-          <div class="col-lg-3">
-            <div class="card">
-              <div class="card-body">
-                <h5 class="card-title">Date</h5>
-                <h6 class="card-subtitle mb-2 text-muted">Account</h6>
-                <p class="card-text">
-                  <b>Iphone 15 pro max</b><br />
-                  Quantity: 100<br />
-                  Price/Piece: 1,60,000<br />
-                  Price: 16,000,000<br />
-                  Seller
-                </p>
-                <p class="card-text">
-                  <a href="#" class="btn btn-primary">Edit</a>
-                  <a href="#" class="btn btn-primary">Delete</a>
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-3">
-            <div class="card">
-              <div class="card-body">
-                <h5 class="card-title">Date</h5>
-                <h6 class="card-subtitle mb-2 text-muted">Account</h6>
-                <p class="card-text">
-                  <b>Iphone 15 pro max</b><br />
-                  Quantity: 100<br />
-                  Price/Piece: 1,60,000<br />
-                  Price: 16,000,000<br />
-                  Seller
-                </p>
-                <p class="card-text">
-                  <a href="#" class="btn btn-primary">Edit</a>
-                  <a href="#" class="btn btn-primary">Delete</a>
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-3">
-            <div class="card">
-              <div class="card-body">
-                <h5 class="card-title">Date</h5>
-                <h6 class="card-subtitle mb-2 text-muted">Account</h6>
-                <p class="card-text">
-                  <b>Iphone 15 pro max</b><br />
-                  Quantity: 100<br />
-                  Price/Piece: 1,60,000<br />
-                  Price: 16,000,000<br />
-                  Seller
-                </p>
-                <p class="card-text">
-                  <a href="#" class="btn btn-primary">Edit</a>
-                  <a href="#" class="btn btn-primary">Delete</a>
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-3">
-            <div class="card">
-              <div class="card-body">
-                <h5 class="card-title">Date</h5>
-                <h6 class="card-subtitle mb-2 text-muted">Account</h6>
-                <p class="card-text">
-                  <b>Iphone 15 pro max</b><br />
-                  Quantity: 100<br />
-                  Price/Piece: 1,60,000<br />
-                  Price: 16,000,000<br />
-                  Seller
-                </p>
-                <p class="card-text">
-                  <a href="#" class="btn btn-primary">Edit</a>
-                  <a href="#" class="btn btn-primary">Delete</a>
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-3">
-            <div class="card">
-              <div class="card-body">
-                <h5 class="card-title">Date</h5>
-                <h6 class="card-subtitle mb-2 text-muted">Account</h6>
-                <p class="card-text">
-                  <b>Iphone 15 pro max</b><br />
-                  Quantity: 100<br />
-                  Price/Piece: 1,60,000<br />
-                  Price: 16,000,000<br />
-                  Seller
-                </p>
-                <p class="card-text">
-                  <a href="#" class="btn btn-primary">Edit</a>
-                  <a href="#" class="btn btn-primary">Delete</a>
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col">
-              <div class="table-responsive">
-                <table class="table table-bordered" id="productsTable">
-                  <thead>
-                    <tr>
-                      <th scope="col">Item</th>
-                      <th scope="col">Rate</th>
-                      <th scope="col"><i class="bi bi-pencil-fill"></i></th>
-                      <th scope="col"><i class="bi bi-bag-plus-fill"></i></th>
-                    </tr>
-                  </thead>
-                  <tbody id="table-body-items"></tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-12">
-            <div class="card top-selling overflow-auto">
-
-              <div class="filter">
-                <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                  <li class="dropdown-header text-start">
-                    <h6>Filter</h6>
-                  </li>
-
-                  <li><a class="dropdown-item" href="#">Today</a></li>
-                  <li><a class="dropdown-item" href="#">This Month</a></li>
-                  <li><a class="dropdown-item" href="#">This Year</a></li>
-                </ul>
-              </div>
-
-              <div class="card-body pb-0">
-                <h5 class="card-title">Top Selling <span>| Today</span></h5>
-
-                <table class="table table-borderless">
-                  <thead>
-                    <tr>
-                      <th scope="col">Preview</th>
-                      <th scope="col">Product</th>
-                      <th scope="col">Price</th>
-                      <th scope="col">Sold</th>
-                      <th scope="col">Revenue</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <th scope="row"><a href="#">Product 1</a></th>
-                      <td><a href="#" class="text-primary fw-bold">Ut inventore ipsa voluptas nulla</a></td>
-                      <td>$64</td>
-                      <td class="fw-bold">124</td>
-                      <td>$5,828</td>
-                    </tr>
-                    <tr>
-                      <th scope="row"><a href="#">Product 1</a></th>
-                      <td><a href="#" class="text-primary fw-bold">Exercitationem similique doloremque</a></td>
-                      <td>$46</td>
-                      <td class="fw-bold">98</td>
-                      <td>$4,508</td>
-                    </tr>
-                    <tr>
-                      <th scope="row"><a href="#">Product 1</a></th>
-                      <td><a href="#" class="text-primary fw-bold">Doloribus nisi exercitationem</a></td>
-                      <td>$59</td>
-                      <td class="fw-bold">74</td>
-                      <td>$4,366</td>
-                    </tr>
-                    <tr>
-                      <th scope="row"><a href="#">Product 1</a></th>
-                      <td><a href="#" class="text-primary fw-bold">Officiis quaerat sint rerum error</a></td>
-                      <td>$32</td>
-                      <td class="fw-bold">63</td>
-                      <td>$2,016</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Product 1</th>
-                      <td><a href="#" class="text-primary fw-bold">Sit unde debitis delectus repellendus</a></td>
-                      <td>$79</td>
-                      <td class="fw-bold">41</td>
-                      <td>$3,239</td>
-                    </tr>
-                  </tbody>
-                </table>
-
-              </div>
-
-            </div>
-          </div><!-- End Top Selling -->
-
-
-
+          <!-- End Top Selling -->
         </div>
       </section>
     </main>
@@ -469,5 +288,24 @@
 
     <!-- Template Main JS File -->
     <script src="assets/js/main.js"></script>
+    <script
+      defer
+      src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"
+    ></script>
+
+    <script
+      defer
+      src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"
+    ></script>
+    <script
+      defer
+      src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"
+    ></script>
+    <script
+      defer
+      src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"
+    ></script>
+
+    <script defer src="assets/js/stock-out.js"></script>
   </body>
 </html>

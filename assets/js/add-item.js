@@ -55,6 +55,7 @@ function addItem() {
             name: itemName,
             category: itemCategory,
             rate: itemRate,
+            stock: 0,
           })
           .then(() => {
             database
