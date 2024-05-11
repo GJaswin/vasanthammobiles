@@ -77,6 +77,8 @@ function getItem(itemName, itemRate) {
     stockRate = itemRate;
     console.log(stockName, stockRate);
 
+    document.querySelector("#addToStock .modal-title").innerHTML= `Add to Stock - ${stockName}`;
+
 }
 
 const paidButton = document.getElementById('paid');
