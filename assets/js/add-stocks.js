@@ -18,6 +18,10 @@ const db = firebase.firestore();
 
 var database = firebase.database();
 
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+const itemKey = urlParams.get("item");
+
 function capitalize(string) {
     return string.replace(/\w\S*/g, function (txt) {
         return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
@@ -31,39 +35,115 @@ function capitalize(string) {
 //      ->Rate
 //      ->Category
 
+const dbRef = database.ref();
+dbRef
+    .child("items")
+    .get()
+    .then((snapshot) => {
+        if (snapshot.exists()) {
+            snapshot.forEach((childSnapshot) => {
+                const key = childSnapshot.key;
+                const value = childSnapshot.val();
+
+
+
+                document.getElementById("stockIn-items").innerHTML += `
+                        <tr id='${key}'>
+                          <td>${key}</td>
+                          <td>${value}</td>
+                          <td>
+                            <span class="text-primary">
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#addToStock" onclick="getItem('${key}', ${value})"><i class="bi bi-plus-circle-fill"></i></a>
+                            </span>
+                          </td>
+                        </tr>
+      `;
+
+            });
+            // filterRows("");
+            // document.getElementById("totalPages").textContent = countPages();
+        } else {
+            console.log("No data available");
+        }
+    })
+    .catch((error) => {
+        console.error(error);
+    });
+
+
+function getItem(itemName, itemRate) {
+
+    stockName = capitalize(itemName.trim().toLowerCase()).toString();
+    stockRate = itemRate;
+    console.log(stockName, stockRate);
+
+}
+
+const paidButton = document.getElementById('paid');
+var stockPaid = false;
+
+paidButton.addEventListener('change', function () {
+    if (this.checked) {
+        stockPaid = true;
+        console.log(stockPaid);
+    } else {
+        stockPaid = false;
+
+        console.log(stockPaid);
+    }
+});
+
 function addItem() {
 
-    var stockName = capitalize(document.getElementById("stock-name").value.trim().toLowerCase());
-    var stockSeller = capitalize(document.getElementById("stock-seller").value.trim().toLowerCase());
-    var stockRate = parseInt(document.getElementById("stock-rate").value, 10);
-    var stockQty = parseInt(document.getElementById("stock-qty").value, 10);
-    var stockPrice = parseInt(document.getElementById("stock-price").value, 10);
-    var stockBalance = parseInt(document.getElementById("stock-balance").value, 10);
-    var stockPaid = (stockBalance > 0) ? false : true;
+    var stockSeller = capitalize(document.getElementById("stockSeller").value.trim().toLowerCase());
+    var stockQty = parseInt(document.getElementById("stockQty").value, 10);
+    var stockPrice = parseInt(document.getElementById("stockPrice").value, 10);
 
-    // var stockPaid = capitalize(document.getElementById("stock-paid").value.trim().toLowerCase());
+
+    var stockPaidVal = stockPaid.toString();
+
+    const itemData = {
+        stockName: stockName,
+        stockRate: stockRate,
+        stockSeller: stockSeller,
+        stockQty: stockQty,
+        stockPrice: stockPrice,
+
+    }
+
+    console.log(itemData);
 
     function getTimestamp() {
-        fulltime = new Date();
-        var timestamp = `${fulltime.getDate()}-${fulltime.getMonth()}-${fulltime.getFullYear()}`
-        return timestamp
+        //fulltime = new Date();
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        const seconds = date.getSeconds().toString().padStart(2, '0');
+        const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
+        dateID = `${day}-${month}-${year}`
+        fulltime = `${day}-${month}-${year}-${hours}-${minutes}-${seconds}-${milliseconds}`
+        readableTime = date.toISOString();
+        return dateID;
     }
+
 
     const docRef = db.collection("stockin").doc(getTimestamp());
 
     const docData = {
-        [Date.now().toString()]: {
+        [fulltime]: {
             item: {
                 name: stockName,
                 rate: stockRate,
                 qty: stockQty,
                 price: stockPrice,
-                time: fulltime
+                time: readableTime
 
             },
-            balance: stockBalance,
             seller: stockSeller,
-            paid: stockPaid
+            paid: stockPaidVal
         }
     }
 
