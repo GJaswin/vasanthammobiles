@@ -1280,6 +1280,28 @@ h6 {
  }
 }
 
+#addToStock .iteminputs input {
+padding: 10px;
+margin: 10px;
+
+}
+
 .invisible{
   visibility: hidden;
+}
+
+.card.itemlist {
+  width: 100%;
+}
+
+#addToStock .checkbox {
+  font-size: 16px;
+  border: 2px solid #012970;
+  border-radius: 5px;
+} 
+
+#addToStock .checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  border: 3px solid #012970;
 }

@@ -78,6 +78,7 @@ var database = firebase.database();
 //         });
 // }
 
+
 const dbRef = database.ref();
 dbRef
   .child("items")
@@ -87,6 +88,7 @@ dbRef
       snapshot.forEach((childSnapshot) => {
         const key = childSnapshot.key;
         const value = childSnapshot.val();
+
         document.getElementById("table-body-items").innerHTML += `
                         <tr id='${key}'>
                           <td>${key}</td>

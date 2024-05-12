@@ -77,10 +77,26 @@ var database = firebase.database();
 //             console.error('Error getting documents: ', error);
 //         });
 // }
+// function getTimestamp() {
+//   var time = new Date();
+//   var timestamp = `${time.getDate()}-${time.getMonth()}-${time.getFullYear()}`
+//   return timestamp
+// }
+
+
 function getTimestamp() {
-  var time = new Date();
-  var timestamp = `${time.getDate()}-${time.getMonth()}-${time.getFullYear()}`
-  return timestamp
+  //fulltime = new Date();
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const seconds = date.getSeconds().toString().padStart(2, '0');
+  const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
+  var timestamp = `${day}-${month}-${year}`
+  fulltime = Date.now().toString();
+  return timestamp;
 }
 
 
@@ -118,7 +134,6 @@ dbRef
                           <td>${data.stockRate}</td>
                           <td>${data.stockQty}</td>
                           <td>${data.stockPrice}</td>
-                          <td>${data.stockBalance}</td>
                           <td>${data.stockPaid}</td>
                           <td>
                             <span class="text-primary"
@@ -127,7 +142,7 @@ dbRef
                           </td>
                           <td>
                             <span class="text-danger"
-                              ><a href="javascript:deleteItem('${key}')"><i class="bi bi-trash-fill"></i
+                              ><a href="javascript:deleteItem('${key}', '${data.stockName}')"><i class="bi bi-trash-fill"></i
                             ></a></span>
                           </td>
                         </tr>
@@ -143,32 +158,32 @@ dbRef
     console.error(error);
   });
 
-function deleteItem(stockName) {
-  var result = confirm("Are you sure you want to delete " + itemName + " ?");
-  if (result) {
-    db.collection("stockin")
-      .doc(itemName)
-      .delete()
-      .then(function () {
-        database
-          .ref("items/" + itemName)
-          .remove()
-          .then(() => {
-            database
-              .ref("/")
-              .update({
-                "item-count": firebase.database.ServerValue.increment(-1),
-              })
-              .then(() => {
-                document.getElementById(itemName).remove();
-                console.log(itemName + " Document successfully deleted!");
-                alert(itemName + " Deleted Successfully");
-                changePage(1);
-              });
-          });
-      })
-      .catch(function (error) {
-        console.error("Error removing document docid: ", error);
-      });
-  }
-}
+// function deleteItem(key, stockName) {
+//   var result = confirm("Are you sure you want to delete " + stockName + " ?");
+//   if (result) {
+//     db.collection("stockin")
+//       .doc(key)
+//       .delete()
+//       .then(function () {
+//         database
+//           .ref("stockin/" + key)
+//           .remove()
+//           .then(() => {
+//             database
+//               .ref("/")
+//               .update({
+//                 "item-count": firebase.database.ServerValue.increment(-1),
+//               })
+//               .then(() => {
+//                 document.getElementById(itemName).remove();
+//                 console.log(itemName + " Document successfully deleted!");
+//                 alert(itemName + " Deleted Successfully");
+//                 changePage(1);
+//               });
+//           });
+//       })
+//       .catch(function (error) {
+//         console.error("Error removing document docid: ", error);
+//       });
+//   }
+// }
