@@ -36,8 +36,8 @@ function addItem() {
     document.getElementById("item-name").value.trim().toLowerCase()
   );
   var itemCategory = capitalize(document.getElementById("item-category").value.trim().toLowerCase());
-  var itemRate = parseInt(document.getElementById("item-rate").value,10);
-
+  var retailRate = parseInt(document.getElementById("item-retail-rate").value,10);
+  var wholesaleRate = parseInt(document.getElementById("item-wholesale-rate").value,10);
   const docRef = db.collection("items").doc(itemName);
 
   docRef
@@ -54,13 +54,14 @@ function addItem() {
           .set({
             name: itemName,
             category: itemCategory,
-            rate: itemRate,
+            retailRate: retailRate,
+            wholesaleRate: wholesaleRate,
             stock: 0,
           })
           .then(() => {
             database
               .ref("/items")
-              .update({ [itemName]: itemRate })
+              .update({ [itemName]: itemCategory })
               .then(() => {
                 database
                   .ref("/")

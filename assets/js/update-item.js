@@ -34,7 +34,9 @@ docRef
       data = doc.data();
       document.getElementById("item-name").value = data.name;
       document.getElementById("item-category").value = data.category;
-      document.getElementById("item-rate").value = data.rate;
+      document.getElementById("item-retail-rate").value = data.retailRate;
+      document.getElementById("item-wholesale-rate").value = data.wholesaleRate;
+      document.getElementById("item-stock-avl").value = data.stock;
     } else {
       console.log("No such document!");
     }
@@ -56,7 +58,9 @@ function updateItem() {
   var itemCategory = capitalize(
     document.getElementById("item-category").value.trim().toLowerCase()
   );
-  var itemRate = parseInt(document.getElementById("item-rate").value, 10);
+  var retailRate = parseInt(document.getElementById("item-retail-rate").value,10);
+  var wholesaleRate = parseInt(document.getElementById("item-wholesale-rate").value,10);
+  var stockAvl = parseInt(document.getElementById("item-stock-avl").value,10);
 
   const docRef = db.collection("items").doc(itemName);
 
@@ -69,10 +73,12 @@ function updateItem() {
           .doc(itemName)
           .update({
             category: itemCategory,
-            rate: itemRate,
+            retailRate: retailRate,
+            wholesaleRate: wholesaleRate,
+            stock: data.stock,
           })
           .then(() => {
-            database.ref("/items").update({ [itemName]: itemRate });
+            database.ref("/items").update({ [itemName]: itemCategory });
             console.log("Document(Item) Updated successfully!");
             document.getElementById("alert-msg").textContent =
               itemName + " - Item Updated!";
@@ -83,12 +89,14 @@ function updateItem() {
           .set({
             name: itemName,
             category: itemCategory,
-            rate: itemRate,
+            retailRate: retailRate,
+            wholesaleRate: wholesaleRate,
+            stock: data.stock,
           })
           .then(() => {
             database
               .ref("/items")
-              .update({ [itemName]: itemRate })
+              .update({ [itemName]: itemCategory })
               .then(() => {
                 db.collection("items")
                   .doc(data.name)
