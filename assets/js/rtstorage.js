@@ -60,7 +60,6 @@ function fetchByDate(dateString) {
               <div class="card stockItem">
                 <div class="card-body">
                   <h5 class="card-title">${itemKeys[i].slice(0, 10)}</h5>
-                  <h5 class="card-subtitle mb-2 mt-2 text-muted">Paid: ${stocks[itemKeys[i]].paid} </h5>
                   <p class="card-text">
                     <b> <span>${stocks[itemKeys[i]].item.name}</span> </b> <br>
                     <span>Quantity: ${stocks[itemKeys[i]].item.qty} </span> <br>
@@ -114,7 +113,6 @@ docRef = db.collection("returntostorage").doc(getTimestamp());
               <div class="card stockItem">
                 <div class="card-body">
                   <h5 class="card-title">${itemKeys[i].slice(0, 10)}</h5>
-                  <h5 class="card-subtitle mb-2 mt-2 text-muted">Paid: ${stocks[itemKeys[i]].paid} </h5>
                   <p class="card-text">
                     <b> <span>${stocks[itemKeys[i]].item.name}</span> </b> <br>
                     <span>Quantity: ${stocks[itemKeys[i]].item.qty} </span> <br>
