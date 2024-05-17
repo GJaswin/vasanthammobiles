@@ -5,7 +5,7 @@
   <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
 
-  <title>Vasantham Mobiles | Add Item</title>
+  <title>Vasantham Mobiles | Select Items to Return</title>
 
   <!-- Favicons -->
   <link href="assets/img/favicon.png" rel="icon" />
@@ -48,15 +48,15 @@
                 <div class="card-body">
                   <div class="pt-4 pb-2">
                     <h5 class="card-title text-center pb-0 fs-4">
-                      Item List
+                     Select Items to Return 
                     </h5>
                     <div>
-                      <table class="table table-bordered" id="stockIn-items">
+                      <table class="table table-bordered" id="rtstorage-items">
                         <thead>
                           <tr>
                             <th scope="col">Item</th>
                             <th scope="col">Category</th>
-                            <th scope="col"><i class="bi bi-plus-circle-fill"></i> Add to Stock</th>
+                            <th scope="col"><i class="bi bi-plus-circle-fill"></i> Return to Storage</th>
                           </tr>
 
                         </thead>
@@ -65,17 +65,17 @@
                     </div>
 
                     <!-- Modal -->
-                    <div class="modal fade" id="addToStock" tabindex="-1" aria-labelledby="addToStock"
+                    <div class="modal fade" id="returnToStorage" tabindex="-1" aria-labelledby="returnToStorage"
                       aria-hidden="true">
                       <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
                           <div class="modal-header">
-                            <h1 class="modal-title fs-5">Add to Stock</h1>
+                            <h1 class="modal-title fs-5">Return to Storage</h1>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                           </div>
                           <div class="modal-body d-flex  justify-content-center">
                             <form class="col-10 d-flex flex-column justify-content-center p-3 iteminputs"
-                              action="javascript:addItem()">
+                              action="javascript:returnItem()">
 
                               <input type="text" name="seller" placeholder="Seller" id="stockSeller" required>
                               <input type="number" name="qty" placeholder="Quantity" id="stockQty" required>
@@ -189,7 +189,7 @@
   <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-  <script defer src="assets/js/add-stocks.js"></script>
+  <script defer src="assets/js/rtstorage-add.js"></script>
 </body>
 
 </html>
