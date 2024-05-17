@@ -35,47 +35,48 @@ function capitalize(string) {
 //      ->Rate
 //      ->Category
 
+// Showing the items for adding them to the Billing Section
 const dbRef = database.ref();
 dbRef
-    .child("items")
-    .get()
-    .then((snapshot) => {
-        if (snapshot.exists()) {
-            snapshot.forEach((childSnapshot) => {
-                const key = childSnapshot.key;
-                const value = childSnapshot.val();
+  .child("items")
+  .get()
+  .then((snapshot) => {
+    if (snapshot.exists()) {
+      snapshot.forEach((childSnapshot) => {
+        const key = childSnapshot.key;
+        const value = childSnapshot.val();
+        document.getElementById("table-body-items").innerHTML += `
+                          <tr id='${key}'>
+                            <td>${key}</td>
+                            <td>${value}</td>
+                            <td>
+                              <span class="text-primary"
+                                ><a href="update-item.html?item=${key}"><i class="bi bi-pencil-fill"></i
+                              ></a></span>
+                            </td>
+                            <td>
+                              <span class="text-danger"
+                                ><a data-bs-toggle="modal" data-bs-target="#addToStock" href="javascript:getItem('${key}','${value}')"><i class="bi bi-bag-plus-fill"></i></a>
+                              </span>
+                            </td>
+                          </tr>
+        `;
+      });
+      filterRows("");
+      document.getElementById("totalPages").textContent = countPages();
+    } else {
+      console.log("No data available");
+    }
+  })
+  .catch((error) => {
+    console.error(error);
+  });
 
-
-
-                document.getElementById("stockIn-items").innerHTML += `
-                        <tr id='${key}'>
-                          <td>${key}</td>
-                          <td>${value}</td>
-                          <td>
-                            <span class="text-primary">
-                            <a href="#" data-bs-toggle="modal" data-bs-target="#addToStock" onclick="getItem('${key}', '${value}')"><i class="bi bi-plus-circle-fill"></i></a>
-                            </span>
-                          </td>
-                        </tr>
-      `;
-
-            });
-            // filterRows("");
-            // document.getElementById("totalPages").textContent = countPages();
-        } else {
-            console.log("No data available");
-        }
-    })
-    .catch((error) => {
-        console.error(error);
-    });
-
-
-function getItem(itemName, itemRate) {
+function getItem(itemName, itemCat) {
 
     stockName = capitalize(itemName.trim().toLowerCase()).toString();
-    stockRate = itemRate;
-    console.log(stockName, stockRate);
+    stockCat = itemCat;
+    console.log(stockName, stockCat);
 
     document.querySelector("#addToStock .modal-title").innerHTML = `Add to Stock - ${stockName}`;
 
