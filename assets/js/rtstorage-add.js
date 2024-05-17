@@ -47,13 +47,13 @@ dbRef
 
 
 
-                document.getElementById("stockIn-items").innerHTML += `
+                document.getElementById("rtstorage-items").innerHTML += `
                         <tr id='${key}'>
                           <td>${key}</td>
                           <td>${value}</td>
                           <td>
                             <span class="text-primary">
-                            <a href="#" data-bs-toggle="modal" data-bs-target="#addToStock" onclick="getItem('${key}', '${value}')"><i class="bi bi-plus-circle-fill"></i></a>
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#returnToStorage" onclick="getItem('${key}', '${value}')"><i class="bi bi-plus-circle-fill"></i></a>
                             </span>
                           </td>
                         </tr>
@@ -71,13 +71,13 @@ dbRef
     });
 
 
-function getItem(itemName, itemRate) {
+function getItem(itemName, itemCategory) {
 
     stockName = capitalize(itemName.trim().toLowerCase()).toString();
-    stockRate = itemRate;
-    console.log(stockName, stockRate);
+    stockCategory = itemCategory;
+    console.log(stockName, stockCategory);
 
-    document.querySelector("#addToStock .modal-title").innerHTML = `Add to Stock - ${stockName}`;
+    document.querySelector("#returnToStorage .modal-title").innerHTML = `Return to Storage - ${stockName}`;
 
 }
 
@@ -95,7 +95,7 @@ paidButton.addEventListener('change', function () {
     }
 });
 
-function addItem() {
+function returnItem() {
 
     var stockSeller = capitalize(document.getElementById("stockSeller").value.trim().toLowerCase());
     var stockQty = parseInt(document.getElementById("stockQty").value, 10);
@@ -106,7 +106,7 @@ function addItem() {
 
     const itemData = {
         stockName: stockName,
-        stockRate: stockRate,
+        stockCategory: stockCategory,
         stockSeller: stockSeller,
         stockQty: stockQty,
         stockPrice: stockPrice,
@@ -132,13 +132,13 @@ function addItem() {
     }
 
 
-    const docRef = db.collection("stockin").doc(getTimestamp());
+    const docRef = db.collection("returntostorage").doc(getTimestamp());
 
     const docData = {
         [fulltime]: {
             item: {
                 name: stockName,
-                rate: stockRate,
+                category: stockCategory,
                 qty: stockQty,
                 price: stockPrice,
                 time: readableTime
@@ -152,7 +152,7 @@ function addItem() {
     // const docData = {
     //     [Date.now().toString()]: {
     //         items: [stockName],
-    //         rates: [stockRate],
+    //         rates: [stockCategory],
     //         qty: [stockQty],
     //         price: [stockPrice],
     //         balance: stockBalance,
@@ -166,14 +166,10 @@ function addItem() {
         .get()
         .then(() => {
 
-            db.collection("stockin")
+            db.collection("returntostorage")
                 .doc(getTimestamp())
                 .set(docData, { merge: true })
                 .then(() => {
-                    database
-                        .ref(`/stockin/${getTimestamp()}`)
-                        .update(docData)
-
                     console.log("Document(Item) successfully written!");
                     document.getElementById("alert-msg").textContent = stockName + " - Item Added!";
                 })
