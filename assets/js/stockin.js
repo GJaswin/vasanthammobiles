@@ -18,74 +18,9 @@ const db = firebase.firestore();
 
 var database = firebase.database();
 
-// var pages;
-// var docs;
-// var docs_per_page = 3;
-
-// Firestore Reading Count data from Items Collection
-// db.collection("items").doc("item-count").get().then((doc) => {
-//     if (doc.exists) {
-//         docs = doc.data().count;
-//         pages = Math.ceil(docs/docs_per_page);
-//     } else {
-//         // doc.data() will be undefined in this case
-//         console.log("No item-cont document!");
-//     }
-// }).catch((error) => {
-//     console.log("Error getting item-count document:", error);
-// });
-
-// database.ref('/item-count').once('value').then((snapshot) => {
-//     docs = (snapshot.val());
-//     pages = Math.ceil(docs/docs_per_page);
-//     document.getElementById("total-pages").textContent = pages;
-//     document.getElementById("page-search-input").setAttribute("max",pages);
-// }).catch((error) => {
-//     console.log("Error getting item-count document:", error);
-// });
-
-// function showPageDocs(i){
-//     var startDoc = (i*docs_per_page) - (docs_per_page-1);
-//     var sno=1;
-//     db.collection('items')
-//         .orderBy('__name__') // Order documents by their IDs
-//         .startAt('4'.toString()) // Start at the document with index startIndex
-//         .limit(docs_per_page)
-//         .get()
-//         .then((snapshot) => {
-//             snapshot.forEach((doc) => {
-//                 // Print data of each document
-//                 console.log(doc.id, ' => ', doc.data());
-//                 document.getElementById("table-body").innerHTML += `
-//                 <tr>
-//                 <td>${sno}</td>
-//                 <td>${doc.id}</td>
-//                 <td>${doc.data().category}</td>
-//                 <td>${doc.data().rate}</td>
-//                 <td><a href="${doc.data().id}"><i class="bi bi-pencil-fill"></i
-//                   ></a>
-//                 </td>
-//                 <td><a href="${doc.data().id}"><i class="bi bi-trash-fill"></i
-//                   ></a>
-//                 </td>
-//               </tr>
-//                 `
-//                 sno++;
-//             });
-//         })
-//         .catch((error) => {
-//             console.error('Error getting documents: ', error);
-//         });
-// }
-// function getTimestamp() {
-//   var time = new Date();
-//   var timestamp = `${time.getDate()}-${time.getMonth()}-${time.getFullYear()}`
-//   return timestamp
-// }
-
+var fetchingDate;
 
 function getTimestamp() {
-  //fulltime = new Date();
   const date = new Date();
   const year = date.getFullYear();
   const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -100,63 +35,230 @@ function getTimestamp() {
 }
 
 
-const dbRef = database.ref();
-dbRef
-  .child(`/stockin/${getTimestamp()}`)
-  .get()
-  .then((snapshot) => {
-    if (snapshot.exists()) {
-      snapshot.forEach((childSnapshot) => {
-        const key = childSnapshot.key;
-        const details = childSnapshot.val();
-        const item = childSnapshot.val().item;
+function fetchByDate(dateString) {
 
-        const data = {
-          stockName: item.name,
-          stockSeller: details.seller,
-          stockRate: item.rate,
-          stockQty: item.qty,
-          stockPrice: item.price,
-          stockBalance: details.balance,
-          stockPaid: details.paid
+  const date = dateString;
+  const year = date.slice(0, 4);
+  const month = date.slice(5, 7);
+  const day = date.slice(8, 10);
+  fetchingDate = `${day}-${month}-${year}`;
 
-        }
-        console.log(data);
-        // for (var names of data.stockName) {
-        //   console.log(names);
+  document.getElementById("stocks").innerHTML = "";
 
-        // }
+  var docRef = db.collection("stockin").doc(fetchingDate);
+  docRef.get().then((doc) => {
+    if (doc.exists) {
+      itemKeys = Object.keys(doc.data())
+      itemNo = itemKeys.length;
+      stocks = doc.data();
+      console.log(itemKeys, itemNo);
 
-        document.getElementById("table-body-items").innerHTML += `
-                        <tr id='${key}'>
-                          <td>${data.stockName}</td>
-                          <td>${data.stockSeller}</td>
-                          <td>${data.stockRate}</td>
-                          <td>${data.stockQty}</td>
-                          <td>${data.stockPrice}</td>
-                          <td>${data.stockPaid}</td>
-                          <td>
-                            <span class="text-primary"
-                              ><a href="update-item.html?item=${key}"><i class="bi bi-pencil-fill"></i
-                            ></a></span>
-                          </td>
-                          <td>
-                            <span class="text-danger"
-                              ><a href="javascript:deleteItem('${key}', '${data.stockName}')"><i class="bi bi-trash-fill"></i
-                            ></a></span>
-                          </td>
-                        </tr>
-      `;
-      });
-      filterRows("");
-      document.getElementById("totalPages").textContent = countPages();
-    } else {
-      console.log("No data available");
+      for (i = 0; i < itemNo; i++) {
+        console.log(stocks[itemKeys[i]]);
+
+        document.getElementById("stocks").innerHTML += `<div class="col-lg-3">
+              <div class="card stockItem">
+                <div class="card-body">
+                  <h5 class="card-title">${itemKeys[i].slice(0, 10)}</h5>
+                  <h5 class="card-subtitle mb-2 mt-2 text-muted">Paid: ${stocks[itemKeys[i]].paid} </h5>
+                  <p class="card-text">
+                    <b> <span>${stocks[itemKeys[i]].item.name}</span> </b> <br>
+                    <span>Quantity: ${stocks[itemKeys[i]].item.qty} </span> <br>
+                    <span>Price: ${stocks[itemKeys[i]].item.price}</span> <br>
+                    <span>Seller: ${stocks[itemKeys[i]].seller}</span>
+                  </p>
+                  <p class="card-text">
+                    <a href="#" class="btn btn-primary">Edit</a>
+                    <a href="#" class="btn btn-primary">Delete</a>
+                  </p>
+                </div>
+              </div>
+            </div>`
+      }
+
     }
-  })
-  .catch((error) => {
-    console.error(error);
-  });
+  }
+  );
+
+  // const dbRef = database.ref();
+  // dbRef
+  //   .child(`/stockin/${fetchingDate}`)
+  //   .get()
+  //   .then((snapshot) => {
+  //     if (snapshot.exists()) {
+  //       snapshot.forEach((childSnapshot) => {
+  //         const key = childSnapshot.key;
+  //         const details = childSnapshot.val();
+  //         const item = childSnapshot.val().item;
+
+  //         const data = {
+  //           stockName: item.name,
+  //           stockSeller: details.seller,
+  //           stockRate: item.rate,
+  //           stockQty: item.qty,
+  //           stockPrice: item.price,
+  //           stockBalance: details.balance,
+  //           stockPaid: details.paid
+
+  //         }
+  //         console.log(data);
+
+  //         document.getElementById("stocks").innerHTML += `<div class="col-lg-3">
+  //             <div class="card stockItem">
+  //               <div class="card-body">
+  //                 <h5 class="card-title">${key.slice(0, 10)}</h5>
+  //                 <h6 class="card-subtitle mb-2 mt-2 text-muted">Paid: ${data.stockPaid} </h6>
+  //                 <p class="card-text">
+  //                   <b> <span>${data.stockName}</span> </b> <br>
+  //                   <span>Quantity: ${data.stockQty} </span> <br>
+  //                   <span>Price: ${data.stockPrice}</span> <br>
+  //                   <span>Seller: ${data.stockSeller}</span>
+  //                 </p>
+  //                 <p class="card-text">
+  //                   <a href="#" class="btn btn-primary">Edit</a>
+  //                   <a href="#" class="btn btn-primary">Delete</a>
+  //                 </p>
+  //               </div>
+  //             </div>
+  //           </div>`
+
+  //       });
+  //       document.getElementById("totalPages").textContent = countPages();
+  //     } else {
+  //       console.log("No data available");
+  //     }
+  //   })
+  //   .catch((error) => {
+  //     console.error(error);
+  //   });
+
+}
+
+// function filterStocks(query) {
+//   var stocks = document.getElementsByClassName("stockItem");
+//   var allstocks = stocks;
+//   var found = false;
+
+//   for (var i = 0; i < stocks.length; i++) {
+//     if (stocks[i].innerHTML.toString().toLowerCase().includes(query.toLowerCase())) {
+//       found = true;
+//       break;
+//     }
+//   }
+
+//   for (var i = 0; i < stocks.length; i++) {
+//     if (found && !stocks[i].innerHTML.toString().toLowerCase().includes(query.toLowerCase())) {
+//       stocks[i].style.display = "none";
+//     } else {
+//       stocks[i].style.display = "block";  
+//     }
+//   }
+// }
+
+
+var docRef = db.collection("stockin").doc(getTimestamp());
+docRef.get().then((doc) => {
+  if (doc.exists) {
+    itemKeys = Object.keys(doc.data())
+    itemNo = itemKeys.length;
+    console.log(itemKeys, itemNo);
+    // console.log("Document data:", doc.data());
+    for (i = 0; i < itemNo; i++) {
+      console.log(doc.data()[itemKeys[i]]);
+    }
+
+  }
+}
+);
+
+docRef = db.collection("stockin").doc(getTimestamp());
+  docRef.get().then((doc) => {
+    if (doc.exists) {
+      itemKeys = Object.keys(doc.data())
+      itemNo = itemKeys.length;
+      stocks = doc.data();
+      console.log(itemKeys, itemNo);
+
+      for (i = 0; i < itemNo; i++) {
+        console.log(stocks[itemKeys[i]]);
+
+        document.getElementById("stocks").innerHTML += `
+        <div class="col-lg-3">
+              <div class="card stockItem">
+                <div class="card-body">
+                  <h5 class="card-title">${itemKeys[i].slice(0, 10)}</h5>
+                  <h5 class="card-subtitle mb-2 mt-2 text-muted">Paid: ${stocks[itemKeys[i]].paid} </h5>
+                  <p class="card-text">
+                    <b> <span>${stocks[itemKeys[i]].item.name}</span> </b> <br>
+                    <span>Quantity: ${stocks[itemKeys[i]].item.qty} </span> <br>
+                    <span>Price: ${stocks[itemKeys[i]].item.price}</span> <br>
+                    <span>Seller: ${stocks[itemKeys[i]].seller}</span>
+                  </p>
+                  <p class="card-text">
+                    <a href="#" class="btn btn-primary">Edit</a>
+                    <a href="javascript:deleteItem(${itemKeys[i]})" class="btn btn-primary">Delete</a>
+                  </p>
+                </div>
+              </div>
+            </div>
+            `
+      }
+
+    }
+  }
+  );
+
+// const dbRef = database.ref();
+// dbRef
+//   .child(`/stockin/${getTimestamp()}`)
+//   .get()
+//   .then((snapshot) => {
+//     if (snapshot.exists()) {
+//       snapshot.forEach((childSnapshot) => {
+//         const key = childSnapshot.key;
+//         const details = childSnapshot.val();
+//         const item = childSnapshot.val().item;
+
+//         const data = {
+//           stockName: item.name,
+//           stockSeller: details.seller,
+//           stockRate: item.rate,
+//           stockQty: item.qty,
+//           stockPrice: item.price,
+//           stockBalance: details.balance,
+//           stockPaid: details.paid
+
+//         }
+//         console.log(data);
+
+//         document.getElementById("stocks").innerHTML += `<div class="col-lg-3">
+//               <div class="card stockItem">
+//                 <div class="card-body">
+//                   <h5 class="card-title">${key.slice(0, 10)}</h5>
+//                   <h6 class="card-subtitle mb-2 mt-2 text-muted">Paid: ${data.stockPaid} </h6>
+//                   <p class="card-text">
+//                     <b> <span>${data.stockName}</span> </b> <br>
+//                     <span>Quantity: ${data.stockQty} </span> <br>
+//                     <span>Price: ${data.stockPrice}</span> <br>
+//                     <span>Seller: ${data.stockSeller}</span>
+//                   </p>
+//                   <p class="card-text">
+//                     <a href="#" class="btn btn-primary">Edit</a>
+//                     <a href="#" class="btn btn-primary">Delete</a>
+//                   </p>
+//                 </div>
+//               </div>
+//             </div>`
+
+//       });
+//       document.getElementById("totalPages").textContent = countPages();
+//     } else {
+//       console.log("No data available");
+//     }
+//   })
+//   .catch((error) => {
+//     console.error(error);
+//   });
 
 // function deleteItem(key, stockName) {
 //   var result = confirm("Are you sure you want to delete " + stockName + " ?");
