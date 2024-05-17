@@ -81,28 +81,11 @@ function getItem(itemName, itemCategory) {
 
 }
 
-const paidButton = document.getElementById('paid');
-var stockPaid = false;
-
-paidButton.addEventListener('change', function () {
-    if (this.checked) {
-        stockPaid = true;
-        console.log(stockPaid);
-    } else {
-        stockPaid = false;
-
-        console.log(stockPaid);
-    }
-});
-
 function returnItem() {
 
     var stockSeller = capitalize(document.getElementById("stockSeller").value.trim().toLowerCase());
     var stockQty = parseInt(document.getElementById("stockQty").value, 10);
     var stockPrice = parseInt(document.getElementById("stockPrice").value, 10);
-
-
-    var stockPaidVal = stockPaid.toString();
 
     const itemData = {
         stockName: stockName,
@@ -145,7 +128,6 @@ function returnItem() {
 
             },
             seller: stockSeller,
-            paid: stockPaidVal
         }
     }
 
