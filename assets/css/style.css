@@ -101,6 +101,35 @@ h6 {
 }
 
 /*--------------------------------------------------------------
+# item to shop button
+--------------------------------------------------------------*/
+.add-shop-item {
+  position: fixed;
+  visibility: visible;
+  opacity: 1;
+  right: 15px;
+  bottom: 15px;
+  z-index: 99999;
+  background: #4154f1;
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  transition: all 0.4s;
+}
+
+.add-shop-item i {
+  font-size: 24px;
+  color: #fff;
+  line-height: 0;
+}
+
+.add-shop-item:hover {
+  background: #6776f4;
+  color: #fff;
+}
+
+
+/*--------------------------------------------------------------
 # Override some default Bootstrap stylings
 --------------------------------------------------------------*/
 /* Dropdown menus */
@@ -1235,6 +1264,10 @@ h6 {
 
 /** Custom **/
 #add-item-form input {
+  text-transform: capitalize;
+}
+
+#addShopForm input{
   text-transform: capitalize;
 }
 

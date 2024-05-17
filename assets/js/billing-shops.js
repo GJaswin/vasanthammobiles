@@ -54,6 +54,40 @@ dbRef
     console.error(error);
   });
 
+  dbRef
+  .child("shops")
+  .get()
+  .then((snapshot) => {
+    if (snapshot.exists()) {
+      snapshot.forEach((childSnapshot) => {
+        const key = childSnapshot.key;
+        const value = childSnapshot.val();
+        document.getElementById("table-body-shops").innerHTML += `
+                          <tr id='${key}'>
+                            <td>${key}</td>
+                            <td>${value}</td>
+                            <td>
+                              <span class="text-primary"
+                                ><a href="update-shop.html?shop=${key}"><i class="bi bi-pencil-fill"></i
+                              ></a></span>
+                            </td>
+                            <td>
+                              <span class="text-danger"
+                                ><a href="javascript:setShop('${key}')"><i class="bi bi-check2-circle"></i></a>
+                              </span>
+                            </td>
+                          </tr>
+        `;
+      });
+      filterRowsShops("");
+    } else {
+      console.log("No data available");
+    }
+  })
+  .catch((error) => {
+    console.error(error);
+  });
+
 // Global Variables
 var totalItems = 0;
 var totalAmount = 0;
@@ -61,6 +95,7 @@ var totalBalanceKept = 0;
 var prevBalance = 0;
 var customerAvl = false;
 var whatsappLink;
+var shop;
 
 function itemToBill(itemName) {
   var qty = prompt("Enter " + itemName + "'s Quantity", 1);
@@ -399,23 +434,54 @@ function whatsappBill() {
   window.open(whatsappLink);
 }
 
-function selectedOption() {
-  // Get all radio buttons with the name "flexRadioDefault"
-  var radioButtons = document.getElementsByName("flexRadioDefault");
+function capitalize(string) {
+  return string.replace(/\w\S*/g, function (txt) {
+    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+  });
+}
 
-  // Initialize a variable to store the value of the active radio button
-  var selectedValue;
+function addShop(){
+  var shopName = capitalize(
+    document.getElementById("shopName").value.trim().toLowerCase()
+  );
+  var shopPhone = parseInt(document.getElementById("shopNumber").value,10);
 
-  // Loop through each radio button
-  for (var i = 0; i < radioButtons.length; i++) {
-    // Check if the current radio button is checked
-    if (radioButtons[i].checked) {
-      // If checked, store its value
-      selectedValue = radioButtons[i].value;
-      // Break the loop since we found the checked radio button
-      break;
-    }
-  }
+  const docRef = db.collection("shops").doc(shopName);
 
-  return selectedValue;
+  docRef
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        // Document exists, handle notification here
+        
+        console.log("Shop already exists!");
+        document.getElementById("addShopModal-alert").textContent =
+          "Shop Already Exists!";
+      } else {
+        db.collection("shops")
+          .doc(shopName)
+          .set({
+            name: shopName,
+            phone: shopPhone,
+            balance: 0,
+          })
+          .then(() => {
+            database
+              .ref("/shops")
+              .update({ [shopName]: shopPhone });
+            console.log("Document(shop) successfully written!");
+            document.getElementById("addShopModal-alert").textContent = shopName + " - Shop Added!";
+          })
+          .catch((error) => {
+            console.error("Error writing document: ", error);
+            document.getElementById("addShopModal-alert").textContent =
+              "Error Occured, Try Again!";
+          });
+      }
+    })
+    .catch((error) => {
+      console.error("Error getting document: ", error);
+      document.getElementById("addShopModal-alert").textContent =
+        "Error Occured, Try Again!";
+    });
 }
