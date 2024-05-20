@@ -75,16 +75,8 @@
             </a>
           </li> -->
           <!-- End Search Icon-->
-
-          <li class="nav-item">
-            <a
-              class="nav-link nav-icon search-bar-toggle"
-              data-bs-toggle="modal"
-              data-bs-target="#addShopItem"
-            >
-              <i class="bi bi-house-up-fill"></i>
-            </a>
-          </li>
+          <div id="addItemToShopLink">
+            </div>
 
           <li class="nav-item">
             <a
@@ -429,7 +421,7 @@
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
             <div class="modal-header">
-              <h1 class="modal-title fs-5">Add Item</h1>
+              <h1 class="modal-title fs-5">Add Shop Item</h1>
               <button
                 type="button"
                 class="btn-close"
@@ -439,6 +431,7 @@
             </div>
             <div class="modal-body d-flex justify-content-center">
               <form
+                id="addShopItemForm"
                 class="col-10 d-flex flex-column justify-content-center p-3 iteminputs"
                 action="javascript:addShopItem()"
               >
@@ -446,23 +439,32 @@
                   class="form-control"
                   type="text"
                   name="shopItemName"
-                  placeholder="Item Name"
+                  placeholder="Shop Item Name"
                   id="shopItemName"
                   required
+                  disabled
                 />
                 <br />
                 <input
                   class="form-control"
                   type="number"
                   name="shopItemRate"
-                  placeholder="Phone"
+                  placeholder="Shop Item Rate"
                   id="shopItemRate"
+                  required
+                  disabled
+                />
+                <br />
+                <input
+                  class="form-control"
+                  type="number"
+                  name="shopItemQty"
+                  placeholder="Shop Item Qty"
+                  id="shopItemQty"
                   required
                 />
                 <br />
-                <button type="submit" class="btn btn-primary">
-                  <a href="#"></a>Add Item
-                </button>
+                <button type="submit" data-bs-dismiss="modal" class="btn btn-primary">Add Shop Item</button>
               </form>
             </div>
             <div class="modal-footer p-4">
@@ -474,10 +476,7 @@
                 Close
               </button>
               <div class="col-12">
-                <p
-                  class="small mb-0 text-success"
-                  id="addShopItemModal-alert"
-                ></p>
+                <p class="small mb-0 text-success" id="addShopItemModal-alert"></p>
               </div>
             </div>
           </div>

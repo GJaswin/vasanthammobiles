@@ -38,7 +38,8 @@ dbRef
                             </td>
                             <td>
                               <span class="text-danger"
-                                ><a href="javascript:itemToBill('${key}')"><i class="bi bi-bag-plus-fill"></i></a>
+                                ><a data-bs-toggle="modal"
+                                data-bs-target="#addShopItem" onclick="javascript:addToItemModal('${key}')"><i class="bi bi-bag-plus-fill"></i></a>
                               </span>
                             </td>
                           </tr>
@@ -54,7 +55,7 @@ dbRef
     console.error(error);
   });
 
-  dbRef
+dbRef
   .child("shops")
   .get()
   .then((snapshot) => {
@@ -68,12 +69,12 @@ dbRef
                             <td>${value}</td>
                             <td>
                               <span class="text-primary"
-                                ><a href="update-shop.html?shop=${key}"><i class="bi bi-pencil-fill"></i
+                                ><a href="handle-shop-items.html?shop=${key}"><i class="bi bi-pencil-fill"></i
                               ></a></span>
                             </td>
                             <td>
                               <span class="text-danger"
-                                ><a href="javascript:setShop('${key}')"><i class="bi bi-check2-circle"></i></a>
+                                ><a href="javascript:setShop('${key}','${value}')"><i class="bi bi-check2-circle"></i></a>
                               </span>
                             </td>
                           </tr>
@@ -95,7 +96,7 @@ var totalBalanceKept = 0;
 var prevBalance = 0;
 var customerAvl = false;
 var whatsappLink;
-var shop;
+var shopCustomer;
 
 function itemToBill(itemName) {
   var qty = prompt("Enter " + itemName + "'s Quantity", 1);
@@ -440,11 +441,11 @@ function capitalize(string) {
   });
 }
 
-function addShop(){
+function addShop() {
   var shopName = capitalize(
     document.getElementById("shopName").value.trim().toLowerCase()
   );
-  var shopPhone = parseInt(document.getElementById("shopNumber").value,10);
+  var shopPhone = parseInt(document.getElementById("shopNumber").value, 10);
 
   const docRef = db.collection("shops").doc(shopName);
 
@@ -453,7 +454,7 @@ function addShop(){
     .then((doc) => {
       if (doc.exists) {
         // Document exists, handle notification here
-        
+
         console.log("Shop already exists!");
         document.getElementById("addShopModal-alert").textContent =
           "Shop Already Exists!";
@@ -466,11 +467,10 @@ function addShop(){
             balance: 0,
           })
           .then(() => {
-            database
-              .ref("/shops")
-              .update({ [shopName]: shopPhone });
+            database.ref("/shops").update({ [shopName]: shopPhone });
             console.log("Document(shop) successfully written!");
-            document.getElementById("addShopModal-alert").textContent = shopName + " - Shop Added!";
+            document.getElementById("addShopModal-alert").textContent =
+              shopName + " - Shop Added!";
           })
           .catch((error) => {
             console.error("Error writing document: ", error);
@@ -484,4 +484,125 @@ function addShop(){
       document.getElementById("addShopModal-alert").textContent =
         "Error Occured, Try Again!";
     });
+}
+
+function setShop(shopName, shopPhone) {
+  document.getElementById("customer-name").textContent = shopName;
+  document.getElementById("customer-ph").textContent = shopPhone;
+  customerAvl = true;
+  var docRef = db.collection("shops").doc(shopName);
+
+  docRef
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        shopCustomer = doc.data();
+        document.getElementById("customer-prev-balance").textContent =
+          shopCustomer.balance;
+        document.getElementById(
+          "addItemToShopLink"
+        ).innerHTML = `<li class="nav-item">
+          <a class="nav-link nav-icon search-bar-toggle" href="handle-shop-items.html?shop=${shopName}">
+          <i class="bi bi-house-up-fill"></i>
+          </a>
+        </li>`;
+        alert(shopName + " Set");
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+      }
+    })
+    .catch((error) => {
+      console.log("Error getting document:", error);
+    });
+}
+
+async function addToItemModal(itemName) {
+  if (customerAvl == true) {
+    document.getElementById("shopItemName").value = itemName;
+  } else {
+    alert("Set the Shop!");
+  }
+  var itemExists;
+  var docRef = db.collection("shops").doc(shopCustomer.name);
+
+  await docRef
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        if (doc.data().hasOwnProperty("items")) {
+          console.log("Document data:", doc.data().items);
+          if (itemName in doc.data().items) {
+            console.log(
+              `Item '${itemName}' exists with value: ${
+                doc.data().items[itemName]
+              }`
+            );
+            document.getElementById("shopItemRate").value =
+              doc.data().items[itemName];
+            itemExists = true;
+          } else {
+            console.log(`Item does not exist in shop`);
+            itemExists = false;
+          }
+        } else {
+          console.log("No data called items!");
+        }
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+      }
+    })
+    .catch((error) => {
+      console.log("Error getting document:", error);
+    });
+
+  var itemRef = db.collection("items").doc(itemName);
+
+  await itemRef
+    .get()
+    .then((itemdoc) => {
+      if (itemdoc.exists) {
+        document.getElementById("shopItemRate").value =
+          itemdoc.data().wholesaleRate;
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+      }
+    })
+    .catch((error) => {
+      console.log("Error getting document:", error);
+    });
+}
+
+function addShopItem() {
+  itemName = document.getElementById("shopItemName").value;
+  itemRate = document.getElementById("shopItemRate").value;
+  var qty = document.getElementById("shopItemQty").value;
+  var id = itemName + "bill";
+  var price;
+
+  if (qty != "") {
+    price = qty * itemRate;
+    document.getElementById("table-bill-items").innerHTML += `
+    <tr id='${id}' class="bill-item">
+      <td>${itemName}</td>
+      <td>${itemRate}</td>
+      <td>${qty}</td>
+      <td>${price}</td>
+      <td class="delete-ico-bill">
+        <span class="text-danger"
+          ><a href="javascript:removeItemFromBill('${id}',${price})"><i class="bi bi-trash-fill"></i></a>
+        </span>
+      </td>
+    </tr>
+  `;
+    totalItems++;
+    totalAmount += price;
+    document.getElementById("total-items-bill").textContent = totalItems;
+    document.getElementById("total-amount-bill").textContent = totalAmount;
+    totalBalanceKept = totalAmount + prevBalance;
+    document.getElementById("customer-total-balance").textContent =
+      totalBalanceKept;
+  }
 }
