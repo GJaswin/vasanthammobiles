@@ -34,6 +34,7 @@ function getTimestamp() {
   return timestamp;
 }
 
+document.getElementById("stock-in-date").textContent = getTimestamp();
 
 function fetchByDate(dateString) {
 
@@ -70,6 +71,7 @@ function fetchByDate(dateString) {
                     <b> <span>${stocks[itemKeys[i]].item.name}</span> </b> <br>
                     <span>Quantity: ${stocks[itemKeys[i]].item.qty} </span> <br>
                     <span>Price: ${stocks[itemKeys[i]].item.price}</span> <br>
+                    <span>Rate: ${Number((stocks[itemKeys[i]].item.price/stocks[itemKeys[i]].item.qty).toFixed(2))} </span> <br>
                     <span>Seller: ${stocks[itemKeys[i]].seller}</span>
                   </p>
                   <p class="card-text">
@@ -109,20 +111,20 @@ function fetchByDate(dateString) {
 // }
 
 
-var docRef = db.collection("stockin").doc(getTimestamp());
-docRef.get().then((doc) => {
-  if (doc.exists) {
-    itemKeys = Object.keys(doc.data())
-    itemNo = itemKeys.length;
-    console.log(itemKeys, itemNo);
-    // console.log("Document data:", doc.data());
-    for (i = 0; i < itemNo; i++) {
-      console.log(doc.data()[itemKeys[i]]);
-    }
+// var docRef = db.collection("stockin").doc(getTimestamp());
+// docRef.get().then((doc) => {
+//   if (doc.exists) {
+//     itemKeys = Object.keys(doc.data())
+//     itemNo = itemKeys.length;
+//     console.log(itemKeys, itemNo);
+//     // console.log("Document data:", doc.data());
+//     for (i = 0; i < itemNo; i++) {
+//       console.log(doc.data()[itemKeys[i]]);
+//     }
 
-  }
-}
-);
+//   }
+// }
+// );
 
 docRef = db.collection("stockin").doc(getTimestamp());
 docRef.get().then((doc) => {
@@ -149,6 +151,7 @@ docRef.get().then((doc) => {
                     <b> <span>${stocks[itemKeys[i]].item.name}</span> </b> <br>
                     <span>Quantity: ${stocks[itemKeys[i]].item.qty} </span> <br>
                     <span>Price: ${stocks[itemKeys[i]].item.price}</span> <br>
+                    <span>Rate: ${Number((stocks[itemKeys[i]].item.price/stocks[itemKeys[i]].item.qty).toFixed(2))} </span> <br>
                     <span>Seller: ${stocks[itemKeys[i]].seller}</span>
                   </p>
                   <p class="card-text">
