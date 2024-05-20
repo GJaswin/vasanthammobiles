@@ -19,6 +19,8 @@ var database = firebase.database();
 
 // Showing the items for adding them to the Billing Section
 const dbRef = database.ref();
+
+
 dbRef
   .child("items")
   .get()
@@ -499,6 +501,11 @@ function setShop(shopName, shopPhone) {
         shopCustomer = doc.data();
         document.getElementById("customer-prev-balance").textContent =
           shopCustomer.balance;
+        totalItems = 0;
+        totalAmount = 0;
+        prevBalance = shopCustomer.balance;
+        totalBalanceKept = shopCustomer.balance + totalAmount;
+        document.getElementById("total-amount-bill").textContent = totalAmount,
         document.getElementById(
           "addItemToShopLink"
         ).innerHTML = `<li class="nav-item">
