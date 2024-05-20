@@ -63,8 +63,8 @@ dbRef
         `;
 
             });
-            // filterRows("");
-            // document.getElementById("totalPages").textContent = countPages();
+            filterRows("");
+            document.getElementById("totalPages").textContent = countPages();
         } else {
             console.log("No data available");
         }
