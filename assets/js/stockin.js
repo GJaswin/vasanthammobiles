@@ -48,18 +48,23 @@ function fetchByDate(dateString) {
   var docRef = db.collection("stockin").doc(fetchingDate);
   docRef.get().then((doc) => {
     if (doc.exists) {
-      itemKeys = Object.keys(doc.data())
+      itemKeys = Object.keys(doc.data());
       itemNo = itemKeys.length;
       stocks = doc.data();
       console.log(itemKeys, itemNo);
 
       for (i = 0; i < itemNo; i++) {
-        console.log(stocks[itemKeys[i]]);
 
-        document.getElementById("stocks").innerHTML += `<div class="col-lg-3">
+        var hr = itemKeys[i].slice(11, 13);
+        var min = itemKeys[i].slice(14, 16)
+        var sec = itemKeys[i].slice(17, 19)
+        var time = `${hr}:${min}:${sec}`;
+        console.log(time);
+
+        document.getElementById("stocks").innerHTML += `<div class="col-lg-3" id="${itemKeys[i]}">
               <div class="card stockItem">
                 <div class="card-body">
-                  <h5 class="card-title">${itemKeys[i].slice(0, 10)}</h5>
+                  <h5 class="card-title">${fetchingDate} ${time}</h5>
                   <h5 class="card-subtitle mb-2 mt-2 text-muted">Paid: ${stocks[itemKeys[i]].paid} </h5>
                   <p class="card-text">
                     <b> <span>${stocks[itemKeys[i]].item.name}</span> </b> <br>
@@ -68,8 +73,8 @@ function fetchByDate(dateString) {
                     <span>Seller: ${stocks[itemKeys[i]].seller}</span>
                   </p>
                   <p class="card-text">
-                    <a href="#" class="btn btn-primary">Edit</a>
-                    <a href="#" class="btn btn-primary">Delete</a>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#editStock" class="btn btn-primary" onclick="getItem('${itemKeys[i]}')">Edit</a>
+                    <a href="javascript:deleteItem('${itemKeys[i]}', '${stocks[itemKeys[i]].item.name}')" class="btn btn-primary">Delete</a>
                   </p>
                 </div>
               </div>
@@ -79,58 +84,6 @@ function fetchByDate(dateString) {
     }
   }
   );
-
-  // const dbRef = database.ref();
-  // dbRef
-  //   .child(`/stockin/${fetchingDate}`)
-  //   .get()
-  //   .then((snapshot) => {
-  //     if (snapshot.exists()) {
-  //       snapshot.forEach((childSnapshot) => {
-  //         const key = childSnapshot.key;
-  //         const details = childSnapshot.val();
-  //         const item = childSnapshot.val().item;
-
-  //         const data = {
-  //           stockName: item.name,
-  //           stockSeller: details.seller,
-  //           stockRate: item.rate,
-  //           stockQty: item.qty,
-  //           stockPrice: item.price,
-  //           stockBalance: details.balance,
-  //           stockPaid: details.paid
-
-  //         }
-  //         console.log(data);
-
-  //         document.getElementById("stocks").innerHTML += `<div class="col-lg-3">
-  //             <div class="card stockItem">
-  //               <div class="card-body">
-  //                 <h5 class="card-title">${key.slice(0, 10)}</h5>
-  //                 <h6 class="card-subtitle mb-2 mt-2 text-muted">Paid: ${data.stockPaid} </h6>
-  //                 <p class="card-text">
-  //                   <b> <span>${data.stockName}</span> </b> <br>
-  //                   <span>Quantity: ${data.stockQty} </span> <br>
-  //                   <span>Price: ${data.stockPrice}</span> <br>
-  //                   <span>Seller: ${data.stockSeller}</span>
-  //                 </p>
-  //                 <p class="card-text">
-  //                   <a href="#" class="btn btn-primary">Edit</a>
-  //                   <a href="#" class="btn btn-primary">Delete</a>
-  //                 </p>
-  //               </div>
-  //             </div>
-  //           </div>`
-
-  //       });
-  //       document.getElementById("totalPages").textContent = countPages();
-  //     } else {
-  //       console.log("No data available");
-  //     }
-  //   })
-  //   .catch((error) => {
-  //     console.error(error);
-  //   });
 
 }
 
@@ -172,21 +125,25 @@ docRef.get().then((doc) => {
 );
 
 docRef = db.collection("stockin").doc(getTimestamp());
-  docRef.get().then((doc) => {
-    if (doc.exists) {
-      itemKeys = Object.keys(doc.data())
-      itemNo = itemKeys.length;
-      stocks = doc.data();
-      console.log(itemKeys, itemNo);
+docRef.get().then((doc) => {
+  if (doc.exists) {
+    itemKeys = Object.keys(doc.data())
+    itemNo = itemKeys.length;
+    stocks = doc.data();
+    console.log(itemKeys, itemNo);
 
-      for (i = 0; i < itemNo; i++) {
-        console.log(stocks[itemKeys[i]]);
+    for (i = 0; i < itemNo; i++) {
+      var hr = itemKeys[i].slice(11, 13);
+      var min = itemKeys[i].slice(14, 16)
+      var sec = itemKeys[i].slice(17, 19)
+      var time = `${hr}:${min}:${sec}`;
+      console.log(stocks[itemKeys[i]]);
 
-        document.getElementById("stocks").innerHTML += `
-        <div class="col-lg-3">
+      document.getElementById("stocks").innerHTML += `
+        <div class="col-lg-3" id="${itemKeys[i]}">
               <div class="card stockItem">
                 <div class="card-body">
-                  <h5 class="card-title">${itemKeys[i].slice(0, 10)}</h5>
+                  <h5 class="card-title">${getTimestamp()} ${time}</h5>
                   <h5 class="card-subtitle mb-2 mt-2 text-muted">Paid: ${stocks[itemKeys[i]].paid} </h5>
                   <p class="card-text">
                     <b> <span>${stocks[itemKeys[i]].item.name}</span> </b> <br>
@@ -195,97 +152,86 @@ docRef = db.collection("stockin").doc(getTimestamp());
                     <span>Seller: ${stocks[itemKeys[i]].seller}</span>
                   </p>
                   <p class="card-text">
-                    <a href="#" class="btn btn-primary">Edit</a>
-                    <a href="javascript:deleteItem(${itemKeys[i]})" class="btn btn-primary">Delete</a>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#editStock" class="btn btn-primary" onclick="getItem('${itemKeys[i]}')">Edit</a>
+                    <a href="javascript:deleteItem('${itemKeys[i]}', '${stocks[itemKeys[i]].item.name}')" class="btn btn-primary">Delete</a>
                   </p>
                 </div>
               </div>
             </div>
             `
-      }
+    }
 
+  }
+}
+);
+
+function deleteItem(key, stockName) {
+  console.log(key, stockName);
+  var result = confirm("Are you sure you want to delete " + stockName + " ?");
+  if (result) {
+    db.collection("stockin").doc(key.slice(0, 10)).update({
+      [key]: firebase.firestore.FieldValue.delete()
+    }
+    ).then(
+      alert(`${stockName} deleted successfully`)
+    ).then(
+      document.getElementById(`${key}`).remove()
+    )
+      .catch(function (error) {
+        console.error("Error removing document: ", error);
+      });
+  }
+}
+var itemData;
+var itemKey;
+
+function getItem(key) {
+  itemKey = key;
+  console.log(key);
+  var docRef = db.collection('stockin').doc(key.slice(0, 10))
+
+  docRef.get().then((doc) => {
+    var itemDetails = doc.data()[key];
+    document.querySelector("#editStock .modal-title").innerHTML = `Edit Stock - ${itemDetails.item.name}`;
+    itemData = {
+      name: itemDetails.item.name,
+      cat: itemDetails.item.category,
+      qty: itemDetails.item.qty,
+      price: itemDetails.item.price,
+      time: itemDetails.item.time,
+      seller: itemDetails.seller,
+      paid: itemDetails.paid
+    }
+    document.querySelector("#editStock .iteminputs #stockName").value = itemData.name;
+    document.querySelector("#editStock .iteminputs #stockSeller").value = itemData.seller;
+    document.querySelector("#editStock .iteminputs #stockQty").value = itemData.qty;
+    document.querySelector("#editStock .iteminputs #stockPrice").value = itemData.price;
+    document.querySelector("#editStock .iteminputs #paid").checked = itemData.paid;
+    console.log(document.querySelector("#editStock .iteminputs #paid").checked)
+  }
+  )
+
+}
+
+function editItem() {
+
+  db.collection("stockin").doc(itemKey.slice(0, 10)).update({
+    [itemKey]: {
+      item: {
+        name: document.querySelector("#editStock .iteminputs #stockName").value,
+        qty: document.querySelector("#editStock .iteminputs #stockQty").value,
+        price: document.querySelector("#editStock .iteminputs #stockPrice").value,
+
+      },
+      paid: document.querySelector("#editStock .iteminputs #paid").checked,
+      seller: document.querySelector("#editStock .iteminputs #stockSeller").value
     }
   }
-  );
+  ).then(() => {
+    location.reload()
+  }
+  ).catch((error) => {
+    console.log("Error editing the item: ", error);
+  })
 
-// const dbRef = database.ref();
-// dbRef
-//   .child(`/stockin/${getTimestamp()}`)
-//   .get()
-//   .then((snapshot) => {
-//     if (snapshot.exists()) {
-//       snapshot.forEach((childSnapshot) => {
-//         const key = childSnapshot.key;
-//         const details = childSnapshot.val();
-//         const item = childSnapshot.val().item;
-
-//         const data = {
-//           stockName: item.name,
-//           stockSeller: details.seller,
-//           stockRate: item.rate,
-//           stockQty: item.qty,
-//           stockPrice: item.price,
-//           stockBalance: details.balance,
-//           stockPaid: details.paid
-
-//         }
-//         console.log(data);
-
-//         document.getElementById("stocks").innerHTML += `<div class="col-lg-3">
-//               <div class="card stockItem">
-//                 <div class="card-body">
-//                   <h5 class="card-title">${key.slice(0, 10)}</h5>
-//                   <h6 class="card-subtitle mb-2 mt-2 text-muted">Paid: ${data.stockPaid} </h6>
-//                   <p class="card-text">
-//                     <b> <span>${data.stockName}</span> </b> <br>
-//                     <span>Quantity: ${data.stockQty} </span> <br>
-//                     <span>Price: ${data.stockPrice}</span> <br>
-//                     <span>Seller: ${data.stockSeller}</span>
-//                   </p>
-//                   <p class="card-text">
-//                     <a href="#" class="btn btn-primary">Edit</a>
-//                     <a href="#" class="btn btn-primary">Delete</a>
-//                   </p>
-//                 </div>
-//               </div>
-//             </div>`
-
-//       });
-//       document.getElementById("totalPages").textContent = countPages();
-//     } else {
-//       console.log("No data available");
-//     }
-//   })
-//   .catch((error) => {
-//     console.error(error);
-//   });
-
-// function deleteItem(key, stockName) {
-//   var result = confirm("Are you sure you want to delete " + stockName + " ?");
-//   if (result) {
-//     db.collection("stockin")
-//       .doc(key)
-//       .delete()
-//       .then(function () {
-//         database
-//           .ref("stockin/" + key)
-//           .remove()
-//           .then(() => {
-//             database
-//               .ref("/")
-//               .update({
-//                 "item-count": firebase.database.ServerValue.increment(-1),
-//               })
-//               .then(() => {
-//                 document.getElementById(itemName).remove();
-//                 console.log(itemName + " Document successfully deleted!");
-//                 alert(itemName + " Deleted Successfully");
-//                 changePage(1);
-//               });
-//           });
-//       })
-//       .catch(function (error) {
-//         console.error("Error removing document docid: ", error);
-//       });
-//   }
-// }
+}

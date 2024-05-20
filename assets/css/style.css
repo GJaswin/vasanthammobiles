@@ -1321,18 +1321,18 @@ h6 {
   width: 100%;
 }
 
-#addToStock .iteminputs input, #returnToStorage .iteminputs input {
+#addToStock .iteminputs input, #returnToStorage .iteminputs input, #editStock .iteminputs input {
 padding: 10px;
 margin: 10px;
 }
 
-#addToStock .checkbox, #returnToStorage .checkbox {
+#addToStock .checkbox, #returnToStorage .checkbox, #editStock .checkbox{
   font-size: 16px;
   border: 2px solid #012970;
   border-radius: 5px;
 } 
 
-#addToStock .checkbox input[type="checkbox"], #returnToStorage .checkbox input[type="checkbox"] {
+#addToStock .checkbox input[type="checkbox"], #returnToStorage .checkbox input[type="checkbox"], #editStock .checkbox input[type="checkbox"] {
   width: 18px;
   height: 18px;
   border: 3px solid #012970;
