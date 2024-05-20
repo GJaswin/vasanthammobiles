@@ -1,415 +1,326 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
 
-    <title>Vasantham Mobiles | Add Item</title>
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
 
-    <!-- Favicons -->
-    <link href="assets/img/favicon.png" rel="icon" />
-    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon" />
+  <title>Vasantham Mobiles | Add Item</title>
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.gstatic.com" rel="preconnect" />
-    <link
-      href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
-      rel="stylesheet"
-    />
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon" />
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon" />
 
-    <!-- Vendor CSS Files -->
-    <link
-      href="assets/vendor/bootstrap/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      href="assets/vendor/bootstrap-icons/bootstrap-icons.css"
-      rel="stylesheet"
-    />
-    <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet" />
-    <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet" />
-    <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet" />
-    <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet" />
-    <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.gstatic.com" rel="preconnect" />
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+    rel="stylesheet" />
 
-    <!-- Template Main CSS File -->
-    <link href="assets/css/style.css" rel="stylesheet" />
-  </head>
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet" />
+  <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet" />
+  <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet" />
+  <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet" />
+  <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet" />
+  <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet" />
 
-  <body>
-    <main>
-      <div class="container">
-        <section class="section">
-          <div class="row align-items-top">
-            <div class="container">
-              <br />
-              <div class="row mb-3">
-                <div class="col-auto">
-                  <!-- Top Search Bar without button -->
-                  <div class="input-group">
-                    <input
-                      type="text"
-                      class="form-control"
-                      placeholder="Search items"
-                      onkeyup="filterRows(this.value)"
-                    />
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col">
-                  <div class="table-responsive">
-                    <table class="table table-bordered" id="productsTable">
-                      <thead>
-                        <tr>
-                          <th scope="col">Item</th>
-                          <th scope="col">Rate</th>
-                          <th scope="col"><i class="bi bi-pencil-fill"></i></th>
-                          <th scope="col">
-                            <i class="bi bi-bag-plus-fill"></i>
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody id="table-body-items"></tbody>
-                    </table>
-                  </div>
+  <!-- Template Main CSS File -->
+  <link href="assets/css/style.css" rel="stylesheet" />
+</head>
+
+<body>
+  <main>
+    <div class="container d-flex align-items-center justify-content-center">
+      <section class="section">
+        <div class="row align-items-top">
+          <div class="container">
+            <br />
+            <div class="row mb-3">
+              <div class="col-auto">
+                <!-- Top Search Bar without button -->
+                <div class="input-group">
+                  <input type="text" class="form-control" placeholder="Search items" onkeyup="filterRows(this.value)" />
                 </div>
               </div>
             </div>
-
-            <!-- "Total pages is 12" below the table -->
-            <div class="container">
-              <div class="row mt-3">
-                <div class="col-auto">
-                  <p>Total pages is <span id="totalPages"></span></p>
-                </div>
-              </div>
-              <!-- Bottom Search Bar -->
-              <div class="row">
-                <div class="col-auto">
-                  <div class="input-group">
-                    <input
-                      type="number"
-                      class="form-control"
-                      placeholder="Enter page"
-                      id="page-search-input"
-                    />
-                    <button
-                      class="btn btn-outline-primary"
-                      type="button"
-                      id="page-search-btn"
-                    >
-                      Search
-                    </button>
-                  </div>
+            <div class="row">
+              <div class="col">
+                <div class="table-responsive">
+                  <table class="table table-bordered" id="productsTable">
+                    <thead>
+                      <tr>
+                        <th scope="col">Item</th>
+                        <th scope="col">Rate</th>
+                        <th scope="col"><i class="bi bi-pencil-fill"></i></th>
+                        <th scope="col">
+                          <i class="bi bi-bag-plus-fill"></i>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody id="table-body-items"></tbody>
+                  </table>
                 </div>
               </div>
             </div>
-
-            <!-- Pagination -->
-            <div class="container">
-              <div class="row mt-3">
-                <div class="col">
-                  <nav aria-label="Page navigation example">
-                    <ul class="pagination">
-                      <li class="page-item">
-                        <a
-                          class="page-link"
-                          id="pagination-prev"
-                          href="javascript:prevPage()"
-                          >Previous</a
-                        >
-                      </li>
-                      <li class="page-item">
-                        <a
-                          class="page-link active"
-                          id="pagination-active-page"
-                          href="#"
-                          >1</a
-                        >
-                      </li>
-                      <li class="page-item">
-                        <a
-                          class="page-link"
-                          id="pagination-next"
-                          href="javascript:nextPage()"
-                          >Next</a
-                        >
-                      </li>
-                    </ul>
-                  </nav>
-                </div>
-              </div>
-            </div>
-            <!-- My Table Code Ends-->
           </div>
 
-          <!-- Modal -->
-          <div
-            class="modal fade"
-            id="addToStock"
-            tabindex="-1"
-            aria-labelledby="addToStock"
-            aria-hidden="true"
-          >
-            <div class="modal-dialog modal-dialog-centered">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h1 class="modal-title fs-5">Add to Stock</h1>
-                  <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                  ></button>
-                </div>
-                <div class="modal-body d-flex justify-content-center">
-                  <form
-                    class="col-10 d-flex flex-column justify-content-center p-3 iteminputs"
-                    action="javascript:addItem()"
-                  >
-                    <input
-                      type="text"
-                      name="seller"
-                      placeholder="Seller"
-                      id="stockSeller"
-                      required
-                    />
-                    <input
-                      type="number"
-                      name="qty"
-                      placeholder="Quantity"
-                      id="stockQty"
-                      required
-                    />
-                    <input
-                      type="number"
-                      name="price"
-                      placeholder="Price"
-                      id="stockPrice"
-                      required
-                    />
-                    <div class="d-flex align-items-center p-2 m-2 checkbox">
-                      <label for="paid">Paid?</label>
-                      <input
-                        type="checkbox"
-                        id="paid"
-                        name="paid"
-                        placeholder="Paid"
-                      />
-                    </div>
-                    <button type="submit" class="btn btn-primary">
-                      <a href="#"></a>Add Item +
-                    </button>
-                  </form>
-                </div>
-                <div class="modal-footer p-4">
-                  <button
-                    type="button"
-                    class="btn btn-secondary"
-                    data-bs-dismiss="modal"
-                  >
-                    Close
+          <!-- "Total pages is 12" below the table -->
+          <div class="container">
+            <div class="row mt-3">
+              <div class="col-auto">
+                <p>Total pages is <span id="totalPages"></span></p>
+              </div>
+            </div>
+            <!-- Bottom Search Bar -->
+            <div class="row">
+              <div class="col-auto">
+                <div class="input-group">
+                  <input type="number" class="form-control" placeholder="Enter page" id="page-search-input" />
+                  <button class="btn btn-outline-primary" type="button" id="page-search-btn">
+                    Search
                   </button>
-                  <div class="col-12">
-                    <p class="small mb-0 text-success" id="alert-msg"></p>
-                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </section>
-      </div>
-    </main>
-    <!-- End #main -->
 
-    <a
-      href="#"
-      class="back-to-top d-flex align-items-center justify-content-center"
-      ><i class="bi bi-arrow-up-short"></i
-    ></a>
+          <!-- Pagination -->
+          <div class="container">
+            <div class="row mt-3">
+              <div class="col">
+                <nav aria-label="Page navigation example">
+                  <ul class="pagination">
+                    <li class="page-item">
+                      <a class="page-link" id="pagination-prev" href="javascript:prevPage()">Previous</a>
+                    </li>
+                    <li class="page-item">
+                      <a class="page-link active" id="pagination-active-page" href="#">1</a>
+                    </li>
+                    <li class="page-item">
+                      <a class="page-link" id="pagination-next" href="javascript:nextPage()">Next</a>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+            </div>
+          </div>
+          <!-- My Table Code Ends-->
+        </div>
 
-    <!-- Vendor JS Files -->
-    <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
-    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/vendor/chart.js/chart.umd.js"></script>
-    <script src="assets/vendor/echarts/echarts.min.js"></script>
-    <script src="assets/vendor/quill/quill.min.js"></script>
-    <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
-    <script src="assets/vendor/tinymce/tinymce.min.js"></script>
+        <!-- Modal -->
+        <div class="modal fade" id="addToStock" tabindex="-1" aria-labelledby="addToStock" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5">Add to Stock</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body d-flex justify-content-center">
+                <form class="col-10 d-flex flex-column justify-content-center p-3 iteminputs"
+                  action="javascript:addItem()">
+                  <input type="text" name="seller" placeholder="Seller" id="stockSeller" required />
+                  <input type="number" name="qty" placeholder="Quantity" id="stockQty" required />
+                  <input type="number" name="price" placeholder="Price" id="stockPrice" required />
+                  <div class="d-flex align-items-center p-2 m-2 checkbox">
+                    <label for="paid">Paid?</label>
+                    <input type="checkbox" id="paid" name="paid" placeholder="Paid" />
+                  </div>
+                  <button type="submit" class="btn btn-primary">
+                    <a href="#"></a>Add Item +
+                  </button>
+                </form>
+              </div>
+              <div class="modal-footer p-4">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                  Close
+                </button>
+                <div class="col-12">
+                  <p class="small mb-0 text-success" id="alert-msg"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+  <!-- End #main -->
 
-    <!-- Template Main JS File -->
-    <script src="assets/js/main.js"></script>
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+      class="bi bi-arrow-up-short"></i></a>
 
-    <!-- <script>
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/chart.js/chart.umd.js"></script>
+  <script src="assets/vendor/echarts/echarts.min.js"></script>
+  <script src="assets/vendor/quill/quill.min.js"></script>
+  <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
+  <script src="assets/vendor/tinymce/tinymce.min.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="assets/js/main.js"></script>
+
+  <!-- <script>
       const form = document.getElementById("add-item-form");
       form.addEventListener("submit", function (event) {
         event.preventDefault();
       });
     </script> -->
-    <script
-      defer
-      src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"
-    ></script>
+  <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 
-    <script
-      defer
-      src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"
-    ></script>
-    <script
-      defer
-      src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"
-    ></script>
-    <script
-      defer
-      src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"
-    ></script>
+  <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-    <script defer src="assets/js/add-stocks.js"></script>
-    <script>
-      function filterRows(searchTerm) {
-        var filter = searchTerm.toUpperCase();
-        var table = document.getElementById("productsTable");
-        var tbody = table.getElementsByTagName("tbody")[0]; // Get the tbody element
-        var trs = tbody.getElementsByTagName("tr");
+  <script defer src="assets/js/add-stocks.js"></script>
+  <script>
+    function filterRows(searchTerm) {
+      var filter = searchTerm.toUpperCase();
+      var table = document.getElementById("productsTable");
+      var tbody = table.getElementsByTagName("tbody")[0]; // Get the tbody element
+      var trs = tbody.getElementsByTagName("tr");
 
-        var visibleRows = 0; // Counter for visible rows
-        var rowsPerPage = 30; // Number of rows to display per page
-        for (var i = 0; i < trs.length; i++) {
-          var tds = trs[i].getElementsByTagName("td");
-          var found = false;
-          for (var j = 0; j < tds.length; j++) {
-            var txtValue = tds[j].textContent || tds[j].innerText;
-            if (txtValue.toUpperCase().indexOf(filter) > -1) {
-              found = true;
-              break;
-            }
-          }
-          if (found) {
-            trs[i].style.display = ""; // Show the row if found
-            visibleRows++;
-          } else {
-            trs[i].style.display = "none"; // Hide the row if not found
-          }
-
-          // Show only rows up to the page limit
-          if (visibleRows >= rowsPerPage) {
+      var visibleRows = 0; // Counter for visible rows
+      var rowsPerPage = 30; // Number of rows to display per page
+      for (var i = 0; i < trs.length; i++) {
+        var tds = trs[i].getElementsByTagName("td");
+        var found = false;
+        for (var j = 0; j < tds.length; j++) {
+          var txtValue = tds[j].textContent || tds[j].innerText;
+          if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            found = true;
             break;
           }
         }
+        if (found) {
+          trs[i].style.display = ""; // Show the row if found
+          visibleRows++;
+        } else {
+          trs[i].style.display = "none"; // Hide the row if not found
+        }
 
-        if (searchTerm == "") {
-          changePage(1);
+        // Show only rows up to the page limit
+        if (visibleRows >= rowsPerPage) {
+          break;
         }
       }
 
-      curPage = 1;
-
-      function countPages() {
-        var table = document.getElementById("productsTable");
-        var tbody = table.getElementsByTagName("tbody")[0];
-        var trs = tbody.getElementsByTagName("tr");
-        var rowsPerPage = 3; // Number of rows to display per page
-        var totalPages = Math.ceil(trs.length / rowsPerPage); // Calculate total number of pages
-        return totalPages;
+      if (searchTerm == "") {
+        changePage(1);
       }
+    }
 
-      // Pagination function
-      function paginateTable(pageNum) {
-        var table = document.getElementById("productsTable");
-        var tbody = table.getElementsByTagName("tbody")[0];
-        var trs = tbody.getElementsByTagName("tr");
-        var rowsPerPage = 3; // Number of rows to display per page
-        var startIndex = (pageNum - 1) * rowsPerPage;
-        var endIndex = startIndex + rowsPerPage;
+    curPage = 1;
 
-        for (var i = 0; i < trs.length; i++) {
-          if (i >= startIndex && i < endIndex) {
-            trs[i].style.display = ""; // Show rows within the page range
-          } else {
-            trs[i].style.display = "none"; // Hide rows beyond the page range
-          }
+    function countPages() {
+      var table = document.getElementById("productsTable");
+      var tbody = table.getElementsByTagName("tbody")[0];
+      var trs = tbody.getElementsByTagName("tr");
+      var rowsPerPage = 3; // Number of rows to display per page
+      var totalPages = Math.ceil(trs.length / rowsPerPage); // Calculate total number of pages
+      return totalPages;
+    }
+
+    // Pagination function
+    function paginateTable(pageNum) {
+      var table = document.getElementById("productsTable");
+      var tbody = table.getElementsByTagName("tbody")[0];
+      var trs = tbody.getElementsByTagName("tr");
+      var rowsPerPage = 3; // Number of rows to display per page
+      var startIndex = (pageNum - 1) * rowsPerPage;
+      var endIndex = startIndex + rowsPerPage;
+
+      for (var i = 0; i < trs.length; i++) {
+        if (i >= startIndex && i < endIndex) {
+          trs[i].style.display = ""; // Show rows within the page range
+        } else {
+          trs[i].style.display = "none"; // Hide rows beyond the page range
         }
       }
+    }
 
-      // Function to handle pagination button clicks
-      function changePage(pageNum) {
-        totalPages = countPages();
-        if (pageNum == 1) {
-          paginateTable(pageNum);
-          curPage = pageNum;
-          document.getElementById("pagination-active-page").textContent =
-            pageNum;
-          document.getElementById("pagination-prev").classList.add("disabled");
-          if (totalPages > 1) {
-            document
-              .getElementById("pagination-next")
-              .classList.remove("disabled");
-          } else {
-            document
-              .getElementById("pagination-next")
-              .classList.add("disabled");
-          }
-        } else if (pageNum < totalPages) {
-          paginateTable(pageNum);
-          curPage = pageNum;
-          document.getElementById("pagination-active-page").textContent =
-            pageNum;
-          document
-            .getElementById("pagination-prev")
-            .classList.remove("disabled");
+    // Function to handle pagination button clicks
+    function changePage(pageNum) {
+      totalPages = countPages();
+      if (pageNum == 1) {
+        paginateTable(pageNum);
+        curPage = pageNum;
+        document.getElementById("pagination-active-page").textContent =
+          pageNum;
+        document.getElementById("pagination-prev").classList.add("disabled");
+        if (totalPages > 1) {
           document
             .getElementById("pagination-next")
             .classList.remove("disabled");
-        } else if (pageNum == totalPages) {
-          paginateTable(pageNum);
-          curPage = pageNum;
-          document.getElementById("pagination-active-page").textContent =
-            pageNum;
-          document.getElementById("pagination-next").classList.add("disabled");
+        } else {
           document
-            .getElementById("pagination-prev")
-            .classList.remove("disabled");
+            .getElementById("pagination-next")
+            .classList.add("disabled");
         }
+      } else if (pageNum < totalPages) {
+        paginateTable(pageNum);
+        curPage = pageNum;
+        document.getElementById("pagination-active-page").textContent =
+          pageNum;
+        document
+          .getElementById("pagination-prev")
+          .classList.remove("disabled");
+        document
+          .getElementById("pagination-next")
+          .classList.remove("disabled");
+      } else if (pageNum == totalPages) {
+        paginateTable(pageNum);
+        curPage = pageNum;
+        document.getElementById("pagination-active-page").textContent =
+          pageNum;
+        document.getElementById("pagination-next").classList.add("disabled");
+        document
+          .getElementById("pagination-prev")
+          .classList.remove("disabled");
       }
+    }
 
-      function nextPage() {
-        changePage(++curPage);
+    function nextPage() {
+      changePage(++curPage);
+    }
+
+    function prevPage() {
+      changePage(--curPage);
+    }
+
+    // Initial pagination when the page loads
+    document.addEventListener("DOMContentLoaded", function () {
+      paginateTable(1); // Show the first page initially
+      totalPages = countPages();
+      document.getElementById("totalPages").textContent = totalPages;
+      if (
+        parseInt(
+          document.getElementById("pagination-active-page").textContent,
+          10
+        ) == 1
+      ) {
+        document.getElementById("pagination-prev").classList.add("disabled");
+      } else if (
+        parseInt(
+          document.getElementById("pagination-active-page").textContent,
+          10
+        ) == countPages
+      ) {
+        document.getElementById("pagination-next").classList.add("disabled");
       }
+    });
 
-      function prevPage() {
-        changePage(--curPage);
-      }
-
-      // Initial pagination when the page loads
-      document.addEventListener("DOMContentLoaded", function () {
-        paginateTable(1); // Show the first page initially
-        totalPages = countPages();
-        document.getElementById("totalPages").textContent = totalPages;
-        if (
-          parseInt(
-            document.getElementById("pagination-active-page").textContent,
-            10
-          ) == 1
-        ) {
-          document.getElementById("pagination-prev").classList.add("disabled");
-        } else if (
-          parseInt(
-            document.getElementById("pagination-active-page").textContent,
-            10
-          ) == countPages
-        ) {
-          document.getElementById("pagination-next").classList.add("disabled");
-        }
+    document
+      .getElementById("page-search-btn")
+      .addEventListener("click", function () {
+        changePage(
+          parseInt(document.getElementById("page-search-input").value, 10)
+        );
       });
+  </script>
+</body>
 
-      document
-        .getElementById("page-search-btn")
-        .addEventListener("click", function () {
-          changePage(
-            parseInt(document.getElementById("page-search-input").value, 10)
-          );
-        });
-    </script>
-  </body>
 </html>

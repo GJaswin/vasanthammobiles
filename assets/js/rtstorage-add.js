@@ -45,19 +45,22 @@ dbRef
                 const key = childSnapshot.key;
                 const value = childSnapshot.val();
 
-
-
-                document.getElementById("rtstorage-items").innerHTML += `
-                        <tr id='${key}'>
-                          <td>${key}</td>
-                          <td>${value}</td>
-                          <td>
-                            <span class="text-primary">
-                            <a href="#" data-bs-toggle="modal" data-bs-target="#returnToStorage" onclick="getItem('${key}', '${value}')"><i class="bi bi-plus-circle-fill"></i></a>
-                            </span>
-                          </td>
-                        </tr>
-      `;
+                document.getElementById("table-body-items").innerHTML += `
+                          <tr id='${key}'>
+                            <td>${key}</td>
+                            <td>${value}</td>
+                            <td>
+                              <span class="text-primary"
+                                ><a href="update-item.html?item=${key}"><i class="bi bi-pencil-fill"></i
+                              ></a></span>
+                            </td>
+                            <td>
+                              <span class="text-danger"
+                                ><a data-bs-toggle="modal" data-bs-target="#returnToStorage" href="#" onclick="getItem('${key}','${value}')"><i class="bi bi-bag-plus-fill"></i></a>
+                              </span>
+                            </td>
+                          </tr>
+        `;
 
             });
             // filterRows("");
