@@ -32,6 +32,7 @@ const firebaseConfig = {
       if (doc.exists) {
         // Document data exists, you can access it using doc.data()
         data = doc.data();
+        updatedData = doc.data();
         document.getElementById("shop-name").value = data.name;
         document.getElementById("shop-phone").value = data.phone;
       } else {
@@ -47,7 +48,9 @@ const firebaseConfig = {
       return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
     });
   }
-  
+
+  var updatedData;
+
   function updateItem() {
     var shopName = capitalize(
       document.getElementById("shop-name").value.trim().toLowerCase()
@@ -73,19 +76,12 @@ const firebaseConfig = {
                 shopName + " - Shop Updated!";
             });
         } else {
+          updatedData.name = shopName;
+          updatedData.phone = shopPhone;
+          console.log("Updated Data: ",updatedData)
           db.collection("shops")
             .doc(shopName)
-            .set({
-              name: shopName,
-              phone: shopPhone,
-              balance: data.balance,
-              lastBillItems: data.lastBillItems,
-              lastBillRate: data.lastBillRate,
-              lastBillQty: data.lastBillQty,
-              lastBillPrice: data.lastBillPrice,
-              items: data.items,
-              payments: data.payments,
-            })
+            .set(updatedData)
             .then(() => {
               database
                 .ref("/shops")

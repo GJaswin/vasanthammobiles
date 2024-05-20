@@ -69,7 +69,7 @@ dbRef
                             <td>${value}</td>
                             <td>
                               <span class="text-primary"
-                                ><a href="handle-shop-items.html?shop=${key}"><i class="bi bi-pencil-fill"></i
+                                ><a href="update-shop.html?shop=${key}"><i class="bi bi-pencil-fill"></i
                               ></a></span>
                             </td>
                             <td>
@@ -304,14 +304,14 @@ async function printPageArea() {
         var itemsRef = db.collection("items");
         for (let i = 0; i < items.length; i++) {
           itemsRef.doc(items[i]).update({
-            stock: firebase.firestore.FieldValue.increment(itemsQty[i]),
+            stock: firebase.firestore.FieldValue.increment(-itemsQty[i]),
           });
         }
       })
       .then(() => {
-        var customerRef = db.collection("customers");
+        var customerRef = db.collection("shops");
         customerRef
-          .doc(buyerPh)
+          .doc(buyerName)
           .update({
             balance: totalBalanceKept - customerPaying,
             //purchase: firebase.firestore.FieldValue.arrayUnion(billid),
@@ -544,27 +544,25 @@ async function addToItemModal(itemName) {
           } else {
             console.log(`Item does not exist in shop`);
             itemExists = false;
+            var itemRef = db.collection("items").doc(itemName);
+            itemRef
+              .get()
+              .then((itemdoc) => {
+                if (itemdoc.exists) {
+                  document.getElementById("shopItemRate").value =
+                    itemdoc.data().wholesaleRate;
+                } else {
+                  // doc.data() will be undefined in this case
+                  console.log("No such document!");
+                }
+              })
+              .catch((error) => {
+                console.log("Error getting document:", error);
+              });
           }
         } else {
           console.log("No data called items!");
         }
-      } else {
-        // doc.data() will be undefined in this case
-        console.log("No such document!");
-      }
-    })
-    .catch((error) => {
-      console.log("Error getting document:", error);
-    });
-
-  var itemRef = db.collection("items").doc(itemName);
-
-  await itemRef
-    .get()
-    .then((itemdoc) => {
-      if (itemdoc.exists) {
-        document.getElementById("shopItemRate").value =
-          itemdoc.data().wholesaleRate;
       } else {
         // doc.data() will be undefined in this case
         console.log("No such document!");

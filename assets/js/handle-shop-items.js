@@ -67,14 +67,21 @@ shopRef
       document.getElementById("shopPhone").textContent = shopData.phone;
       if (doc.data().hasOwnProperty("items")) {
         Object.entries(shopData.items).forEach(([key, value]) => {
+          var mainid = key + "shop";
+          var priceid = key + "price";
           document.getElementById("table-body-shop-items").innerHTML += `
-            <tr>
+            <tr id='${mainid}'>
                 <td>${key}</td>
-                <td>${value}</td>
+                <td id='${priceid}'>${value}</td>
                 <td>
                     <span class="text-danger"
                     ><a data-bs-toggle="modal"
                     data-bs-target="#updateShopItem" onclick="javascript:sendDataUIM('${key}','${value}')"><i class="bi bi-pencil-fill"></i></a>
+                    </span>
+                </td>
+                <td>
+                    <span class="text-danger"
+                    ><a href="javascript:deleteShopItem('${key}')"><i class="bi bi-trash-fill"></i></a>
                     </span>
                 </td>
             </tr>                
@@ -83,7 +90,7 @@ shopRef
       } else {
         document.getElementById("table-body-shop-items").innerHTML = `
             <tr>
-                <td colspan='3'>No items</td>
+                <td colspan='4'>No items</td>
             </tr>
             `;
       }
@@ -121,7 +128,27 @@ function addShopItem() {
             } else {
               let updateObject = {};
               updateObject[`items.${itemName}`] = itemRate;
-              docRef.update(updateObject);
+              docRef.update(updateObject).then(() => {
+                var mainid = itemName + "shop";
+                var priceid = itemName + "price";
+                document.getElementById("table-body-shop-items").innerHTML += `
+                <tr id='${mainid}'>
+                    <td>${itemName}</td>
+                    <td id='${priceid}'>${itemRate}</td>
+                    <td>
+                        <span class="text-danger"
+                        ><a data-bs-toggle="modal"
+                        data-bs-target="#updateShopItem" onclick="javascript:sendDataUIM('${itemName}','${itemRate}')"><i class="bi bi-pencil-fill"></i></a>
+                        </span>
+                    </td>
+                    <td>
+                        <span class="text-danger"
+                        ><a href="javascript:deleteShopItem('${itemName}')"><i class="bi bi-trash-fill"></i></a>
+                        </span>
+                    </td>
+                </tr>                
+            `;
+              });
             }
           } else {
             console.log("No data called items!");
@@ -137,9 +164,25 @@ function addShopItem() {
                 { merge: true }
               )
               .then(() => {
+                var mainid = itemName + "shop";
+                var priceid = itemName + "price";
                 document.getElementById("table-body-shop-items").innerHTML = `
-                
-                `
+                <tr id='${mainid}'>
+                    <td>${itemName}</td>
+                    <td id='${priceid}'>${itemRate}</td>
+                    <td>
+                        <span class="text-danger"
+                        ><a data-bs-toggle="modal"
+                        data-bs-target="#updateShopItem" onclick="javascript:sendDataUIM('${itemName}','${itemRate}')"><i class="bi bi-pencil-fill"></i></a>
+                        </span>
+                    </td>
+                    <td>
+                        <span class="text-danger"
+                        ><a href="javascript:deleteShopItem('${itemName}')"><i class="bi bi-trash-fill"></i></a>
+                        </span>
+                    </td>
+                </tr>                
+            `;
               });
           }
         } else {
@@ -168,7 +211,26 @@ function updateShopItem() {
     let updateObject = {};
     updateObject[`items.${itemName}`] = itemRate;
     docRef.update(updateObject).then(() => {
-      alert("Updated - " + itemName + " - " + itemRate);
+      document.getElementById(itemName + "price").textContent = itemRate;
     });
+  }
+}
+
+function deleteShopItem(itemName) {
+  var result = confirm("Are you sure you want to delete " + itemName + " ?");
+  if (result) {
+    const docRef = db.collection("shops").doc(shopName);
+    let deleteObject = {};
+    deleteObject[`items.${itemName}`] = firebase.firestore.FieldValue.delete();
+    // Update the document to delete the specified item
+    docRef
+      .update(deleteObject)
+      .then(() => {
+        console.log("Item successfully deleted!");
+        document.getElementById(itemName + "shop").remove();
+      })
+      .catch((error) => {
+        console.error("Error deleting item: ", error);
+      });
   }
 }
