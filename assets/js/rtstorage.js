@@ -55,11 +55,17 @@ function fetchByDate(dateString) {
 
       for (i = 0; i < itemNo; i++) {
         console.log(stocks[itemKeys[i]]);
+        var hr = itemKeys[i].slice(11, 13);
+        var min = itemKeys[i].slice(14, 16)
+        var sec = itemKeys[i].slice(17, 19)
+        var time = `${hr}:${min}:${sec}`;
 
-        document.getElementById("stocks").innerHTML += `<div class="col-lg-3">
+        document.getElementById("stocks").innerHTML += `
+        <div class="col-lg-3" id="${itemKeys[i]}">
               <div class="card stockItem">
                 <div class="card-body">
-                  <h5 class="card-title">${itemKeys[i].slice(0, 10)}</h5>
+                  <h5 class="card-title">${getTimestamp()} ${time}</h5>
+                  <h5 class="card-subtitle mb-2 mt-2 text-muted">Paid: ${stocks[itemKeys[i]].paid} </h5>
                   <p class="card-text">
                     <b> <span>${stocks[itemKeys[i]].item.name}</span> </b> <br>
                     <span>Quantity: ${stocks[itemKeys[i]].item.qty} </span> <br>
@@ -67,12 +73,13 @@ function fetchByDate(dateString) {
                     <span>Seller: ${stocks[itemKeys[i]].seller}</span>
                   </p>
                   <p class="card-text">
-                    <a href="#" class="btn btn-primary">Edit</a>
-                    <a href="#" class="btn btn-primary">Delete</a>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#editStock" class="btn btn-primary" onclick="getItem('${itemKeys[i]}')">Edit</a>
+                    <a href="javascript:deleteItem('${itemKeys[i]}', '${stocks[itemKeys[i]].item.name}')" class="btn btn-primary">Delete</a>
                   </p>
                 </div>
               </div>
-            </div>`
+            </div>
+            `
       }
 
     }
@@ -98,21 +105,25 @@ docRef.get().then((doc) => {
 );
 
 docRef = db.collection("returntostorage").doc(getTimestamp());
-  docRef.get().then((doc) => {
-    if (doc.exists) {
-      itemKeys = Object.keys(doc.data())
-      itemNo = itemKeys.length;
-      stocks = doc.data();
-      console.log(itemKeys, itemNo);
+docRef.get().then((doc) => {
+  if (doc.exists) {
+    itemKeys = Object.keys(doc.data())
+    itemNo = itemKeys.length;
+    stocks = doc.data();
+    console.log(itemKeys, itemNo);
 
-      for (i = 0; i < itemNo; i++) {
-        console.log(stocks[itemKeys[i]]);
+    for (i = 0; i < itemNo; i++) {
+      console.log(stocks[itemKeys[i]]);
+      var hr = itemKeys[i].slice(11, 13);
+      var min = itemKeys[i].slice(14, 16)
+      var sec = itemKeys[i].slice(17, 19)
+      var time = `${hr}:${min}:${sec}`;
 
-        document.getElementById("stocks").innerHTML += `
-        <div class="col-lg-3">
+      document.getElementById("stocks").innerHTML += `
+        <div class="col-lg-3" id="${itemKeys[i]}">
               <div class="card stockItem">
                 <div class="card-body">
-                  <h5 class="card-title">${itemKeys[i].slice(0, 10)}</h5>
+                  <h5 class="card-title">${getTimestamp()} ${time}</h5>
                   <p class="card-text">
                     <b> <span>${stocks[itemKeys[i]].item.name}</span> </b> <br>
                     <span>Quantity: ${stocks[itemKeys[i]].item.qty} </span> <br>
@@ -120,15 +131,84 @@ docRef = db.collection("returntostorage").doc(getTimestamp());
                     <span>Seller: ${stocks[itemKeys[i]].seller}</span>
                   </p>
                   <p class="card-text">
-                    <a href="#" class="btn btn-primary">Edit</a>
-                    <a href="javascript:deleteItem(${itemKeys[i]})" class="btn btn-primary">Delete</a>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#editStock" class="btn btn-primary" onclick="getItem('${itemKeys[i]}')">Edit</a>
+                    <a href="javascript:deleteItem('${itemKeys[i]}', '${stocks[itemKeys[i]].item.name}')" class="btn btn-primary">Delete</a>
                   </p>
                 </div>
               </div>
             </div>
             `
-      }
+    }
 
+  }
+}
+);
+
+
+function deleteItem(key, stockName) {
+  console.log(key, stockName);
+  var result = confirm("Are you sure you want to delete " + stockName + " ?");
+  if (result) {
+    db.collection("returntostorage").doc(key.slice(0, 10)).update({
+      [key]: firebase.firestore.FieldValue.delete()
+    }
+    ).then(
+      alert(`${stockName} deleted successfully`)
+    ).then(
+      document.getElementById(`${key}`).remove()
+    )
+      .catch(function (error) {
+        console.error("Error removing document: ", error);
+      });
+  }
+}
+
+var itemData;
+var itemKey;
+
+function getItem(key) {
+  itemKey = key;
+  console.log(key);
+  var docRef = db.collection('returntostorage').doc(key.slice(0, 10))
+
+  docRef.get().then((doc) => {
+    var itemDetails = doc.data()[key];
+    document.querySelector("#editStock .modal-title").innerHTML = `Edit Stock - ${itemDetails.item.name}`;
+    itemData = {
+      name: itemDetails.item.name,
+      cat: itemDetails.item.category,
+      qty: itemDetails.item.qty,
+      price: itemDetails.item.price,
+      time: itemDetails.item.time,
+      seller: itemDetails.seller,
+    }
+    document.querySelector("#editStock .iteminputs #stockName").value = itemData.name;
+    document.querySelector("#editStock .iteminputs #stockSeller").value = itemData.seller;
+    document.querySelector("#editStock .iteminputs #stockQty").value = itemData.qty;
+    document.querySelector("#editStock .iteminputs #stockPrice").value = itemData.price;
+  }
+  )
+
+}
+
+function editItem() {
+
+  db.collection("returntostorage").doc(itemKey.slice(0, 10)).update({
+    [itemKey]: {
+      item: {
+        name: document.querySelector("#editStock .iteminputs #stockName").value,
+        qty: document.querySelector("#editStock .iteminputs #stockQty").value,
+        price: document.querySelector("#editStock .iteminputs #stockPrice").value,
+
+      },
+      seller: document.querySelector("#editStock .iteminputs #stockSeller").value
     }
   }
-  );
+  ).then(() => {
+    location.reload()
+  }
+  ).catch((error) => {
+    console.log("Error editing the item: ", error);
+  })
+
+}

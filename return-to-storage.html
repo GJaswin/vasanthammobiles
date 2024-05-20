@@ -264,6 +264,33 @@
             </div> -->
 
           </div>
+          <div class="modal fade" id="editStock" tabindex="-1" aria-labelledby="editStock" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5">Edit Stock</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body d-flex  justify-content-center">
+                  <form class="col-10 d-flex flex-column justify-content-center p-3 iteminputs"
+                    action="javascript:editItem()">
+
+                    <input type="text" name="name" placeholder="Name" id="stockName">
+                    <input type="text" name="seller" placeholder="Seller" id="stockSeller">
+                    <input type="number" name="qty" placeholder="Quantity" id="stockQty">
+                    <input type="number" name="price" placeholder="Price" id="stockPrice">
+                    <button type="submit" class="btn btn-primary"><a href="#"></a>Edit Item</button>
+                  </form>
+                </div>
+                <div class="modal-footer p-4  ">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <div class="col-12">
+                    <p class="small mb-0 text-success" id="alert-msg"></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- "Total pages is 12" below the table -->
