@@ -80,7 +80,7 @@ const firebaseConfig = {
           } else if(selectedOption() == "wholesale") {
             itemRate = doc.data().wholesaleRate;
             price = qty * itemRate;
-          } else{
+          } else if(selectedOption() == "master"){
             itemRate = doc.data().master;
             price = qty * itemRate;
           }

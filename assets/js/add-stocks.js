@@ -18,9 +18,6 @@ const db = firebase.firestore();
 
 var database = firebase.database();
 
-const queryString = window.location.search;
-const urlParams = new URLSearchParams(queryString);
-const itemKey = urlParams.get("item");
 
 function capitalize(string) {
   return string.replace(/\w\S*/g, function (txt) {
@@ -161,10 +158,6 @@ function addItem() {
         .doc(getTimestamp())
         .set(docData, { merge: true })
         .then(() => {
-          database
-            .ref(`/stockin/${getTimestamp()}`)
-            .update(docData)
-
           console.log("Document(Item) successfully written!");
           document.getElementById("alert-msg").textContent = stockName + " - Item Added!";
           alert(stockname + " - Stock added");
