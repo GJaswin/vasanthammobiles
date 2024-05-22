@@ -78,7 +78,7 @@ var database = firebase.database();
 //         });
 // }
 
-
+itemsTablehtml = ``;
 const dbRef = database.ref();
 dbRef
   .child("items")
@@ -88,24 +88,24 @@ dbRef
       snapshot.forEach((childSnapshot) => {
         const key = childSnapshot.key;
         const value = childSnapshot.val();
-
-        document.getElementById("table-body-items").innerHTML += `
-                        <tr id='${key}'>
-                          <td>${key}</td>
-                          <td>${value}</td>
-                          <td>
-                            <span class="text-primary"
-                              ><a href="update-item.html?item=${key}"><i class="bi bi-pencil-fill"></i
-                            ></a></span>
-                          </td>
-                          <td>
-                            <span class="text-danger"
-                              ><a href="javascript:deleteItem('${key}')"><i class="bi bi-trash-fill"></i
-                            ></a></span>
-                          </td>
-                        </tr>
-      `;
+        itemsTablehtml += `
+        <tr id='${key}'>
+          <td>${key}</td>
+          <td>${value}</td>
+          <td>
+            <span class="text-primary"
+              ><a href="update-item.html?item=${key}"><i class="bi bi-pencil-fill"></i
+            ></a></span>
+          </td>
+          <td>
+            <span class="text-danger"
+              ><a href="javascript:deleteItem('${key}')"><i class="bi bi-trash-fill"></i
+            ></a></span>
+          </td>
+        </tr>
+        `
       });
+      document.getElementById("table-body-items").innerHTML += itemsTablehtml;
       filterRows("");
       document.getElementById("totalPages").textContent = countPages();
     } else {
@@ -116,6 +116,25 @@ dbRef
     console.error(error);
   });
 
+// const dbRef = database.ref();
+// dbRef
+//   .child("items")
+//   .get()
+//   .then((snapshot) => {
+//     if (snapshot.exists()) {
+//       snapshot.forEach((childSnapshot) => {
+//         const key = childSnapshot.key;
+//         const value = childSnapshot.val();
+//         console.log("key: " + key + "   value: " + value);
+//       });
+//     } else {
+//       console.log("No data available");
+//     }
+//   })
+//   .catch((error) => {
+//     console.error(error);
+//   });
+  
 function deleteItem(itemName) {
   var result = confirm("Are you sure you want to delete " + itemName + " ?");
   if (result) {

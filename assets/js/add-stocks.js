@@ -167,6 +167,7 @@ function addItem() {
 
           console.log("Document(Item) successfully written!");
           document.getElementById("alert-msg").textContent = stockName + " - Item Added!";
+          alert(stockname + " - Stock added");
         })
         .catch((error) => {
           console.error("Error writing document: ", error);
