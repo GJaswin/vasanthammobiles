@@ -75,13 +75,33 @@
                           name="item-name"
                           class="form-control"
                           id="item-name"
+                          onkeyup="filterRows(this.value)"
                           required
                         />
                         <div class="invalid-feedback">
                           Please, Enter the Item!
                         </div>
                       </div>
-
+                      <section class="section">
+                        <div class="row align-items-top">
+                
+                          <div class="container">
+                           
+                            <div class="row">
+                              <div class="col">
+                                <div class="table-responsive">
+                                  <table class="table table-bordered" id="productsTable">
+                                    <tbody id="table-body-items">
+                                     
+                                    </tbody>
+                                  </table>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <!-- My Table Code Ends-->
+                        </div>
+                      </section>
                       <div class="col-12">
                         <label for="item-category" class="form-label"
                           >Item Category</label
@@ -192,5 +212,60 @@
     ></script>
 
     <script defer src="assets/js/add-item.js"></script>
+
+    <script>
+      function filterRows(searchTerm) {
+        var filter = searchTerm.toUpperCase();
+        var table = document.getElementById("productsTable");
+        var tbody = table.getElementsByTagName("tbody")[0]; // Get the tbody element
+        var trs = tbody.getElementsByTagName("tr");
+
+        var visibleRows = 0; // Counter for visible rows
+        var rowsPerPage = 3; // Number of rows to display per page
+        for (var i = 0; i < trs.length; i++) {
+          var tds = trs[i].getElementsByTagName("td");
+          var found = false;
+          for (var j = 0; j < tds.length; j++) {
+            var txtValue = tds[j].textContent || tds[j].innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+              found = true;
+              break;
+            }
+          }
+          if (found) {
+            trs[i].style.display = ""; // Show the row if found
+            visibleRows++;
+          } else {
+            trs[i].style.display = "none"; // Hide the row if not found
+          }
+
+          // Show only rows up to the page limit
+          if (visibleRows >= rowsPerPage) {
+            break;
+          }
+          if (searchTerm == "") {
+          paginateTableItems(1);
+        }
+        }
+      }
+
+      function paginateTableItems(pageNum) {
+        var table = document.getElementById("productsTable");
+        var tbody = table.getElementsByTagName("tbody")[0];
+        var trs = tbody.getElementsByTagName("tr");
+        var rowsPerPage = 3; // Number of rows to display per page
+        var startIndex = (pageNum - 1) * rowsPerPage;
+        var endIndex = startIndex + rowsPerPage;
+
+        for (var i = 0; i < trs.length; i++) {
+          if (i >= startIndex && i < endIndex) {
+            trs[i].style.display = ""; // Show rows within the page range
+          } else {
+            trs[i].style.display = "none"; // Hide rows beyond the page range
+          }
+        }
+      }
+    </script>
+
   </body>
 </html>

@@ -162,7 +162,6 @@
         </li>
         <!-- End Profile Page Nav -->
 
-
         <li class="nav-item">
           <a class="nav-link collapsed" href="customers.html">
             <!-- <i class="bi bi-person"></i> -->
@@ -190,7 +189,7 @@
             <span>Items</span>
           </a>
         </li>
-        <!-- End Profile Page Nav --> 
+        <!-- End Profile Page Nav -->
 
         <li class="nav-item">
           <a class="nav-link collapsed" href="notifications.html">
@@ -385,29 +384,49 @@
                   </div>
                 </form>
                 <div class="form-check">
-                  <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" value="retail" checked>
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="flexRadioDefault"
+                    id="flexRadioDefault1"
+                    value="retail"
+                    checked
+                  />
                   <label class="form-check-label" for="flexRadioDefault1">
                     Retail
                   </label>
                 </div>
                 <div class="form-check">
-                  <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" value="wholesale">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="flexRadioDefault"
+                    id="flexRadioDefault2"
+                    value="wholesale"
+                  />
                   <label class="form-check-label" for="flexRadioDefault2">
                     Wholesale
                   </label>
                 </div>
-                
+
                 <div class="form-check">
-                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault3" value="master">
-                    <label class="form-check-label" for="flexRadioDefault3">
-                      Master Wholesale
-                    </label>
-                  </div>
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="flexRadioDefault"
+                    id="flexRadioDefault3"
+                    value="master"
+                  />
+                  <label class="form-check-label" for="flexRadioDefault3">
+                    Master Wholesale
+                  </label>
+                </div>
               </div>
             </div>
             <hr />
+
             <div class="row" id="printing-bill">
-              <div id="dummy-print">
+              <div class="dummy-print">
                 <center>
                   <div id="print-bill-head">
                     <h2>Vasantham Mobiles</h2>
@@ -425,7 +444,7 @@
                 </div>
                 <div class="col">
                   <div class="table-responsive">
-                    <table class="table" id="billingTable">
+                    <table class="table table-bordered border-dark" id="billingTable">
                       <thead>
                         <tr id="billing-table-head">
                           <th scope="col">Item</th>
@@ -461,7 +480,7 @@
                   </p>
                   <p>Balance Kept: <span id="customer-balance-kept"></span></p>
                 </div>
-                <hr>
+                <hr />
               </div>
             </div>
             <div class="row mb-3">
@@ -488,14 +507,30 @@
               </div>
             </div>
             <center>
-              <button id="printBtn" class="btn btn-primary" onclick="printPageArea()">
-                Print
-              </button><br>
-              <a href="javascript:whatsappBill()" class="invisible" id="whatsappLink">Send the Whatsapp Bill</a>
+              <button
+                id="printBtn"
+                class="btn btn-primary"
+                onclick="dummyPrint()"
+              >
+                Print</button
+              ><br />
+              <a
+                href="javascript:whatsappBill()"
+                class="invisible"
+                id="whatsappLink"
+                >Send the Whatsapp Bill</a
+              >
             </center>
           </div>
 
           <!-- My Table Code Ends-->
+        </div>
+      </section>
+      <section>
+        <div class="row">
+          <div class="col">
+            <iframe width="100%" id="iframePrint"></iframe>
+          </div>
         </div>
       </section>
       <!-- Billing Section End -->

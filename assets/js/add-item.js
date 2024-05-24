@@ -30,14 +30,48 @@ function capitalize(string) {
 //      ->Item
 //      ->Rate
 //      ->Category
+// Showing the items for adding them to the Billing Section
+const dbRef = database.ref();
+itemsTablehtml = ``;
+dbRef
+  .child("items")
+  .get()
+  .then((snapshot) => {
+    if (snapshot.exists()) {
+      snapshot.forEach((childSnapshot) => {
+        const key = childSnapshot.key;
+        const value = childSnapshot.val();
+        itemsTablehtml += `
+        <tr id='${key}'>
+            <td>${key}</td>
+        </tr>
+        `;
+      });
+      document.getElementById("table-body-items").innerHTML = itemsTablehtml;
+      filterRows("");
+    } else {
+      console.log("No data available");
+    }
+  })
+  .catch((error) => {
+    console.error(error);
+  });
 
 function addItem() {
   var itemName = capitalize(
     document.getElementById("item-name").value.trim().toLowerCase()
   );
-  var itemCategory = capitalize(document.getElementById("item-category").value.trim().toLowerCase());
-  var retailRate = parseInt(document.getElementById("item-retail-rate").value,10);
-  var wholesaleRate = parseInt(document.getElementById("item-wholesale-rate").value,10);
+  var itemCategory = capitalize(
+    document.getElementById("item-category").value.trim().toLowerCase()
+  );
+  var retailRate = parseInt(
+    document.getElementById("item-retail-rate").value,
+    10
+  );
+  var wholesaleRate = parseInt(
+    document.getElementById("item-wholesale-rate").value,
+    10
+  );
   const docRef = db.collection("items").doc(itemName);
 
   docRef
@@ -63,14 +97,13 @@ function addItem() {
               .ref("/items")
               .update({ [itemName]: itemCategory })
               .then(() => {
-                database
-                  .ref("/")
-                  .update({
-                    "item-count": firebase.database.ServerValue.increment(1),
-                  });
+                database.ref("/").update({
+                  "item-count": firebase.database.ServerValue.increment(1),
+                });
               });
             console.log("Document(Item) successfully written!");
-            document.getElementById("alert-msg").textContent = itemName + " - Item Added!";
+            document.getElementById("alert-msg").textContent =
+              itemName + " - Item Added!";
           })
           .catch((error) => {
             console.error("Error writing document: ", error);
