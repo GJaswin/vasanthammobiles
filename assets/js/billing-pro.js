@@ -57,6 +57,42 @@ dbRef
     console.error(error);
   });
 
+shopsTablehtml = ``;
+dbRef
+  .child("shops")
+  .get()
+  .then((snapshot) => {
+    if (snapshot.exists()) {
+      snapshot.forEach((childSnapshot) => {
+        const key = childSnapshot.key;
+        const value = childSnapshot.val();
+        shopsTablehtml += `
+        <tr id='${key}'>
+        <td>${key}</td>
+        <td>${value}</td>
+        <td>
+          <span class="text-primary"
+            ><a href="update-shop.html?shop=${key}"><i class="bi bi-pencil-fill"></i
+          ></a></span>
+        </td>
+        <td>
+          <span class="text-danger"
+            ><a href="javascript:setShop('${key}','${value}')"><i class="bi bi-check2-circle"></i></a>
+          </span>
+        </td>
+      </tr>
+      `;
+      });
+      document.getElementById("table-body-shops").innerHTML = shopsTablehtml;
+      filterRowsShops("");
+    } else {
+      console.log("No data available");
+    }
+  })
+  .catch((error) => {
+    console.error(error);
+  });
+
 // Global Variables
 var totalItems = 0;
 var totalAmount = 0;
@@ -64,34 +100,41 @@ var totalBalanceKept = 0;
 var prevBalance = 0;
 var customerAvl = false;
 var whatsappLink;
+var shopCustomer;
 
 function itemToBill(itemName) {
-  var qty = prompt("Enter " + itemName + "'s Quantity", 1);
-  var id = itemName + "bill";
-  var price;
-  if (qty != null) {
-    var docRef = db.collection("items").doc(itemName);
-    docRef
-      .get()
-      .then((doc) => {
-        if (selectedOption() == "retail") {
-          itemRate = doc.data().retailRate;
-          price = qty * itemRate;
-        } else if (selectedOption() == "wholesale") {
-          itemRate = doc.data().wholesaleRate;
-          price = qty * itemRate;
-        } else if (selectedOption() == "master") {
-          itemRate = doc.data().master;
-          price = qty * itemRate;
-        }
-      })
-      .then(() => {
-        document.getElementById("table-bill-items").innerHTML += `
+  if (checkIdExists(itemName + "bill")) {
+    alert(itemName + " is already added!");
+  } else {
+    var qty = prompt("Enter " + itemName + "'s Quantity", 1);
+    var id = itemName + "bill";
+    var rateid = itemName + "rate";
+    var priceid = itemName + "price";
+
+    var price;
+    if (qty != null) {
+      var docRef = db.collection("items").doc(itemName);
+      docRef
+        .get()
+        .then((doc) => {
+          if (selectedOption() == "retail") {
+            itemRate = doc.data().retailRate;
+            price = qty * itemRate;
+          } else if (selectedOption() == "wholesale") {
+            itemRate = doc.data().wholesaleRate;
+            price = qty * itemRate;
+          } else if (selectedOption() == "master") {
+            itemRate = doc.data().master;
+            price = qty * itemRate;
+          }
+        })
+        .then(() => {
+          document.getElementById("table-bill-items").innerHTML += `
             <tr id='${id}' class="bill-item">
               <td>${itemName}</td>
-              <td>${itemRate}</td>
+              <td id='${rateid}' onclick="rateClickChange('${itemName}',${qty})">${itemRate}</td>
               <td>${qty}</td>
-              <td>${price}</td>
+              <td id='${priceid}' onclick="priceClickChange('${itemName}',${qty})">${price}</td>
               <td class="delete-ico-bill">
                 <span class="text-danger"
                   ><a href="javascript:removeItemFromBill('${id}',${price})"><i class="bi bi-trash-fill"></i></a>
@@ -99,14 +142,16 @@ function itemToBill(itemName) {
               </td>
             </tr>
           `;
-        totalItems++;
-        totalAmount += price;
-        document.getElementById("total-items-bill").textContent = totalItems;
-        document.getElementById("total-amount-bill").textContent = totalAmount;
-        totalBalanceKept = totalAmount + prevBalance;
-        document.getElementById("customer-total-balance").textContent =
-          totalBalanceKept;
-      });
+          totalItems++;
+          totalAmount += price;
+          document.getElementById("total-items-bill").textContent = totalItems;
+          document.getElementById("total-amount-bill").textContent =
+            totalAmount;
+          totalBalanceKept = totalAmount + prevBalance;
+          document.getElementById("customer-total-balance").textContent =
+            totalBalanceKept;
+        });
+    }
   }
 }
 
@@ -238,9 +283,7 @@ function whatsappBill() {
   totalBalanceKept = 0;
   prevBalance = 0;
   customerAvl = false;
-
-  document.getElementById("customer-name-input").value = "";
-  document.getElementById("customer-ph-input").value = "";
+  shopCustomer = '';
   document.getElementById("customer-name").textContent = "";
   document.getElementById("customer-ph").textContent = "";
   document.getElementById("customer-billid").textContent = "";
@@ -305,14 +348,12 @@ async function sendStockOut() {
     var buyerName = document.getElementById("customer-name").textContent;
     var buyerPh = document.getElementById("customer-ph").textContent;
     var sellerName = document.getElementById("seller-name").textContent;
-    var buyerAmount = parseInt(
-      document.getElementById("total-amount-bill").textContent,
-      10
-    );
-    var balanceKept = parseInt(
-      document.getElementById("customer-balance-kept").textContent,
-      10
-    );
+    var buyerAmount = parseFloat(
+      document.getElementById("total-amount-bill").textContent
+    ).toFixed(0);
+    var balanceKept = parseFloat(
+      document.getElementById("customer-balance-kept").textContent
+    ).toFixed(0);
     var paid = false;
     if (customerPaying >= buyerAmount) {
       paid = true;
@@ -343,6 +384,7 @@ async function sendStockOut() {
             buyerPhone: buyerPh,
             sellerName: sellerName,
             amount: buyerAmount,
+            customerPaid: customerPaying,
             items: items,
             qty: itemsQty,
             rate: itemsRate,
@@ -362,12 +404,8 @@ async function sendStockOut() {
         }
       })
       .then(() => {
-        var customerRef = db.collection("customers");
-        customerRef
-          .doc(buyerPh)
-          .update({
-            balance: totalBalanceKept - customerPaying,
-          })
+        var balance = totalBalanceKept - customerPaying;
+        addTransaction(buyerName,timeid,customerPaying,balance)
           .then(() => {
             let table = ``;
             for (i = 0; i < items.length; i++) {
@@ -388,12 +426,7 @@ async function sendStockOut() {
 }
 
 function dummyPrint(billid) {
-  // const elements = document.getElementsByClassName("delete-ico-bill");
-  // while (elements.length > 0) {
-  //   elements[0].parentNode.removeChild(elements[0]);
-  // }
-  // var cell = document.getElementById("change-colspan");
-  // cell.colSpan = 2;
+  document.title = billid;
 
   var preContent = `<!DOCTYPE html>
    <html lang="en">
@@ -429,4 +462,167 @@ function dummyPrint(billid) {
   previewFrame.onload = function () {
     previewFrame.contentWindow.print();
   };
+}
+
+function rateClickChange(id, qty) {
+  var rate = parseFloat(document.getElementById(id + "rate").textContent);
+  var price = parseFloat(document.getElementById(id + "price").textContent);
+  var Qty = parseInt(qty, 10);
+  var changed = parseFloat(prompt("Enter " + id + "'s New Rate", rate));
+  if (changed != null) {
+    totalAmount = totalAmount-price;
+    document.getElementById(id + "rate").textContent = Number.isInteger(changed)
+      ? changed.toFixed(0)
+      : changed.toFixed(2);
+    changedPrice = changed * Qty;
+    totalAmount += changedPrice;
+    document.getElementById("total-amount-bill").textContent = Number.isInteger(totalAmount)
+      ? totalAmount.toFixed(0)
+      : totalAmount.toFixed(2);
+    totalBalanceKept = totalAmount + prevBalance;
+    document.getElementById("customer-total-balance").textContent =
+      totalBalanceKept;
+    document.getElementById(id + "price").textContent = Number.isInteger(changedPrice)
+    ? changedPrice.toFixed(0)
+    : changedPrice.toFixed(2);;
+  }
+}
+
+function priceClickChange(id, qty) {
+  var price = parseFloat(document.getElementById(id + "price").textContent);
+  var Qty = parseInt(qty, 10);
+  var changed = parseFloat(prompt("Enter " + id + "'s New Price", price));
+  if (changed != null) {
+    totalAmount -= price;
+    totalAmount += changed;
+    document.getElementById("total-amount-bill").textContent = totalAmount;
+    totalBalanceKept = totalAmount + prevBalance;
+    document.getElementById("customer-total-balance").textContent =
+      totalBalanceKept;
+    document.getElementById(id + "price").textContent = changed;
+    document.getElementById(id + "rate").textContent = Number.isInteger(
+      changed / Qty
+    )
+      ? (changed / Qty).toFixed(0)
+      : (changed / Qty).toFixed(2);
+  }
+}
+
+function setShop(shopName, shopPhone) {
+  document.getElementById("customer-name").textContent = shopName;
+  document.getElementById("customer-ph").textContent = shopPhone;
+  customerAvl = true;
+  var docRef = db.collection("shops").doc(shopName);
+
+  docRef
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        shopCustomer = doc.data();
+        document.getElementById("customer-prev-balance").textContent =
+          shopCustomer.balance;
+        prevBalance = shopCustomer.balance;
+        totalBalanceKept = shopCustomer.balance + totalAmount;
+        document.getElementById("total-amount-bill").textContent = totalAmount,
+        document.getElementById("customer-total-balance").textContent = totalBalanceKept
+          alert(shopName + " Set");
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+      }
+    })
+    .catch((error) => {
+      console.log("Error getting document:", error);
+    });
+}
+
+function capitalize(string) {
+  return string.replace(/\w\S*/g, function (txt) {
+    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+  });
+}
+
+function addShop() {
+  var shopName = capitalize(
+    document.getElementById("shopName").value.trim().toLowerCase()
+  );
+  var shopPhone = parseInt(document.getElementById("shopNumber").value, 10);
+
+  const docRef = db.collection("shops").doc(shopName);
+
+  docRef
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        // Document exists, handle notification here
+
+        console.log("Shop already exists!");
+        document.getElementById("addShopModal-alert").textContent =
+          "Shop Already Exists!";
+      } else {
+        db.collection("shops")
+          .doc(shopName)
+          .set({
+            name: shopName,
+            phone: shopPhone,
+            balance: 0,
+            payment: [],
+          })
+          .then(() => {
+            database.ref("/shops").update({ [shopName]: shopPhone });
+            console.log("Document(shop) successfully written!");
+            document.getElementById("addShopModal-alert").textContent =
+              shopName + " - Shop Added!";
+          })
+          .catch((error) => {
+            console.error("Error writing document: ", error);
+            document.getElementById("addShopModal-alert").textContent =
+              "Error Occured, Try Again!";
+          });
+      }
+    })
+    .catch((error) => {
+      console.error("Error getting document: ", error);
+      document.getElementById("addShopModal-alert").textContent =
+        "Error Occured, Try Again!";
+    });
+}
+
+function checkIdExists(elementId) {
+  return document.getElementById(elementId) !== null;
+}
+
+
+function addTransaction(shopName,billid,amt,blnce) {
+  var shopRef = db.collection("shops").doc(shopName);
+
+  return db.runTransaction(function(transaction) {
+      return transaction.get(shopRef).then(function(doc) {
+          if (!doc.exists) {
+              throw "Document does not exist!";
+          }
+
+          var transactions = doc.data().payment || [];
+
+          // Check if the transactions array length is 20 or more
+          if (transactions.length >= 3) {
+              // Remove the oldest transaction (first element)
+              transactions.shift();
+          }
+
+          // Add the new transaction to the array
+          transactions.push({
+            [billid]: amt,
+          });
+
+          // Update the document with the modified transactions array
+          transaction.update(shopRef, { payment: transactions, balance: blnce });
+      });
+  }).then(function() {
+      console.log("Transaction added successfully.");
+      alert("Transaction added successfully");
+  }).catch(function(error) {
+      alert("Transaction Error");
+      console.error("Transaction failed: ", error);
+  });
 }

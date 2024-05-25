@@ -30,21 +30,21 @@ dbRef
         const key = childSnapshot.key;
         const value = childSnapshot.val();
         itemsTablehtml += `
-        <tr id='${key}'>
-          <td>${key}</td>
-          <td>${value}</td>
-          <td>
-          <span class="text-primary"
-              ><a href="update-item.html?item=${key}"><i class="bi bi-pencil-fill"></i
-          ></a></span>
-          </td>
-          <td>
-          <span class="text-danger"
-              ><a href="javascript:itemToBill('${key}')"><i class="bi bi-bag-plus-fill"></i></a>
-          </span>
-          </td>
-      </tr>
-          `;
+          <tr id='${key}'>
+            <td>${key}</td>
+            <td>${value}</td>
+            <td>
+            <span class="text-primary"
+                ><a href="update-item.html?item=${key}"><i class="bi bi-pencil-fill"></i
+            ></a></span>
+            </td>
+            <td>
+            <span class="text-danger"
+                ><a href="javascript:itemToBill('${key}')"><i class="bi bi-bag-plus-fill"></i></a>
+            </span>
+            </td>
+        </tr>
+            `;
       });
       document.getElementById("table-body-items").innerHTML = itemsTablehtml;
       filterRows("");
@@ -66,47 +66,55 @@ var customerAvl = false;
 var whatsappLink;
 
 function itemToBill(itemName) {
-  var qty = prompt("Enter " + itemName + "'s Quantity", 1);
-  var id = itemName + "bill";
-  var price;
-  if (qty != null) {
-    var docRef = db.collection("items").doc(itemName);
-    docRef
-      .get()
-      .then((doc) => {
-        if (selectedOption() == "retail") {
-          itemRate = doc.data().retailRate;
-          price = qty * itemRate;
-        } else if(selectedOption() == "wholesale") {
-          itemRate = doc.data().wholesaleRate;
-          price = qty * itemRate;
-        } else if(selectedOption() == "master"){
-          itemRate = doc.data().master;
-          price = qty * itemRate;
-        }
-      })
-      .then(() => {
-        document.getElementById("table-bill-items").innerHTML += `
-          <tr id='${id}' class="bill-item">
-            <td>${itemName}</td>
-            <td>${itemRate}</td>
-            <td>${qty}</td>
-            <td>${price}</td>
-            <td class="delete-ico-bill">
-              <span class="text-danger"
-                ><a href="javascript:removeItemFromBill('${id}',${price})"><i class="bi bi-trash-fill"></i></a>
-              </span>
-            </td>
-          </tr>
-        `;
-        totalItems++;
-        totalAmount += price;
-        document.getElementById("total-items-bill").textContent = totalItems;
-        document.getElementById("total-amount-bill").textContent = totalAmount;
-        totalBalanceKept = totalAmount + prevBalance;
-        document.getElementById("customer-total-balance").textContent =
-          totalBalanceKept;
-      });
+  if (checkIdExists(itemName + "bill")) {
+    alert(itemName + " is already added!");
+  } else {
+    var qty = prompt("Enter " + itemName + "'s Quantity", 1);
+    var id = itemName + "bill";
+    var rateid = itemName + "rate";
+    var priceid = itemName + "price";
+
+    var price;
+    if (qty != null) {
+      var docRef = db.collection("items").doc(itemName);
+      docRef
+        .get()
+        .then((doc) => {
+          if (selectedOption() == "retail") {
+            itemRate = doc.data().retailRate;
+            price = qty * itemRate;
+          } else if (selectedOption() == "wholesale") {
+            itemRate = doc.data().wholesaleRate;
+            price = qty * itemRate;
+          } else if (selectedOption() == "master") {
+            itemRate = doc.data().master;
+            price = qty * itemRate;
+          }
+        })
+        .then(() => {
+          document.getElementById("table-bill-items").innerHTML += `
+            <tr id='${id}' class="bill-item">
+              <td>${itemName}</td>
+              <td id='${rateid}' onclick="rateClickChange('${itemName}',${qty})">${itemRate}</td>
+              <td>${qty}</td>
+              <td id='${priceid}' onclick="priceClickChange('${itemName}',${qty})">${price}</td>
+              <td class="delete-ico-bill">
+                <span class="text-danger"
+                  ><a href="javascript:removeItemFromBill('${id}',${price})"><i class="bi bi-trash-fill"></i></a>
+                </span>
+              </td>
+            </tr>
+          `;
+          totalItems++;
+          totalAmount += price;
+          document.getElementById("total-items-bill").textContent = totalItems;
+          document.getElementById("total-amount-bill").textContent =
+            totalAmount;
+          totalBalanceKept = totalAmount + prevBalance;
+          document.getElementById("customer-total-balance").textContent =
+            totalBalanceKept;
+        });
+    }
   }
 }
 
@@ -123,6 +131,9 @@ function removeItemFromBill(id, price) {
 
 function searchCustomer() {
   var customerPhone = document.getElementById("customer-ph-input").value;
+  if (customerPhone.length != 10) {
+    alert("Enter 10 digit!");
+  }
   var docRef = db.collection("customers").doc(customerPhone);
   var customerName = document.getElementById("customer-name-input").value;
   docRef
@@ -174,13 +185,117 @@ function searchCustomer() {
     });
 }
 
-const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
-async function printPageArea() {
-  var customerPaying = prompt(
-    "Amount Payable by Customer",
-    document.getElementById("customer-pay-input").value
-  );
-  if (prompt != null && customerAvl == true) {
+function updateClock() {
+  const date = new Date();
+
+  // Get the individual components of the date and time
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Month is zero-indexed, so add 1
+  const day = date.getDate().toString().padStart(2, "0");
+  const hours = date.getHours().toString().padStart(2, "0");
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  const seconds = date.getSeconds().toString().padStart(2, "0");
+  const milliseconds = date.getMilliseconds().toString().padStart(3, "0");
+
+  // Determine if it's AM or PM
+  const period = hours >= 12 ? "PM" : "AM";
+
+  // Convert hours to 12-hour format
+  const formattedHours = (hours % 12 || 12).toString().padStart(2, "0"); // If hours is 0, convert to 12
+
+  // Construct the formatted date and time string
+  const formattedDate = `${day}-${month}-${year}`;
+  const formattedDateTime = `${day}-${month}-${year} ${formattedHours}:${minutes}:${seconds} ${period}`;
+  const formattedBillId = `${day}-${month}-${year}-${hours}-${minutes}-${seconds}`;
+
+  document.getElementById("customer-date-time").textContent = formattedDateTime;
+  document.getElementById("customer-billid").textContent = formattedBillId;
+
+  return [formattedDateTime, formattedBillId, formattedDate];
+}
+
+function amountCheck() {
+  payableAmt = document.getElementById("customer-pay-input").value;
+  if (payableAmt != "") {
+    document.getElementById("customer-currently-paid").textContent = payableAmt;
+    document.getElementById("customer-balance-kept").textContent =
+      totalBalanceKept - payableAmt;
+  } else {
+    document.getElementById("customer-pay-input").placeholder = "Amt Please!";
+  }
+}
+
+function whatsappBill() {
+  const itemElements = document.getElementsByClassName("bill-item");
+  while (itemElements.length > 0) {
+    itemElements[0].parentNode.removeChild(itemElements[0]);
+  }
+  totalItems = 0;
+  totalAmount = 0;
+  document.getElementById("total-items-bill").textContent = totalItems;
+  document.getElementById("total-amount-bill").textContent = totalAmount;
+  document.getElementById(
+    "billing-table-head"
+  ).innerHTML += `<th class="delete-ico-bill" scope="col">
+    <i class="bi bi-trash-fill"></i>
+    </th>`;
+
+  cell = document.getElementById("change-colspan");
+  cell.colSpan = 3;
+
+  totalBalanceKept = 0;
+  prevBalance = 0;
+  customerAvl = false;
+
+  document.getElementById("customer-name-input").value = "";
+  document.getElementById("customer-ph-input").value = "";
+  document.getElementById("customer-name").textContent = "";
+  document.getElementById("customer-ph").textContent = "";
+  document.getElementById("customer-billid").textContent = "";
+  document.getElementById("customer-date-time").textContent = "";
+  document.getElementById("customer-prev-balance").textContent = 0;
+  document.getElementById("customer-total-balance").textContent = 0;
+  document.getElementById("customer-currently-paid").textContent = 0;
+  document.getElementById("customer-balance-kept").textContent = 0;
+  document.getElementById("customer-pay-input").value = "";
+
+  document.getElementById("whatsappLink").classList.add("invisible");
+  document.getElementById("printBtn").classList.remove("disabled");
+  window.open(whatsappLink);
+}
+
+function selectedOption() {
+  // Get all radio buttons with the name "flexRadioDefault"
+  var radioButtons = document.getElementsByName("flexRadioDefault");
+
+  // Initialize a variable to store the value of the active radio button
+  var selectedValue;
+
+  // Loop through each radio button
+  for (var i = 0; i < radioButtons.length; i++) {
+    // Check if the current radio button is checked
+    if (radioButtons[i].checked) {
+      // If checked, store its value
+      selectedValue = radioButtons[i].value;
+      // Break the loop since we found the checked radio button
+      break;
+    }
+  }
+
+  return selectedValue;
+}
+
+async function sendStockOut() {
+  var customerPaying;
+  if (customerAvl == true) {
+    customerPaying = prompt(
+      "Amount Payable by Customer",
+      document.getElementById("customer-pay-input").value
+    );
+  } else {
+    alert("Enter Customer!");
+  }
+  if (customerPaying != null && customerAvl == true) {
     document.getElementById("customer-pay-input").value = customerPaying;
     amountCheck();
 
@@ -228,53 +343,29 @@ async function printPageArea() {
     var stockoutRef = db.collection("stockout");
 
     stockoutRef
-      .get(billid)
-      .then((doc) => {
-        if (doc.exists) {
-          console.log("Doc exists");
-          stockoutRef.doc(dateid).set(
-            {
-              [billid]: {
-                buyerName: buyerName,
-                buyerPhone: buyerPh,
-                sellerName: sellerName,
-                amount: buyerAmount,
-                items: items,
-                qty: itemsQty,
-                rate: itemsRate,
-                price: itemsPrice,
-                paid: paid,
-                time: timeid,
-              },
-            },
-            { merge: true }
-          );
-        } else {
-          console.log("Doesn't not exist");
-          stockoutRef.doc(dateid).set(
-            {
-              [billid]: {
-                buyerName: buyerName,
-                buyerPhone: buyerPh,
-                sellerName: sellerName,
-                amount: buyerAmount,
-                items: items,
-                qty: itemsQty,
-                rate: itemsRate,
-                price: itemsPrice,
-                paid: paid,
-                time: timeid,
-              },
-            },
-            { merge: true }
-          );
-        }
-      })
+      .doc(dateid)
+      .set(
+        {
+          [billid]: {
+            buyerName: buyerName,
+            buyerPhone: buyerPh,
+            sellerName: sellerName,
+            amount: buyerAmount,
+            items: items,
+            qty: itemsQty,
+            rate: itemsRate,
+            price: itemsPrice,
+            paid: paid,
+            time: timeid,
+          },
+        },
+        { merge: true }
+      )
       .then(() => {
         var itemsRef = db.collection("items");
         for (let i = 0; i < items.length; i++) {
           itemsRef.doc(items[i]).update({
-            stock: firebase.firestore.FieldValue.increment(itemsQty[i]),
+            stock: firebase.firestore.FieldValue.increment(-itemsQty[i]),
           });
         }
       })
@@ -284,7 +375,6 @@ async function printPageArea() {
           .doc(buyerPh)
           .update({
             balance: totalBalanceKept - customerPaying,
-            //purchase: firebase.firestore.FieldValue.arrayUnion(billid),
           })
           .then(() => {
             let table = ``;
@@ -301,127 +391,97 @@ async function printPageArea() {
             document.getElementById("customer-billid").textContent = billid;
           });
       });
+    dummyPrint(billid);
+  }
+}
 
-    await sleep(1000);
-    var printContent = document.getElementById("printing-bill").innerHTML;
-    var originalContent = document.body.innerHTML;
-    document.body.innerHTML = printContent;
-    window.print();
-    await sleep(1000);
-    document.body.innerHTML = originalContent;
-    const itemElements = document.getElementsByClassName("bill-item");
-    while (itemElements.length > 0) {
-      itemElements[0].parentNode.removeChild(itemElements[0]);
-    }
-    totalItems = 0;
-    totalAmount = 0;
-    document.getElementById("total-items-bill").textContent = totalItems;
+function dummyPrint(billid) {
+  document.title = billid;
+
+  var preContent = `<!DOCTYPE html>
+   <html lang="en">
+     <head>
+       <meta charset="utf-8" />
+       <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+       <title>${billid}</title>
+       <!-- Vendor CSS Files -->
+       <link
+         href="assets/vendor/bootstrap/css/bootstrap.min.css"
+         rel="stylesheet"
+   
+       <!-- Template Main CSS File -->
+       <link href="assets/css/style.css" rel="stylesheet" />
+     </head>
+   
+     <body>`;
+  var postContent = `<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script></body></html>`;
+  var iframe = preContent;
+  var contentDiv = document.getElementById("printing-bill");
+  var contentHTML = contentDiv.innerHTML;
+
+  // Remove id attributes using a regular expression
+  var modifiedHTML = contentHTML; //.replace(/ id="[^"]*"/g, "");
+
+  iframe += modifiedHTML;
+  // iframe += postContent
+  // Set the modified HTML as the srcdoc of the iframe
+  var previewFrame = document.getElementById("iframePrint");
+  previewFrame.srcdoc = iframe;
+
+  // Print the content of the iframe
+  previewFrame.onload = function () {
+    previewFrame.contentWindow.print();
+  };
+}
+
+function rateClickChange(id, qty) {
+  var rate = parseFloat(document.getElementById(id + "rate").textContent);
+  var price = parseFloat(document.getElementById(id + "price").textContent);
+  var Qty = parseInt(qty, 10);
+  var changed = parseFloat(prompt("Enter " + id + "'s New Rate", rate));
+  if (changed != null) {
+    totalAmount = totalAmount - price;
+    document.getElementById(id + "rate").textContent = Number.isInteger(changed)
+      ? changed.toFixed(0)
+      : changed.toFixed(2);
+    changedPrice = changed * Qty;
+    totalAmount += changedPrice;
+    document.getElementById("total-amount-bill").textContent = Number.isInteger(
+      totalAmount
+    )
+      ? totalAmount.toFixed(0)
+      : totalAmount.toFixed(2);
+    totalBalanceKept = totalAmount + prevBalance;
+    document.getElementById("customer-total-balance").textContent =
+      totalBalanceKept;
+    document.getElementById(id + "price").textContent = Number.isInteger(
+      changedPrice
+    )
+      ? changedPrice.toFixed(0)
+      : changedPrice.toFixed(2);
+  }
+}
+
+function priceClickChange(id, qty) {
+  var price = parseFloat(document.getElementById(id + "price").textContent);
+  var Qty = parseInt(qty, 10);
+  var changed = parseFloat(prompt("Enter " + id + "'s New Price", price));
+  if (changed != null) {
+    totalAmount -= price;
+    totalAmount += changed;
     document.getElementById("total-amount-bill").textContent = totalAmount;
-    document.getElementById(
-      "billing-table-head"
-    ).innerHTML += `<th class="delete-ico-bill" scope="col">
-  <i class="bi bi-trash-fill"></i>
-  </th>`;
-
-    cell = document.getElementById("change-colspan");
-    cell.colSpan = 3;
+    totalBalanceKept = totalAmount + prevBalance;
+    document.getElementById("customer-total-balance").textContent =
+      totalBalanceKept;
+    document.getElementById(id + "price").textContent = changed;
+    document.getElementById(id + "rate").textContent = Number.isInteger(
+      changed / Qty
+    )
+      ? (changed / Qty).toFixed(0)
+      : (changed / Qty).toFixed(2);
   }
 }
 
-// const date = new Date();
-
-// // Get day, month, and year components
-// const day = date.getDate().toString().padStart(2, "0"); // Ensure 2 digits with leading zero if necessary
-// const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Month is zero-indexed, so add 1
-// const year = date.getFullYear();
-
-// // Construct the formatted date string
-// const formattedDate = `${day}-${month}-${year}`;
-
-// console.log(formattedDate);
-
-// Create a new Date object
-
-function updateClock() {
-  const date = new Date();
-
-  // Get the individual components of the date and time
-  const year = date.getFullYear();
-  const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Month is zero-indexed, so add 1
-  const day = date.getDate().toString().padStart(2, "0");
-  const hours = date.getHours().toString().padStart(2, "0");
-  const minutes = date.getMinutes().toString().padStart(2, "0");
-  const seconds = date.getSeconds().toString().padStart(2, "0");
-  const milliseconds = date.getMilliseconds().toString().padStart(3, "0");
-
-  // Determine if it's AM or PM
-  const period = hours >= 12 ? "PM" : "AM";
-
-  // Convert hours to 12-hour format
-  const formattedHours = (hours % 12 || 12).toString().padStart(2, "0"); // If hours is 0, convert to 12
-
-  // Construct the formatted date and time string
-  const formattedDate = `${day}-${month}-${year}`;
-  const formattedDateTime = `${day}-${month}-${year} ${formattedHours}:${minutes}:${seconds} ${period}`;
-  const formattedBillId = `${day}-${month}-${year}-${hours}-${minutes}-${seconds}`;
-
-  document.getElementById("customer-date-time").textContent = formattedDateTime;
-  document.getElementById("customer-billid").textContent = formattedBillId;
-
-  return [formattedDateTime, formattedBillId, formattedDate];
-}
-
-function amountCheck() {
-  payableAmt = document.getElementById("customer-pay-input").value;
-  if (payableAmt != "") {
-    document.getElementById("customer-currently-paid").textContent = payableAmt;
-    document.getElementById("customer-balance-kept").textContent =
-      totalBalanceKept - payableAmt;
-  } else {
-    document.getElementById("customer-pay-input").placeholder = "Amt Please!";
-  }
-}
-// var docData = {
-//   [formattedDateTime]: {
-//     vendor: "Hello world!",
-//     paid: true,
-//     dateExample: firebase.firestore.FieldValue.serverTimestamp(),
-//     arrayExample: [5, 6, 7],
-//   },
-// };
-// db.collection("stockin")
-//   .doc(formattedDate)
-//   .set(docData)
-//   .then(() => {
-//     console.log("Document successfully written!");
-//   })
-//   .catch((err) => {
-//     console.log(err);
-//   });
-
-function whatsappBill() {
-  document.getElementById("whatsappLink").classList.add("invisible");
-  document.getElementById("printBtn").classList.remove("disabled");
-  window.open(whatsappLink);
-}
-
-function selectedOption() {
-  // Get all radio buttons with the name "flexRadioDefault"
-  var radioButtons = document.getElementsByName("flexRadioDefault");
-
-  // Initialize a variable to store the value of the active radio button
-  var selectedValue;
-
-  // Loop through each radio button
-  for (var i = 0; i < radioButtons.length; i++) {
-    // Check if the current radio button is checked
-    if (radioButtons[i].checked) {
-      // If checked, store its value
-      selectedValue = radioButtons[i].value;
-      // Break the loop since we found the checked radio button
-      break;
-    }
-  }
-
-  return selectedValue;
+function checkIdExists(elementId) {
+  return document.getElementById(elementId) !== null;
 }

@@ -17,11 +17,10 @@ const db = firebase.firestore();
 
 var database = firebase.database();
 
-// Showing the items for adding them to the Billing Section
-const dbRef = database.ref();
-
 itemsTablehtml = ``;
 
+// Showing the items for adding them to the Billing Section
+const dbRef = database.ref();
 dbRef
   .child("items")
   .get()
@@ -31,22 +30,21 @@ dbRef
         const key = childSnapshot.key;
         const value = childSnapshot.val();
         itemsTablehtml += `
-        <tr id='${key}'>
+          <tr id='${key}'>
             <td>${key}</td>
             <td>${value}</td>
             <td>
-              <span class="text-primary"
+            <span class="text-primary"
                 ><a href="update-item.html?item=${key}"><i class="bi bi-pencil-fill"></i
-              ></a></span>
+            ></a></span>
             </td>
             <td>
-              <span class="text-danger"
-                ><a data-bs-toggle="modal"
-                data-bs-target="#addShopItem" onclick="javascript:addToItemModal('${key}')"><i class="bi bi-bag-plus-fill"></i></a>
-              </span>
+            <span class="text-danger"
+                ><a href="javascript:itemToBill('${key}')"><i class="bi bi-bag-plus-fill"></i></a>
+            </span>
             </td>
         </tr>
-        `
+            `;
       });
       document.getElementById("table-body-items").innerHTML = itemsTablehtml;
       filterRows("");
@@ -59,6 +57,7 @@ dbRef
     console.error(error);
   });
 
+shopsTablehtml = ``;
 dbRef
   .child("shops")
   .get()
@@ -67,23 +66,24 @@ dbRef
       snapshot.forEach((childSnapshot) => {
         const key = childSnapshot.key;
         const value = childSnapshot.val();
-        document.getElementById("table-body-shops").innerHTML += `
-                          <tr id='${key}'>
-                            <td>${key}</td>
-                            <td>${value}</td>
-                            <td>
-                              <span class="text-primary"
-                                ><a href="update-shop.html?shop=${key}"><i class="bi bi-pencil-fill"></i
-                              ></a></span>
-                            </td>
-                            <td>
-                              <span class="text-danger"
-                                ><a href="javascript:setShop('${key}','${value}')"><i class="bi bi-check2-circle"></i></a>
-                              </span>
-                            </td>
-                          </tr>
-        `;
+        shopsTablehtml += `
+        <tr id='${key}'>
+        <td>${key}</td>
+        <td>${value}</td>
+        <td>
+          <span class="text-primary"
+            ><a href="update-shop.html?shop=${key}"><i class="bi bi-pencil-fill"></i
+          ></a></span>
+        </td>
+        <td>
+          <span class="text-danger"
+            ><a href="javascript:setShop('${key}','${value}')"><i class="bi bi-check2-circle"></i></a>
+          </span>
+        </td>
+      </tr>
+      `;
       });
+      document.getElementById("table-body-shops").innerHTML = shopsTablehtml;
       filterRowsShops("");
     } else {
       console.log("No data available");
@@ -103,44 +103,55 @@ var whatsappLink;
 var shopCustomer;
 
 function itemToBill(itemName) {
-  var qty = prompt("Enter " + itemName + "'s Quantity", 1);
-  var id = itemName + "bill";
-  var price;
-  if (qty != null) {
-    var docRef = db.collection("items").doc(itemName);
-    docRef
-      .get()
-      .then((doc) => {
-        if (selectedOption() == "retail") {
-          itemRate = doc.data().retailRate;
-          price = qty * itemRate;
-        } else {
-          itemRate = doc.data().wholesaleRate;
-          price = qty * itemRate;
-        }
-      })
-      .then(() => {
-        document.getElementById("table-bill-items").innerHTML += `
-          <tr id='${id}' class="bill-item">
-            <td>${itemName}</td>
-            <td>${itemRate}</td>
-            <td>${qty}</td>
-            <td>${price}</td>
-            <td class="delete-ico-bill">
-              <span class="text-danger"
-                ><a href="javascript:removeItemFromBill('${id}',${price})"><i class="bi bi-trash-fill"></i></a>
-              </span>
-            </td>
-          </tr>
-        `;
-        totalItems++;
-        totalAmount += price;
-        document.getElementById("total-items-bill").textContent = totalItems;
-        document.getElementById("total-amount-bill").textContent = totalAmount;
-        totalBalanceKept = totalAmount + prevBalance;
-        document.getElementById("customer-total-balance").textContent =
-          totalBalanceKept;
-      });
+  if (checkIdExists(itemName + "bill")) {
+    alert(itemName + " is already added!");
+  } else {
+    var qty = prompt("Enter " + itemName + "'s Quantity", 1);
+    var id = itemName + "bill";
+    var rateid = itemName + "rate";
+    var priceid = itemName + "price";
+
+    var price;
+    if (qty != null) {
+      var docRef = db.collection("items").doc(itemName);
+      docRef
+        .get()
+        .then((doc) => {
+          if (selectedOption() == "retail") {
+            itemRate = doc.data().retailRate;
+            price = qty * itemRate;
+          } else if (selectedOption() == "wholesale") {
+            itemRate = doc.data().wholesaleRate;
+            price = qty * itemRate;
+          } else if (selectedOption() == "master") {
+            itemRate = doc.data().master;
+            price = qty * itemRate;
+          }
+        })
+        .then(() => {
+          document.getElementById("table-bill-items").innerHTML += `
+            <tr id='${id}' class="bill-item">
+              <td>${itemName}</td>
+              <td id='${rateid}' onclick="rateClickChange('${itemName}',${qty})">${itemRate}</td>
+              <td>${qty}</td>
+              <td id='${priceid}' onclick="priceClickChange('${itemName}',${qty})">${price}</td>
+              <td class="delete-ico-bill">
+                <span class="text-danger"
+                  ><a href="javascript:removeItemFromBill('${id}',${price})"><i class="bi bi-trash-fill"></i></a>
+                </span>
+              </td>
+            </tr>
+          `;
+          totalItems++;
+          totalAmount += price;
+          document.getElementById("total-items-bill").textContent = totalItems;
+          document.getElementById("total-amount-bill").textContent =
+            totalAmount;
+          totalBalanceKept = totalAmount + prevBalance;
+          document.getElementById("customer-total-balance").textContent =
+            totalBalanceKept;
+        });
+    }
   }
 }
 
@@ -157,6 +168,9 @@ function removeItemFromBill(id, price) {
 
 function searchCustomer() {
   var customerPhone = document.getElementById("customer-ph-input").value;
+  if (customerPhone.length != 10) {
+    alert("Enter 10 digit!");
+  }
   var docRef = db.collection("customers").doc(customerPhone);
   var customerName = document.getElementById("customer-name-input").value;
   docRef
@@ -208,174 +222,6 @@ function searchCustomer() {
     });
 }
 
-const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
-async function printPageArea() {
-  var customerPaying = prompt(
-    "Amount Payable by Customer",
-    document.getElementById("customer-pay-input").value
-  );
-  if (prompt != null && customerAvl == true) {
-    document.getElementById("customer-pay-input").value = customerPaying;
-    amountCheck();
-
-    const elements = document.getElementsByClassName("delete-ico-bill");
-    while (elements.length > 0) {
-      elements[0].parentNode.removeChild(elements[0]);
-    }
-    var cell = document.getElementById("change-colspan");
-    cell.colSpan = 2;
-
-    var items = [];
-    var itemsRate = [];
-    var itemsQty = [];
-    var itemsPrice = [];
-    var buyerName = document.getElementById("customer-name").textContent;
-    var buyerPh = document.getElementById("customer-ph").textContent;
-    var sellerName = document.getElementById("seller-name").textContent;
-    var buyerAmount = parseInt(
-      document.getElementById("total-amount-bill").textContent,
-      10
-    );
-    var balanceKept = parseInt(
-      document.getElementById("customer-balance-kept").textContent,
-      10
-    );
-    var paid = false;
-    if (customerPaying >= buyerAmount) {
-      paid = true;
-    } // Get the table element by its id
-    const table = document.getElementById("billingTable");
-    // Get all the rows from the table
-    const rows = table.getElementsByTagName("tr");
-    // Loop through each row
-    for (let i = 1; i < rows.length - 1; i++) {
-      // Get all the cells in the current row
-      const cells = rows[i].getElementsByTagName("td");
-      items.push(cells[0].innerText);
-      itemsRate.push(cells[1].innerText);
-      itemsQty.push(cells[2].innerText);
-      itemsPrice.push(cells[3].innerText);
-    }
-
-    var [timeid, billid, dateid] = updateClock();
-
-    var stockoutRef = db.collection("stockout");
-
-    stockoutRef
-      .get(billid)
-      .then((doc) => {
-        if (doc.exists) {
-          console.log("Doc exists");
-          stockoutRef.doc(dateid).set(
-            {
-              [billid]: {
-                buyerName: buyerName,
-                buyerPhone: buyerPh,
-                sellerName: sellerName,
-                amount: buyerAmount,
-                items: items,
-                qty: itemsQty,
-                rate: itemsRate,
-                price: itemsPrice,
-                paid: paid,
-                time: timeid,
-              },
-            },
-            { merge: true }
-          );
-        } else {
-          console.log("Doesn't not exist");
-          stockoutRef.doc(dateid).set(
-            {
-              [billid]: {
-                buyerName: buyerName,
-                buyerPhone: buyerPh,
-                sellerName: sellerName,
-                amount: buyerAmount,
-                items: items,
-                qty: itemsQty,
-                rate: itemsRate,
-                price: itemsPrice,
-                paid: paid,
-                time: timeid,
-              },
-            },
-            { merge: true }
-          );
-        }
-      })
-      .then(() => {
-        var itemsRef = db.collection("items");
-        for (let i = 0; i < items.length; i++) {
-          itemsRef.doc(items[i]).update({
-            stock: firebase.firestore.FieldValue.increment(-itemsQty[i]),
-          });
-        }
-      })
-      .then(() => {
-        var customerRef = db.collection("shops");
-        customerRef
-          .doc(buyerName)
-          .update({
-            balance: totalBalanceKept - customerPaying,
-            //purchase: firebase.firestore.FieldValue.arrayUnion(billid),
-          })
-          .then(() => {
-            let table = ``;
-            for (i = 0; i < items.length; i++) {
-              table += `Item: ${items[i]}\nRate: ${itemsRate[i]}\nQty: ${itemsQty[i]}\nPrice: ${itemsPrice[i]}\n\n`;
-            }
-            var formattedWaBill = encodeURIComponent(table);
-            whatsappLink = `https://wa.me/+91${buyerPh}?text=Vasantham Mobiles Bill%0a%0aSeller:${sellerName}%0aTo:${buyerName}%0aBill id:${billid}%0a%0a${formattedWaBill}%0aTotal Amount:${buyerAmount}%0aPrev Balance:${prevBalance}%0aTotal Balance:${totalBalanceKept}%0aCurrently Paid:${customerPaying}%0aBalance Kept:${balanceKept}`;
-            document.getElementById("printBtn").classList.add("disabled");
-            document
-              .getElementById("whatsappLink")
-              .classList.remove("invisible");
-            document.getElementById("customer-date-time").textContent = timeid;
-            document.getElementById("customer-billid").textContent = billid;
-          });
-      });
-
-    await sleep(1000);
-    var printContent = document.getElementById("printing-bill").innerHTML;
-    var originalContent = document.body.innerHTML;
-    document.body.innerHTML = printContent;
-    window.print();
-    await sleep(1000);
-    document.body.innerHTML = originalContent;
-    const itemElements = document.getElementsByClassName("bill-item");
-    while (itemElements.length > 0) {
-      itemElements[0].parentNode.removeChild(itemElements[0]);
-    }
-    totalItems = 0;
-    totalAmount = 0;
-    document.getElementById("total-items-bill").textContent = totalItems;
-    document.getElementById("total-amount-bill").textContent = totalAmount;
-    document.getElementById(
-      "billing-table-head"
-    ).innerHTML += `<th class="delete-ico-bill" scope="col">
-  <i class="bi bi-trash-fill"></i>
-  </th>`;
-
-    cell = document.getElementById("change-colspan");
-    cell.colSpan = 3;
-  }
-}
-
-// const date = new Date();
-
-// // Get day, month, and year components
-// const day = date.getDate().toString().padStart(2, "0"); // Ensure 2 digits with leading zero if necessary
-// const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Month is zero-indexed, so add 1
-// const year = date.getFullYear();
-
-// // Construct the formatted date string
-// const formattedDate = `${day}-${month}-${year}`;
-
-// console.log(formattedDate);
-
-// Create a new Date object
-
 function updateClock() {
   const date = new Date();
 
@@ -415,28 +261,279 @@ function amountCheck() {
     document.getElementById("customer-pay-input").placeholder = "Amt Please!";
   }
 }
-// var docData = {
-//   [formattedDateTime]: {
-//     vendor: "Hello world!",
-//     paid: true,
-//     dateExample: firebase.firestore.FieldValue.serverTimestamp(),
-//     arrayExample: [5, 6, 7],
-//   },
-// };
-// db.collection("stockin")
-//   .doc(formattedDate)
-//   .set(docData)
-//   .then(() => {
-//     console.log("Document successfully written!");
-//   })
-//   .catch((err) => {
-//     console.log(err);
-//   });
 
 function whatsappBill() {
+  const itemElements = document.getElementsByClassName("bill-item");
+  while (itemElements.length > 0) {
+    itemElements[0].parentNode.removeChild(itemElements[0]);
+  }
+  totalItems = 0;
+  totalAmount = 0;
+  document.getElementById("total-items-bill").textContent = totalItems;
+  document.getElementById("total-amount-bill").textContent = totalAmount;
+  document.getElementById(
+    "billing-table-head"
+  ).innerHTML += `<th class="delete-ico-bill" scope="col">
+    <i class="bi bi-trash-fill"></i>
+    </th>`;
+
+  cell = document.getElementById("change-colspan");
+  cell.colSpan = 3;
+
+  totalBalanceKept = 0;
+  prevBalance = 0;
+  customerAvl = false;
+  shopCustomer = '';
+  document.getElementById("customer-name").textContent = "";
+  document.getElementById("customer-ph").textContent = "";
+  document.getElementById("customer-billid").textContent = "";
+  document.getElementById("customer-date-time").textContent = "";
+  document.getElementById("customer-prev-balance").textContent = 0;
+  document.getElementById("customer-total-balance").textContent = 0;
+  document.getElementById("customer-currently-paid").textContent = 0;
+  document.getElementById("customer-balance-kept").textContent = 0;
+  document.getElementById("customer-pay-input").value = "";
+
   document.getElementById("whatsappLink").classList.add("invisible");
   document.getElementById("printBtn").classList.remove("disabled");
   window.open(whatsappLink);
+}
+
+function selectedOption() {
+  // Get all radio buttons with the name "flexRadioDefault"
+  var radioButtons = document.getElementsByName("flexRadioDefault");
+
+  // Initialize a variable to store the value of the active radio button
+  var selectedValue;
+
+  // Loop through each radio button
+  for (var i = 0; i < radioButtons.length; i++) {
+    // Check if the current radio button is checked
+    if (radioButtons[i].checked) {
+      // If checked, store its value
+      selectedValue = radioButtons[i].value;
+      // Break the loop since we found the checked radio button
+      break;
+    }
+  }
+
+  return selectedValue;
+}
+
+async function sendStockOut() {
+  var customerPaying;
+  if (customerAvl == true) {
+    customerPaying = prompt(
+      "Amount Payable by Customer",
+      document.getElementById("customer-pay-input").value
+    );
+  } else {
+    alert("Enter Customer!");
+  }
+  if (customerPaying != null && customerAvl == true) {
+    document.getElementById("customer-pay-input").value = customerPaying;
+    amountCheck();
+
+    const elements = document.getElementsByClassName("delete-ico-bill");
+    while (elements.length > 0) {
+      elements[0].parentNode.removeChild(elements[0]);
+    }
+    var cell = document.getElementById("change-colspan");
+    cell.colSpan = 2;
+
+    var items = [];
+    var itemsRate = [];
+    var itemsQty = [];
+    var itemsPrice = [];
+    var buyerName = document.getElementById("customer-name").textContent;
+    var buyerPh = document.getElementById("customer-ph").textContent;
+    var sellerName = document.getElementById("seller-name").textContent;
+    var buyerAmount = parseFloat(
+      document.getElementById("total-amount-bill").textContent
+    ).toFixed(0);
+    var balanceKept = parseFloat(
+      document.getElementById("customer-balance-kept").textContent
+    ).toFixed(0);
+    var paid = false;
+    if (customerPaying >= buyerAmount) {
+      paid = true;
+    } // Get the table element by its id
+    const table = document.getElementById("billingTable");
+    // Get all the rows from the table
+    const rows = table.getElementsByTagName("tr");
+    // Loop through each row
+    for (let i = 1; i < rows.length - 1; i++) {
+      // Get all the cells in the current row
+      const cells = rows[i].getElementsByTagName("td");
+      items.push(cells[0].innerText);
+      itemsRate.push(cells[1].innerText);
+      itemsQty.push(cells[2].innerText);
+      itemsPrice.push(cells[3].innerText);
+    }
+
+    var [timeid, billid, dateid] = updateClock();
+
+    var stockoutRef = db.collection("stockout");
+
+    stockoutRef
+      .doc(dateid)
+      .set(
+        {
+          [billid]: {
+            buyerName: buyerName,
+            buyerPhone: buyerPh,
+            sellerName: sellerName,
+            amount: buyerAmount,
+            customerPaid: customerPaying,
+            items: items,
+            qty: itemsQty,
+            rate: itemsRate,
+            price: itemsPrice,
+            paid: paid,
+            time: timeid,
+          },
+        },
+        { merge: true }
+      )
+      .then(() => {
+        var itemsRef = db.collection("items");
+        for (let i = 0; i < items.length; i++) {
+          itemsRef.doc(items[i]).update({
+            stock: firebase.firestore.FieldValue.increment(-itemsQty[i]),
+          });
+        }
+      })
+      .then(() => {
+        var balance = totalBalanceKept - customerPaying;
+        addTransaction(buyerName,timeid,customerPaying,balance)
+          .then(() => {
+            let table = ``;
+            for (i = 0; i < items.length; i++) {
+              table += `Item: ${items[i]}\nRate: ${itemsRate[i]}\nQty: ${itemsQty[i]}\nPrice: ${itemsPrice[i]}\n\n`;
+            }
+            var formattedWaBill = encodeURIComponent(table);
+            whatsappLink = `https://wa.me/+91${buyerPh}?text=Vasantham Mobiles Bill%0a%0aSeller:${sellerName}%0aTo:${buyerName}%0aBill id:${billid}%0a%0a${formattedWaBill}%0aTotal Amount:${buyerAmount}%0aPrev Balance:${prevBalance}%0aTotal Balance:${totalBalanceKept}%0aCurrently Paid:${customerPaying}%0aBalance Kept:${balanceKept}`;
+            document.getElementById("printBtn").classList.add("disabled");
+            document
+              .getElementById("whatsappLink")
+              .classList.remove("invisible");
+            document.getElementById("customer-date-time").textContent = timeid;
+            document.getElementById("customer-billid").textContent = billid;
+          });
+      });
+    dummyPrint(billid);
+  }
+}
+
+function dummyPrint(billid) {
+  document.title = billid;
+
+  var preContent = `<!DOCTYPE html>
+   <html lang="en">
+     <head>
+       <meta charset="utf-8" />
+       <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+       <title>${billid}</title>
+       <!-- Vendor CSS Files -->
+       <link
+         href="assets/vendor/bootstrap/css/bootstrap.min.css"
+         rel="stylesheet"
+   
+       <!-- Template Main CSS File -->
+       <link href="assets/css/style.css" rel="stylesheet" />
+     </head>
+   
+     <body>`;
+  var postContent = `<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script></body></html>`;
+  var iframe = preContent;
+  var contentDiv = document.getElementById("printing-bill");
+  var contentHTML = contentDiv.innerHTML;
+
+  // Remove id attributes using a regular expression
+  var modifiedHTML = contentHTML; //.replace(/ id="[^"]*"/g, "");
+
+  iframe += modifiedHTML;
+  // iframe += postContent
+  // Set the modified HTML as the srcdoc of the iframe
+  var previewFrame = document.getElementById("iframePrint");
+  previewFrame.srcdoc = iframe;
+
+  // Print the content of the iframe
+  previewFrame.onload = function () {
+    previewFrame.contentWindow.print();
+  };
+}
+
+function rateClickChange(id, qty) {
+  var rate = parseFloat(document.getElementById(id + "rate").textContent);
+  var price = parseFloat(document.getElementById(id + "price").textContent);
+  var Qty = parseInt(qty, 10);
+  var changed = parseFloat(prompt("Enter " + id + "'s New Rate", rate));
+  if (changed != null) {
+    totalAmount = totalAmount-price;
+    document.getElementById(id + "rate").textContent = Number.isInteger(changed)
+      ? changed.toFixed(0)
+      : changed.toFixed(2);
+    changedPrice = changed * Qty;
+    totalAmount += changedPrice;
+    document.getElementById("total-amount-bill").textContent = Number.isInteger(totalAmount)
+      ? totalAmount.toFixed(0)
+      : totalAmount.toFixed(2);
+    totalBalanceKept = totalAmount + prevBalance;
+    document.getElementById("customer-total-balance").textContent =
+      totalBalanceKept;
+    document.getElementById(id + "price").textContent = Number.isInteger(changedPrice)
+    ? changedPrice.toFixed(0)
+    : changedPrice.toFixed(2);;
+  }
+}
+
+function priceClickChange(id, qty) {
+  var price = parseFloat(document.getElementById(id + "price").textContent);
+  var Qty = parseInt(qty, 10);
+  var changed = parseFloat(prompt("Enter " + id + "'s New Price", price));
+  if (changed != null) {
+    totalAmount -= price;
+    totalAmount += changed;
+    document.getElementById("total-amount-bill").textContent = totalAmount;
+    totalBalanceKept = totalAmount + prevBalance;
+    document.getElementById("customer-total-balance").textContent =
+      totalBalanceKept;
+    document.getElementById(id + "price").textContent = changed;
+    document.getElementById(id + "rate").textContent = Number.isInteger(
+      changed / Qty
+    )
+      ? (changed / Qty).toFixed(0)
+      : (changed / Qty).toFixed(2);
+  }
+}
+
+function setShop(shopName, shopPhone) {
+  document.getElementById("customer-name").textContent = shopName;
+  document.getElementById("customer-ph").textContent = shopPhone;
+  customerAvl = true;
+  var docRef = db.collection("shops").doc(shopName);
+
+  docRef
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        shopCustomer = doc.data();
+        document.getElementById("customer-prev-balance").textContent =
+          shopCustomer.balance;
+        prevBalance = shopCustomer.balance;
+        totalBalanceKept = shopCustomer.balance + totalAmount;
+        document.getElementById("total-amount-bill").textContent = totalAmount,
+        document.getElementById("customer-total-balance").textContent = totalBalanceKept
+          alert(shopName + " Set");
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+      }
+    })
+    .catch((error) => {
+      console.log("Error getting document:", error);
+    });
 }
 
 function capitalize(string) {
@@ -469,6 +566,7 @@ function addShop() {
             name: shopName,
             phone: shopPhone,
             balance: 0,
+            payment: [],
           })
           .then(() => {
             database.ref("/shops").update({ [shopName]: shopPhone });
@@ -490,126 +588,41 @@ function addShop() {
     });
 }
 
-function setShop(shopName, shopPhone) {
-  document.getElementById("customer-name").textContent = shopName;
-  document.getElementById("customer-ph").textContent = shopPhone;
-  customerAvl = true;
-  var docRef = db.collection("shops").doc(shopName);
-
-  docRef
-    .get()
-    .then((doc) => {
-      if (doc.exists) {
-        shopCustomer = doc.data();
-        document.getElementById("customer-prev-balance").textContent =
-          shopCustomer.balance;
-        totalItems = 0;
-        totalAmount = 0;
-        prevBalance = shopCustomer.balance;
-        totalBalanceKept = shopCustomer.balance + totalAmount;
-        document.getElementById("total-amount-bill").textContent = totalAmount,
-        document.getElementById(
-          "addItemToShopLink"
-        ).innerHTML = `<li class="nav-item">
-          <a class="nav-link nav-icon search-bar-toggle" href="handle-shop-items.html?shop=${shopName}">
-          <i class="bi bi-house-up-fill"></i>
-          </a>
-        </li>`;
-        alert(shopName + " Set");
-      } else {
-        // doc.data() will be undefined in this case
-        console.log("No such document!");
-      }
-    })
-    .catch((error) => {
-      console.log("Error getting document:", error);
-    });
+function checkIdExists(elementId) {
+  return document.getElementById(elementId) !== null;
 }
 
-async function addToItemModal(itemName) {
-  if (customerAvl == true) {
-    document.getElementById("shopItemName").value = itemName;
-  } else {
-    alert("Set the Shop!");
-  }
-  var itemExists;
-  var docRef = db.collection("shops").doc(shopCustomer.name);
 
-  await docRef
-    .get()
-    .then((doc) => {
-      if (doc.exists) {
-        if (doc.data().hasOwnProperty("items")) {
-          console.log("Document data:", doc.data().items);
-          if (itemName in doc.data().items) {
-            console.log(
-              `Item '${itemName}' exists with value: ${
-                doc.data().items[itemName]
-              }`
-            );
-            document.getElementById("shopItemRate").value =
-              doc.data().items[itemName];
-            itemExists = true;
-          } else {
-            console.log(`Item does not exist in shop`);
-            itemExists = false;
-            var itemRef = db.collection("items").doc(itemName);
-            itemRef
-              .get()
-              .then((itemdoc) => {
-                if (itemdoc.exists) {
-                  document.getElementById("shopItemRate").value =
-                    itemdoc.data().wholesaleRate;
-                } else {
-                  // doc.data() will be undefined in this case
-                  console.log("No such document!");
-                }
-              })
-              .catch((error) => {
-                console.log("Error getting document:", error);
-              });
+function addTransaction(shopName,billid,amt,blnce) {
+  var shopRef = db.collection("shops").doc(shopName);
+
+  return db.runTransaction(function(transaction) {
+      return transaction.get(shopRef).then(function(doc) {
+          if (!doc.exists) {
+              throw "Document does not exist!";
           }
-        } else {
-          console.log("No data called items!");
-        }
-      } else {
-        // doc.data() will be undefined in this case
-        console.log("No such document!");
-      }
-    })
-    .catch((error) => {
-      console.log("Error getting document:", error);
-    });
-}
 
-function addShopItem() {
-  itemName = document.getElementById("shopItemName").value;
-  itemRate = document.getElementById("shopItemRate").value;
-  var qty = document.getElementById("shopItemQty").value;
-  var id = itemName + "bill";
-  var price;
+          var transactions = doc.data().payment || [];
 
-  if (qty != "") {
-    price = qty * itemRate;
-    document.getElementById("table-bill-items").innerHTML += `
-    <tr id='${id}' class="bill-item">
-      <td>${itemName}</td>
-      <td>${itemRate}</td>
-      <td>${qty}</td>
-      <td>${price}</td>
-      <td class="delete-ico-bill">
-        <span class="text-danger"
-          ><a href="javascript:removeItemFromBill('${id}',${price})"><i class="bi bi-trash-fill"></i></a>
-        </span>
-      </td>
-    </tr>
-  `;
-    totalItems++;
-    totalAmount += price;
-    document.getElementById("total-items-bill").textContent = totalItems;
-    document.getElementById("total-amount-bill").textContent = totalAmount;
-    totalBalanceKept = totalAmount + prevBalance;
-    document.getElementById("customer-total-balance").textContent =
-      totalBalanceKept;
-  }
+          // Check if the transactions array length is 20 or more
+          if (transactions.length >= 20) {
+              // Remove the oldest transaction (first element)
+              transactions.shift();
+          }
+
+          // Add the new transaction to the array
+          transactions.push({
+            [billid]: amt,
+          });
+
+          // Update the document with the modified transactions array
+          transaction.update(shopRef, { payment: transactions, balance: blnce });
+      });
+  }).then(function() {
+      console.log("Transaction added successfully.");
+      alert("Transaction added successfully");
+  }).catch(function(error) {
+      alert("Transaction Error");
+      console.error("Transaction failed: ", error);
+  });
 }

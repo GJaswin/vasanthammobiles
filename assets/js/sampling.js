@@ -76,7 +76,6 @@ async function add1000() {
   }
 }
 
-
 const uniqueNames = [
   "Liam",
   "Olivia",
@@ -254,9 +253,70 @@ const uniqueNames = [
   "Tucker",
 ];
 
-
 async function addCus200() {
-  for (let index = 1; index < array.length; index++) {
-    const element = array[index];
+  for (let index = 0; index < uniqueNames.length; index++) {
+    const shopName = uniqueNames[index];
+    addShop(shopName, 8778454354);
   }
 }
+
+function addShop(shopName, shopPhone) {
+  db.collection("shops")
+    .doc(shopName)
+    .set({
+      name: shopName,
+      phone: shopPhone,
+      balance: 0,
+      payment: []
+    })
+    .then(() => {
+      database
+        .ref("/shops")
+        .update({ [shopName]: shopPhone });
+      console.log(shopName + " successfully written!");
+    })
+    .catch((error) => {
+      console.error("Error writing document: ", error);
+      document.getElementById("alert-msg").textContent =
+        "Error Occured, Try Again!";
+    });
+}
+
+
+
+function addTransaction() {
+  var shopRef = db.collection("shops").doc("Aaliyah Shop");
+
+  return db.runTransaction(function(transaction) {
+      return transaction.get(shopRef).then(function(doc) {
+          if (!doc.exists) {
+              throw "Document does not exist!";
+          }
+
+          var transactions = doc.data().payment || [];
+
+          // Check if the transactions array length is 20 or more
+          if (transactions.length >= 3) {
+              // Remove the oldest transaction (first element)
+              transactions.shift();
+          }
+
+          // Add the new transaction to the array
+          transactions.push(newTransaction);
+
+          // Update the document with the modified transactions array
+          transaction.update(shopRef, { payment: transactions });
+      });
+  }).then(function() {
+      console.log("Transaction added successfully.");
+  }).catch(function(error) {
+      console.error("Transaction failed: ", error);
+  });
+}
+
+timeid = "25-05-2024-05-59-56-PM"
+amount = 1000;
+
+var newTransaction = {
+  [timeid]: amount,
+};

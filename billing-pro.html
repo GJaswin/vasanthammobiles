@@ -77,6 +77,16 @@
           <!-- End Search Icon-->
 
           <li class="nav-item">
+            <a
+              class="nav-link nav-icon search-bar-toggle"
+              data-bs-toggle="modal"
+              data-bs-target="#addShop"
+            >
+              <i class="bi bi-houses-fill"></i>
+            </a>
+          </li>
+
+          <li class="nav-item">
             <a class="nav-link nav-icon search-bar-toggle" href="add-item.html">
               <i class="bi bi-plus-circle-fill text-primary"></i>
             </a>
@@ -261,6 +271,44 @@
                     </thead>
                     <tbody id="table-body-items"></tbody>
                   </table>
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="flexRadioDefault"
+                      id="flexRadioDefault1"
+                      value="retail"
+                      checked
+                    />
+                    <label class="form-check-label" for="flexRadioDefault1">
+                      Retail
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="flexRadioDefault"
+                      id="flexRadioDefault2"
+                      value="wholesale"
+                    />
+                    <label class="form-check-label" for="flexRadioDefault2">
+                      Wholesale
+                    </label>
+                  </div>
+  
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="flexRadioDefault"
+                      id="flexRadioDefault3"
+                      value="master"
+                    />
+                    <label class="form-check-label" for="flexRadioDefault3">
+                      Master Wholesale
+                    </label>
+                  </div>
                 </div>
               </div>
             </div>
@@ -347,6 +395,70 @@
       </div>
       <!-- End Page Title -->
 
+       <!-- Modal - addShop -->
+       <div
+       class="modal fade"
+       id="addShop"
+       tabindex="-1"
+       aria-labelledby="addShop"
+       aria-hidden="true"
+     >
+       <div class="modal-dialog modal-dialog-centered">
+         <div class="modal-content">
+           <div class="modal-header">
+             <h1 class="modal-title fs-5">Add Shop</h1>
+             <button
+               type="button"
+               class="btn-close"
+               data-bs-dismiss="modal"
+               aria-label="Close"
+             ></button>
+           </div>
+           <div class="modal-body d-flex justify-content-center">
+             <form
+               id="addShopForm"
+               class="col-10 d-flex flex-column justify-content-center p-3 iteminputs"
+               action="javascript:addShop()"
+             >
+               <input
+                 class="form-control"
+                 type="text"
+                 name="shopName"
+                 placeholder="Shop Name"
+                 id="shopName"
+                 required
+               />
+               <br />
+               <input
+                 class="form-control"
+                 type="number"
+                 name="shopNumber"
+                 placeholder="Phone"
+                 id="shopNumber"
+                 minlength="10"
+                 maxlength="10"
+                 required
+               />
+               <br />
+               <button type="submit" class="btn btn-primary">Add Shop</button>
+             </form>
+           </div>
+           <div class="modal-footer p-4">
+             <button
+               type="button"
+               class="btn btn-secondary"
+               data-bs-dismiss="modal"
+             >
+               Close
+             </button>
+             <div class="col-12">
+               <p class="small mb-0 text-success" id="addShopModal-alert"></p>
+             </div>
+           </div>
+         </div>
+       </div>
+     </div>
+
       <section class="section">
         <div class="row align-items-top">
           <div class="container">
@@ -355,71 +467,35 @@
               <div class="col-auto">
                 <!-- Top Search Bar without button -->
 
-                <div class="input-group mb-3">
+                <div class="input-group">
                   <input
                     type="text"
                     class="form-control"
-                    placeholder="Enter Name"
-                    id="customer-name-input"
+                    placeholder="Search Shop"
+                    onkeyup="filterRowsShops(this.value)"
                   />
                 </div>
-                <form action="javascript:searchCustomer()" novalidate>
-                  <div class="input-group mb-3">
-                    <input
-                      type="number"
-                      class="form-control border-0"
-                      placeholder="Phone"
-                      aria-label="Phone"
-                      min="1000000000"
-                      max="9999999999"
-                      required
-                      id="customer-ph-input"
-                    />
-                    <button
-                      class="input-group-text btn btn-outline-primary"
-                      type="submit"
-                    >
-                      Submit
-                    </button>
-                  </div>
-                </form>
-                <div class="form-check">
-                  <input
-                    class="form-check-input"
-                    type="radio"
-                    name="flexRadioDefault"
-                    id="flexRadioDefault1"
-                    value="retail"
-                    checked
-                  />
-                  <label class="form-check-label" for="flexRadioDefault1">
-                    Retail
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input
-                    class="form-check-input"
-                    type="radio"
-                    name="flexRadioDefault"
-                    id="flexRadioDefault2"
-                    value="wholesale"
-                  />
-                  <label class="form-check-label" for="flexRadioDefault2">
-                    Wholesale
-                  </label>
-                </div>
+              </div>
+            </div>
 
-                <div class="form-check">
-                  <input
-                    class="form-check-input"
-                    type="radio"
-                    name="flexRadioDefault"
-                    id="flexRadioDefault3"
-                    value="master"
-                  />
-                  <label class="form-check-label" for="flexRadioDefault3">
-                    Master Wholesale
-                  </label>
+            <div class="row">
+              <div class="col">
+                <div class="table-responsive">
+                  <table class="table table-bordered" id="shopsTable">
+                    <thead>
+                      <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Phone</th>
+                        <th scope="col">
+                          <i class="bi bi-pencil-fill"></i>
+                        </th>
+                        <th scope="col">
+                          <i class="bi bi-check2-circle"></i>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody id="table-body-shops"></tbody>
+                  </table>
                 </div>
               </div>
             </div>
@@ -444,7 +520,10 @@
                 </div>
                 <div class="col">
                   <div class="table-responsive">
-                    <table class="table table-bordered border-dark" id="billingTable">
+                    <table
+                      class="table table-bordered border-dark"
+                      id="billingTable"
+                    >
                       <thead>
                         <tr id="billing-table-head">
                           <th scope="col">Item</th>
@@ -732,6 +811,59 @@
             parseInt(document.getElementById("page-search-input").value, 10)
           );
         });
+    </script>
+     <script>
+      function filterRowsShops(searchTerm) {
+        var filter = searchTerm.toUpperCase();
+        var table = document.getElementById("shopsTable");
+        var tbody = table.getElementsByTagName("tbody")[0]; // Get the tbody element
+        var trs = tbody.getElementsByTagName("tr");
+
+        var visibleRows = 0; // Counter for visible rows
+        var rowsPerPage = 3; // Number of rows to display per page
+        for (var i = 0; i < trs.length; i++) {
+          var tds = trs[i].getElementsByTagName("td");
+          var found = false;
+          for (var j = 0; j < tds.length; j++) {
+            var txtValue = tds[j].textContent || tds[j].innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+              found = true;
+              break;
+            }
+          }
+          if (found) {
+            trs[i].style.display = ""; // Show the row if found
+            visibleRows++;
+          } else {
+            trs[i].style.display = "none"; // Hide the row if not found
+          }
+
+          // Show only rows up to the page limit
+          if (visibleRows >= rowsPerPage) {
+            break;
+          }
+          if (searchTerm == "") {
+          paginateTableShops(1);
+        }
+        }
+      }
+
+      function paginateTableShops(pageNum) {
+        var table = document.getElementById("shopsTable");
+        var tbody = table.getElementsByTagName("tbody")[0];
+        var trs = tbody.getElementsByTagName("tr");
+        var rowsPerPage = 3; // Number of rows to display per page
+        var startIndex = (pageNum - 1) * rowsPerPage;
+        var endIndex = startIndex + rowsPerPage;
+
+        for (var i = 0; i < trs.length; i++) {
+          if (i >= startIndex && i < endIndex) {
+            trs[i].style.display = ""; // Show rows within the page range
+          } else {
+            trs[i].style.display = "none"; // Hide rows beyond the page range
+          }
+        }
+      }
     </script>
   </body>
 </html>

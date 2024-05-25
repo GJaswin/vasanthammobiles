@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
 
-    <title>Shops Billing</title>
+    <title>Regular Billing</title>
 
     <!-- Favicons -->
     <link href="assets/img/favicon.png" rel="icon" />
@@ -75,8 +75,6 @@
             </a>
           </li> -->
           <!-- End Search Icon-->
-          <div id="addItemToShopLink">
-            </div>
 
           <li class="nav-item">
             <a
@@ -273,6 +271,44 @@
                     </thead>
                     <tbody id="table-body-items"></tbody>
                   </table>
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="flexRadioDefault"
+                      id="flexRadioDefault1"
+                      value="retail"
+                      checked
+                    />
+                    <label class="form-check-label" for="flexRadioDefault1">
+                      Retail
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="flexRadioDefault"
+                      id="flexRadioDefault2"
+                      value="wholesale"
+                    />
+                    <label class="form-check-label" for="flexRadioDefault2">
+                      Wholesale
+                    </label>
+                  </div>
+  
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="flexRadioDefault"
+                      id="flexRadioDefault3"
+                      value="master"
+                    />
+                    <label class="form-check-label" for="flexRadioDefault3">
+                      Master Wholesale
+                    </label>
+                  </div>
                 </div>
               </div>
             </div>
@@ -346,143 +382,6 @@
         </div>
       </section>
 
-      <!-- Modal - addShop -->
-      <div
-        class="modal fade"
-        id="addShop"
-        tabindex="-1"
-        aria-labelledby="addShop"
-        aria-hidden="true"
-      >
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h1 class="modal-title fs-5">Add Shop</h1>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div class="modal-body d-flex justify-content-center">
-              <form
-                id="addShopForm"
-                class="col-10 d-flex flex-column justify-content-center p-3 iteminputs"
-                action="javascript:addShop()"
-              >
-                <input
-                  class="form-control"
-                  type="text"
-                  name="shopName"
-                  placeholder="Shop Name"
-                  id="shopName"
-                  required
-                />
-                <br />
-                <input
-                  class="form-control"
-                  type="number"
-                  name="shopNumber"
-                  placeholder="Phone"
-                  id="shopNumber"
-                  minlength="10"
-                  maxlength="10"
-                  required
-                />
-                <br />
-                <button type="submit" class="btn btn-primary">Add Shop</button>
-              </form>
-            </div>
-            <div class="modal-footer p-4">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                Close
-              </button>
-              <div class="col-12">
-                <p class="small mb-0 text-success" id="addShopModal-alert"></p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Modal - addShopItem -->
-      <div
-        class="modal fade"
-        id="addShopItem"
-        tabindex="-1"
-        aria-labelledby="addShopItem"
-        aria-hidden="true"
-      >
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h1 class="modal-title fs-5">Add Shop Item</h1>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div class="modal-body d-flex justify-content-center">
-              <form
-                id="addShopItemForm"
-                class="col-10 d-flex flex-column justify-content-center p-3 iteminputs"
-                action="javascript:addShopItem()"
-              >
-                <input
-                  class="form-control"
-                  type="text"
-                  name="shopItemName"
-                  placeholder="Shop Item Name"
-                  id="shopItemName"
-                  required
-                  disabled
-                />
-                <br />
-                <input
-                  class="form-control"
-                  type="number"
-                  name="shopItemRate"
-                  placeholder="Shop Item Rate"
-                  id="shopItemRate"
-                  required
-                  disabled
-                />
-                <br />
-                <input
-                  class="form-control"
-                  type="number"
-                  name="shopItemQty"
-                  placeholder="Shop Item Qty"
-                  id="shopItemQty"
-                  required
-                />
-                <br />
-                <button type="submit" data-bs-dismiss="modal" class="btn btn-primary">Add Shop Item</button>
-              </form>
-            </div>
-            <div class="modal-footer p-4">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                Close
-              </button>
-              <div class="col-12">
-                <p class="small mb-0 text-success" id="addShopItemModal-alert"></p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- Billing Section -->
       <div class="pagetitle">
         <br /><br />
@@ -495,6 +394,70 @@
         </nav>
       </div>
       <!-- End Page Title -->
+
+       <!-- Modal - addShop -->
+       <div
+       class="modal fade"
+       id="addShop"
+       tabindex="-1"
+       aria-labelledby="addShop"
+       aria-hidden="true"
+     >
+       <div class="modal-dialog modal-dialog-centered">
+         <div class="modal-content">
+           <div class="modal-header">
+             <h1 class="modal-title fs-5">Add Shop</h1>
+             <button
+               type="button"
+               class="btn-close"
+               data-bs-dismiss="modal"
+               aria-label="Close"
+             ></button>
+           </div>
+           <div class="modal-body d-flex justify-content-center">
+             <form
+               id="addShopForm"
+               class="col-10 d-flex flex-column justify-content-center p-3 iteminputs"
+               action="javascript:addShop()"
+             >
+               <input
+                 class="form-control"
+                 type="text"
+                 name="shopName"
+                 placeholder="Shop Name"
+                 id="shopName"
+                 required
+               />
+               <br />
+               <input
+                 class="form-control"
+                 type="number"
+                 name="shopNumber"
+                 placeholder="Phone"
+                 id="shopNumber"
+                 minlength="10"
+                 maxlength="10"
+                 required
+               />
+               <br />
+               <button type="submit" class="btn btn-primary">Add Shop</button>
+             </form>
+           </div>
+           <div class="modal-footer p-4">
+             <button
+               type="button"
+               class="btn btn-secondary"
+               data-bs-dismiss="modal"
+             >
+               Close
+             </button>
+             <div class="col-12">
+               <p class="small mb-0 text-success" id="addShopModal-alert"></p>
+             </div>
+           </div>
+         </div>
+       </div>
+     </div>
 
       <section class="section">
         <div class="row align-items-top">
@@ -512,7 +475,6 @@
                     onkeyup="filterRowsShops(this.value)"
                   />
                 </div>
-                
               </div>
             </div>
 
@@ -538,8 +500,9 @@
               </div>
             </div>
             <hr />
+
             <div class="row" id="printing-bill">
-              <div id="dummy-print">
+              <div class="dummy-print">
                 <center>
                   <div id="print-bill-head">
                     <h2>Vasantham Mobiles</h2>
@@ -557,7 +520,10 @@
                 </div>
                 <div class="col">
                   <div class="table-responsive">
-                    <table class="table" id="billingTable">
+                    <table
+                      class="table table-bordered border-dark"
+                      id="billingTable"
+                    >
                       <thead>
                         <tr id="billing-table-head">
                           <th scope="col">Item</th>
@@ -623,7 +589,7 @@
               <button
                 id="printBtn"
                 class="btn btn-primary"
-                onclick="printPageArea()"
+                onclick="sendStockOut()"
               >
                 Print</button
               ><br />
@@ -637,6 +603,13 @@
           </div>
 
           <!-- My Table Code Ends-->
+        </div>
+      </section>
+      <section>
+        <div class="row">
+          <div class="col">
+            <iframe width="100%" height="0px" id="iframePrint"></iframe>
+          </div>
         </div>
       </section>
       <!-- Billing Section End -->
@@ -839,7 +812,7 @@
           );
         });
     </script>
-    <script>
+     <script>
       function filterRowsShops(searchTerm) {
         var filter = searchTerm.toUpperCase();
         var table = document.getElementById("shopsTable");
