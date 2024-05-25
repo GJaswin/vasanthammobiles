@@ -370,8 +370,8 @@
                       class="form-control border-0"
                       placeholder="Phone"
                       aria-label="Phone"
-                      minlength="10"
-                      maxlength="10"
+                      min="1000000000"
+                      max="9999999999"
                       required
                       id="customer-ph-input"
                     />
@@ -510,7 +510,7 @@
               <button
                 id="printBtn"
                 class="btn btn-primary"
-                onclick="dummyPrint()"
+                onclick="sendStockOut()"
               >
                 Print</button
               ><br />
@@ -529,7 +529,7 @@
       <section>
         <div class="row">
           <div class="col">
-            <iframe width="100%" id="iframePrint"></iframe>
+            <iframe width="100%" height="0px" id="iframePrint"></iframe>
           </div>
         </div>
       </section>

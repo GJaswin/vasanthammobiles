@@ -123,6 +123,9 @@ function removeItemFromBill(id, price) {
 
 function searchCustomer() {
   var customerPhone = document.getElementById("customer-ph-input").value;
+  if (customerPhone.length != 10) {
+    alert("Enter 10 digit!");
+  }
   var docRef = db.collection("customers").doc(customerPhone);
   var customerName = document.getElementById("customer-name-input").value;
   docRef
@@ -174,13 +177,117 @@ function searchCustomer() {
     });
 }
 
-const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
-async function printPageArea() {
-  var customerPaying = prompt(
-    "Amount Payable by Customer",
-    document.getElementById("customer-pay-input").value
-  );
-  if (prompt != null && customerAvl == true) {
+function updateClock() {
+  const date = new Date();
+
+  // Get the individual components of the date and time
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Month is zero-indexed, so add 1
+  const day = date.getDate().toString().padStart(2, "0");
+  const hours = date.getHours().toString().padStart(2, "0");
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  const seconds = date.getSeconds().toString().padStart(2, "0");
+  const milliseconds = date.getMilliseconds().toString().padStart(3, "0");
+
+  // Determine if it's AM or PM
+  const period = hours >= 12 ? "PM" : "AM";
+
+  // Convert hours to 12-hour format
+  const formattedHours = (hours % 12 || 12).toString().padStart(2, "0"); // If hours is 0, convert to 12
+
+  // Construct the formatted date and time string
+  const formattedDate = `${day}-${month}-${year}`;
+  const formattedDateTime = `${day}-${month}-${year} ${formattedHours}:${minutes}:${seconds} ${period}`;
+  const formattedBillId = `${day}-${month}-${year}-${hours}-${minutes}-${seconds}`;
+
+  document.getElementById("customer-date-time").textContent = formattedDateTime;
+  document.getElementById("customer-billid").textContent = formattedBillId;
+
+  return [formattedDateTime, formattedBillId, formattedDate];
+}
+
+function amountCheck() {
+  payableAmt = document.getElementById("customer-pay-input").value;
+  if (payableAmt != "") {
+    document.getElementById("customer-currently-paid").textContent = payableAmt;
+    document.getElementById("customer-balance-kept").textContent =
+      totalBalanceKept - payableAmt;
+  } else {
+    document.getElementById("customer-pay-input").placeholder = "Amt Please!";
+  }
+}
+
+function whatsappBill() {
+  const itemElements = document.getElementsByClassName("bill-item");
+  while (itemElements.length > 0) {
+    itemElements[0].parentNode.removeChild(itemElements[0]);
+  }
+  totalItems = 0;
+  totalAmount = 0;
+  document.getElementById("total-items-bill").textContent = totalItems;
+  document.getElementById("total-amount-bill").textContent = totalAmount;
+  document.getElementById(
+    "billing-table-head"
+  ).innerHTML += `<th class="delete-ico-bill" scope="col">
+    <i class="bi bi-trash-fill"></i>
+    </th>`;
+
+  cell = document.getElementById("change-colspan");
+  cell.colSpan = 3;
+
+  totalBalanceKept = 0;
+  prevBalance = 0;
+  customerAvl = false;
+
+  document.getElementById("customer-name-input").value = "";
+  document.getElementById("customer-ph-input").value = "";
+  document.getElementById("customer-name").textContent = "";
+  document.getElementById("customer-ph").textContent = "";
+  document.getElementById("customer-billid").textContent = "";
+  document.getElementById("customer-date-time").textContent = "";
+  document.getElementById("customer-prev-balance").textContent = 0;
+  document.getElementById("customer-total-balance").textContent = 0;
+  document.getElementById("customer-currently-paid").textContent = 0;
+  document.getElementById("customer-balance-kept").textContent = 0;
+  document.getElementById("customer-pay-input").value = "";
+
+  document.getElementById("whatsappLink").classList.add("invisible");
+  document.getElementById("printBtn").classList.remove("disabled");
+  window.open(whatsappLink);
+}
+
+function selectedOption() {
+  // Get all radio buttons with the name "flexRadioDefault"
+  var radioButtons = document.getElementsByName("flexRadioDefault");
+
+  // Initialize a variable to store the value of the active radio button
+  var selectedValue;
+
+  // Loop through each radio button
+  for (var i = 0; i < radioButtons.length; i++) {
+    // Check if the current radio button is checked
+    if (radioButtons[i].checked) {
+      // If checked, store its value
+      selectedValue = radioButtons[i].value;
+      // Break the loop since we found the checked radio button
+      break;
+    }
+  }
+
+  return selectedValue;
+}
+
+async function sendStockOut() {
+  var customerPaying;
+  if (customerAvl == true) {
+    customerPaying = prompt(
+      "Amount Payable by Customer",
+      document.getElementById("customer-pay-input").value
+    );
+  } else {
+    alert("Enter Customer!");
+  }
+  if (customerPaying != null && customerAvl == true) {
     document.getElementById("customer-pay-input").value = customerPaying;
     amountCheck();
 
@@ -228,48 +335,24 @@ async function printPageArea() {
     var stockoutRef = db.collection("stockout");
 
     stockoutRef
-      .get(billid)
-      .then((doc) => {
-        if (doc.exists) {
-          console.log("Doc exists");
-          stockoutRef.doc(dateid).set(
-            {
-              [billid]: {
-                buyerName: buyerName,
-                buyerPhone: buyerPh,
-                sellerName: sellerName,
-                amount: buyerAmount,
-                items: items,
-                qty: itemsQty,
-                rate: itemsRate,
-                price: itemsPrice,
-                paid: paid,
-                time: timeid,
-              },
-            },
-            { merge: true }
-          );
-        } else {
-          console.log("Doesn't not exist");
-          stockoutRef.doc(dateid).set(
-            {
-              [billid]: {
-                buyerName: buyerName,
-                buyerPhone: buyerPh,
-                sellerName: sellerName,
-                amount: buyerAmount,
-                items: items,
-                qty: itemsQty,
-                rate: itemsRate,
-                price: itemsPrice,
-                paid: paid,
-                time: timeid,
-              },
-            },
-            { merge: true }
-          );
-        }
-      })
+      .doc(dateid)
+      .set(
+        {
+          [billid]: {
+            buyerName: buyerName,
+            buyerPhone: buyerPh,
+            sellerName: sellerName,
+            amount: buyerAmount,
+            items: items,
+            qty: itemsQty,
+            rate: itemsRate,
+            price: itemsPrice,
+            paid: paid,
+            time: timeid,
+          },
+        },
+        { merge: true }
+      )
       .then(() => {
         var itemsRef = db.collection("items");
         for (let i = 0; i < items.length; i++) {
@@ -284,7 +367,6 @@ async function printPageArea() {
           .doc(buyerPh)
           .update({
             balance: totalBalanceKept - customerPaying,
-            //purchase: firebase.firestore.FieldValue.arrayUnion(billid),
           })
           .then(() => {
             let table = ``;
@@ -301,138 +383,17 @@ async function printPageArea() {
             document.getElementById("customer-billid").textContent = billid;
           });
       });
-
-    await sleep(1000);
-    var printContent = document.getElementById("printing-bill").innerHTML;
-    var originalContent = document.body.innerHTML;
-    document.body.innerHTML = printContent;
-    window.print();
-    await sleep(1000);
-    document.body.innerHTML = originalContent;
-    const itemElements = document.getElementsByClassName("bill-item");
-    while (itemElements.length > 0) {
-      itemElements[0].parentNode.removeChild(itemElements[0]);
-    }
-    totalItems = 0;
-    totalAmount = 0;
-    document.getElementById("total-items-bill").textContent = totalItems;
-    document.getElementById("total-amount-bill").textContent = totalAmount;
-    document.getElementById(
-      "billing-table-head"
-    ).innerHTML += `<th class="delete-ico-bill" scope="col">
-    <i class="bi bi-trash-fill"></i>
-    </th>`;
-
-    cell = document.getElementById("change-colspan");
-    cell.colSpan = 3;
+    dummyPrint();
   }
-}
-
-// const date = new Date();
-
-// // Get day, month, and year components
-// const day = date.getDate().toString().padStart(2, "0"); // Ensure 2 digits with leading zero if necessary
-// const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Month is zero-indexed, so add 1
-// const year = date.getFullYear();
-
-// // Construct the formatted date string
-// const formattedDate = `${day}-${month}-${year}`;
-
-// console.log(formattedDate);
-
-// Create a new Date object
-
-function updateClock() {
-  const date = new Date();
-
-  // Get the individual components of the date and time
-  const year = date.getFullYear();
-  const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Month is zero-indexed, so add 1
-  const day = date.getDate().toString().padStart(2, "0");
-  const hours = date.getHours().toString().padStart(2, "0");
-  const minutes = date.getMinutes().toString().padStart(2, "0");
-  const seconds = date.getSeconds().toString().padStart(2, "0");
-  const milliseconds = date.getMilliseconds().toString().padStart(3, "0");
-
-  // Determine if it's AM or PM
-  const period = hours >= 12 ? "PM" : "AM";
-
-  // Convert hours to 12-hour format
-  const formattedHours = (hours % 12 || 12).toString().padStart(2, "0"); // If hours is 0, convert to 12
-
-  // Construct the formatted date and time string
-  const formattedDate = `${day}-${month}-${year}`;
-  const formattedDateTime = `${day}-${month}-${year} ${formattedHours}:${minutes}:${seconds} ${period}`;
-  const formattedBillId = `${day}-${month}-${year}-${hours}-${minutes}-${seconds}`;
-
-  document.getElementById("customer-date-time").textContent = formattedDateTime;
-  document.getElementById("customer-billid").textContent = formattedBillId;
-
-  return [formattedDateTime, formattedBillId, formattedDate];
-}
-
-function amountCheck() {
-  payableAmt = document.getElementById("customer-pay-input").value;
-  if (payableAmt != "") {
-    document.getElementById("customer-currently-paid").textContent = payableAmt;
-    document.getElementById("customer-balance-kept").textContent =
-      totalBalanceKept - payableAmt;
-  } else {
-    document.getElementById("customer-pay-input").placeholder = "Amt Please!";
-  }
-}
-// var docData = {
-//   [formattedDateTime]: {
-//     vendor: "Hello world!",
-//     paid: true,
-//     dateExample: firebase.firestore.FieldValue.serverTimestamp(),
-//     arrayExample: [5, 6, 7],
-//   },
-// };
-// db.collection("stockin")
-//   .doc(formattedDate)
-//   .set(docData)
-//   .then(() => {
-//     console.log("Document successfully written!");
-//   })
-//   .catch((err) => {
-//     console.log(err);
-//   });
-
-function whatsappBill() {
-  document.getElementById("whatsappLink").classList.add("invisible");
-  document.getElementById("printBtn").classList.remove("disabled");
-  window.open(whatsappLink);
-}
-
-function selectedOption() {
-  // Get all radio buttons with the name "flexRadioDefault"
-  var radioButtons = document.getElementsByName("flexRadioDefault");
-
-  // Initialize a variable to store the value of the active radio button
-  var selectedValue;
-
-  // Loop through each radio button
-  for (var i = 0; i < radioButtons.length; i++) {
-    // Check if the current radio button is checked
-    if (radioButtons[i].checked) {
-      // If checked, store its value
-      selectedValue = radioButtons[i].value;
-      // Break the loop since we found the checked radio button
-      break;
-    }
-  }
-
-  return selectedValue;
 }
 
 function dummyPrint() {
-  const elements = document.getElementsByClassName("delete-ico-bill");
-  while (elements.length > 0) {
-    elements[0].parentNode.removeChild(elements[0]);
-  }
-  var cell = document.getElementById("change-colspan");
-  cell.colSpan = 2;
+  // const elements = document.getElementsByClassName("delete-ico-bill");
+  // while (elements.length > 0) {
+  //   elements[0].parentNode.removeChild(elements[0]);
+  // }
+  // var cell = document.getElementById("change-colspan");
+  // cell.colSpan = 2;
 
   var preContent = `<!DOCTYPE html>
    <html lang="en">

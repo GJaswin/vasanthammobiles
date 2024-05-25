@@ -1277,20 +1277,24 @@ h6 {
 
 #print-bill-head h2 {
   font-size: large;
+  color: black;
 }
 
 #print-bill-head h3 {
   font-size: smaller;
+  color: black;
 }
 
 #print-bill-head h4 {
   font-size: small;
+  color: black;
 }
 
 #print-bill-cus p {
   font-size: smaller;
   padding-bottom: 0px;
   margin-bottom: 5px;
+  color: black;
 }
 
 #print-bill-cus p:last-child {
@@ -1301,6 +1305,7 @@ h6 {
   font-size: smaller;
   padding-bottom: 0px;
   margin-bottom: 5px;
+  color: black;
 }
 
 #print-bill-total p:last-child {
@@ -1311,7 +1316,7 @@ h6 {
 
 @media print {
  .dummy-print{
-  margin:30px;
+  margin:10px;
  }
 }
 
