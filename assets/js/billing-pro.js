@@ -383,11 +383,11 @@ async function sendStockOut() {
             document.getElementById("customer-billid").textContent = billid;
           });
       });
-    dummyPrint();
+    dummyPrint(billid);
   }
 }
 
-function dummyPrint() {
+function dummyPrint(billid) {
   // const elements = document.getElementsByClassName("delete-ico-bill");
   // while (elements.length > 0) {
   //   elements[0].parentNode.removeChild(elements[0]);
@@ -400,6 +400,7 @@ function dummyPrint() {
      <head>
        <meta charset="utf-8" />
        <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+       <title>${billid}</title>
        <!-- Vendor CSS Files -->
        <link
          href="assets/vendor/bootstrap/css/bootstrap.min.css"
