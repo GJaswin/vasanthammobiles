@@ -46,12 +46,8 @@
       </div>
       <!-- End Logo -->
 
-      
-
       <nav class="header-nav ms-auto">
         <ul class="d-flex align-items-center">
-         
-
           <li class="nav-item">
             <a class="nav-link nav-icon search-bar-toggle" href="add-item.html">
               <i class="bi bi-plus-circle-fill text-primary"></i>
@@ -100,7 +96,10 @@
               </li>
 
               <li>
-                <a class="dropdown-item d-flex align-items-center" href="javascript:signOut()">
+                <a
+                  class="dropdown-item d-flex align-items-center"
+                  href="javascript:signOut()"
+                >
                   <i class="bi bi-box-arrow-right"></i>
                   <span>Sign Out</span>
                 </a>
@@ -148,7 +147,6 @@
         </li>
         <!-- End Profile Page Nav -->
 
-
         <li class="nav-item">
           <a class="nav-link collapsed" href="customers.html">
             <!-- <i class="bi bi-person"></i> -->
@@ -176,7 +174,7 @@
             <span>Items</span>
           </a>
         </li>
-        <!-- End Profile Page Nav --> 
+        <!-- End Profile Page Nav -->
 
         <li class="nav-item">
           <a class="nav-link collapsed" href="notifications.html">
@@ -219,20 +217,21 @@
 
       <section class="section">
         <div class="row align-items-top">
-
           <div class="container">
             <br />
             <div class="row mb-3">
               <div class="col-auto">
                 <!-- Top Search Bar without button -->
-                <div class="input-group">
-                  <input
-                    type="text"
-                    class="form-control"
-                    placeholder="Search items"
-                    onkeydown="if (event.keyCode === 13) filterRows(this.value)"
-                  />
-                </div>
+                <form id="searchForm" onsubmit="handleSubmit(event)">
+                  <div class="input-group">
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="Search items"
+                      id="search-items"
+                    />
+                  </div>
+                </form>
               </div>
             </div>
             <div class="row">
@@ -247,9 +246,7 @@
                         <th scope="col"><i class="bi bi-trash-fill"></i></th>
                       </tr>
                     </thead>
-                    <tbody id="table-body-items">
-                     
-                    </tbody>
+                    <tbody id="table-body-items"></tbody>
                   </table>
                 </div>
               </div>
@@ -292,7 +289,10 @@
                 <nav aria-label="Page navigation example">
                   <ul class="pagination">
                     <li class="page-item">
-                      <a class="page-link" id="pagination-prev" href="javascript:prevPage()"
+                      <a
+                        class="page-link"
+                        id="pagination-prev"
+                        href="javascript:prevPage()"
                         >Previous</a
                       >
                     </li>
@@ -305,7 +305,10 @@
                       >
                     </li>
                     <li class="page-item">
-                      <a class="page-link" id="pagination-next" href="javascript:nextPage()"
+                      <a
+                        class="page-link"
+                        id="pagination-next"
+                        href="javascript:nextPage()"
                         >Next</a
                       >
                     </li>
@@ -317,7 +320,6 @@
           <!-- My Table Code Ends-->
         </div>
       </section>
-      
     </main>
     <!-- End #main -->
 
@@ -404,7 +406,7 @@
           }
         }
 
-        if(searchTerm==''){
+        if (searchTerm == "") {
           changePage(1);
         }
       }
@@ -441,28 +443,41 @@
       // Function to handle pagination button clicks
       function changePage(pageNum) {
         totalPages = countPages();
-        if(pageNum==1){
+        if (pageNum == 1) {
           paginateTable(pageNum);
           curPage = pageNum;
-          document.getElementById("pagination-active-page").textContent = pageNum;
+          document.getElementById("pagination-active-page").textContent =
+            pageNum;
           document.getElementById("pagination-prev").classList.add("disabled");
-          if(totalPages>1){
-            document.getElementById("pagination-next").classList.remove("disabled");
-          } else{
-            document.getElementById("pagination-next").classList.add("disabled");
+          if (totalPages > 1) {
+            document
+              .getElementById("pagination-next")
+              .classList.remove("disabled");
+          } else {
+            document
+              .getElementById("pagination-next")
+              .classList.add("disabled");
           }
         } else if (pageNum < totalPages) {
           paginateTable(pageNum);
           curPage = pageNum;
-          document.getElementById("pagination-active-page").textContent = pageNum;
-          document.getElementById("pagination-prev").classList.remove("disabled");
-          document.getElementById("pagination-next").classList.remove("disabled");
-        } else if(pageNum == totalPages){
+          document.getElementById("pagination-active-page").textContent =
+            pageNum;
+          document
+            .getElementById("pagination-prev")
+            .classList.remove("disabled");
+          document
+            .getElementById("pagination-next")
+            .classList.remove("disabled");
+        } else if (pageNum == totalPages) {
           paginateTable(pageNum);
           curPage = pageNum;
-          document.getElementById("pagination-active-page").textContent = pageNum;
+          document.getElementById("pagination-active-page").textContent =
+            pageNum;
           document.getElementById("pagination-next").classList.add("disabled");
-          document.getElementById("pagination-prev").classList.remove("disabled");
+          document
+            .getElementById("pagination-prev")
+            .classList.remove("disabled");
         }
       }
 
@@ -503,6 +518,12 @@
             parseInt(document.getElementById("page-search-input").value, 10)
           );
         });
+
+      function handleSubmit(event) {
+        event.preventDefault(); // Prevent the form from submitting
+        const input = document.getElementById("search-items");
+        filterRows(input.value);
+      }
     </script>
   </body>
 </html>
