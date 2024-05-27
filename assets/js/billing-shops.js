@@ -112,7 +112,7 @@ function itemToBill(itemName) {
     var priceid = itemName + "price";
 
     var price;
-    if (qty != null) {
+    if (!isNaN(qty)) {
       var docRef = db.collection("items").doc(itemName);
       docRef
         .get()
@@ -137,7 +137,7 @@ function itemToBill(itemName) {
               <td id='${priceid}' onclick="priceClickChange('${itemName}',${qty})">${price}</td>
               <td class="delete-ico-bill">
                 <span class="text-danger"
-                  ><a href="javascript:removeItemFromBill('${id}',${price})"><i class="bi bi-trash-fill"></i></a>
+                  ><a href="javascript:removeItemFromBill('${id}','${priceid}')"><i class="bi bi-trash-fill"></i></a>
                 </span>
               </td>
             </tr>
@@ -155,15 +155,16 @@ function itemToBill(itemName) {
   }
 }
 
-function removeItemFromBill(id, price) {
-  document.getElementById(id).remove();
+function removeItemFromBill(id, priceid) {
   totalItems--;
+  var price = parseFloat(document.getElementById(priceid).textContent);
   totalAmount -= price;
   document.getElementById("total-items-bill").textContent = totalItems;
   document.getElementById("total-amount-bill").textContent = totalAmount;
   totalBalanceKept = totalAmount + prevBalance;
   document.getElementById("customer-total-balance").textContent =
     totalBalanceKept;
+    document.getElementById(id).remove();
 }
 
 function searchCustomer() {
@@ -243,7 +244,7 @@ function updateClock() {
   // Construct the formatted date and time string
   const formattedDate = `${day}-${month}-${year}`;
   const formattedDateTime = `${day}-${month}-${year} ${formattedHours}:${minutes}:${seconds} ${period}`;
-  const formattedBillId = `${day}-${month}-${year}-${hours}-${minutes}-${seconds}`;
+  const formattedBillId = `${day}-${month}-${year}-${hours}-${minutes}-${seconds}-${milliseconds}`;
 
   document.getElementById("customer-date-time").textContent = formattedDateTime;
   document.getElementById("customer-billid").textContent = formattedBillId;
@@ -283,7 +284,7 @@ function whatsappBill() {
   totalBalanceKept = 0;
   prevBalance = 0;
   customerAvl = false;
-  shopCustomer = '';
+  shopCustomer = "";
   document.getElementById("customer-name").textContent = "";
   document.getElementById("customer-ph").textContent = "";
   document.getElementById("customer-billid").textContent = "";
@@ -293,6 +294,10 @@ function whatsappBill() {
   document.getElementById("customer-currently-paid").textContent = 0;
   document.getElementById("customer-balance-kept").textContent = 0;
   document.getElementById("customer-pay-input").value = "";
+
+  document.getElementById("page-alert-out").classList.add("invisible");
+  document.getElementById("page-alert-transaction").classList.add("invisible");
+  document.getElementById("billLoopItems").innerHTML = ``;
 
   document.getElementById("whatsappLink").classList.add("invisible");
   document.getElementById("printBtn").classList.remove("disabled");
@@ -397,43 +402,46 @@ async function sendStockOut() {
       )
       .then(() => {
         var itemsRef = db.collection("items");
+        var loopItems = ``;
         for (let i = 0; i < items.length; i++) {
-          itemsRef.doc(items[i]).update({
-            stock: firebase.firestore.FieldValue.increment(-itemsQty[i]),
-          });
+          itemsRef
+            .doc(items[i])
+            .update({
+              stock: firebase.firestore.FieldValue.increment(-itemsQty[i]),
+            })
+            .then(() => {
+              document.getElementById(
+                "billLoopItems"
+              ).innerHTML += `<a>${items[i]} - stock reduced by ${itemsQty[i]}</a><br>`;
+            });
         }
+        document.getElementById("page-alert-out").classList.remove("invisible");
       })
       .then(() => {
         var balance = totalBalanceKept - customerPaying;
-        addTransaction(buyerName,timeid,customerPaying,balance)
-          .then(() => {
-            let table = ``;
-            for (i = 0; i < items.length; i++) {
-              table += `Item: ${items[i]}\nRate: ${itemsRate[i]}\nQty: ${itemsQty[i]}\nPrice: ${itemsPrice[i]}\n\n`;
-            }
-            var formattedWaBill = encodeURIComponent(table);
-            whatsappLink = `https://wa.me/+91${buyerPh}?text=Vasantham Mobiles Bill%0a%0aSeller:${sellerName}%0aTo:${buyerName}%0aBill id:${billid}%0a%0a${formattedWaBill}%0aTotal Amount:${buyerAmount}%0aPrev Balance:${prevBalance}%0aTotal Balance:${totalBalanceKept}%0aCurrently Paid:${customerPaying}%0aBalance Kept:${balanceKept}`;
-            document.getElementById("printBtn").classList.add("disabled");
-            document
-              .getElementById("whatsappLink")
-              .classList.remove("invisible");
-            document.getElementById("customer-date-time").textContent = timeid;
-            document.getElementById("customer-billid").textContent = billid;
-          });
+        addTransaction(buyerName, timeid, customerPaying, balance).then(() => {
+          let table = ``;
+          for (i = 0; i < items.length; i++) {
+            table += `Item: ${items[i]}\nRate: ${itemsRate[i]}\nQty: ${itemsQty[i]}\nPrice: ${itemsPrice[i]}\n\n`;
+          }
+          var formattedWaBill = encodeURIComponent(table);
+          whatsappLink = `https://wa.me/+91${buyerPh}?text=Vasantham Mobiles Bill%0a%0aSeller:${sellerName}%0aTo:${buyerName}%0aBill id:${billid}%0a%0a${formattedWaBill}%0aTotal Amount:${buyerAmount}%0aPrev Balance:${prevBalance}%0aTotal Balance:${totalBalanceKept}%0aCurrently Paid:${customerPaying}%0aBalance Kept:${balanceKept}`;
+          document.getElementById("printBtn").classList.add("disabled");
+          document.getElementById("whatsappLink").classList.remove("invisible");
+          document.getElementById("customer-date-time").textContent = timeid;
+          document.getElementById("customer-billid").textContent = billid;
+        });
       });
-    dummyPrint(billid);
+    dummyPrint();
   }
 }
 
-function dummyPrint(billid) {
-  document.title = billid;
-
+function dummyPrint() {
   var preContent = `<!DOCTYPE html>
    <html lang="en">
      <head>
        <meta charset="utf-8" />
        <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-       <title>${billid}</title>
        <!-- Vendor CSS Files -->
        <link
          href="assets/vendor/bootstrap/css/bootstrap.min.css"
@@ -469,22 +477,26 @@ function rateClickChange(id, qty) {
   var price = parseFloat(document.getElementById(id + "price").textContent);
   var Qty = parseInt(qty, 10);
   var changed = parseFloat(prompt("Enter " + id + "'s New Rate", rate));
-  if (changed != null) {
-    totalAmount = totalAmount-price;
+  if (!isNaN(changed)) {
+    totalAmount = totalAmount - price;
     document.getElementById(id + "rate").textContent = Number.isInteger(changed)
       ? changed.toFixed(0)
       : changed.toFixed(2);
     changedPrice = changed * Qty;
     totalAmount += changedPrice;
-    document.getElementById("total-amount-bill").textContent = Number.isInteger(totalAmount)
+    document.getElementById("total-amount-bill").textContent = Number.isInteger(
+      totalAmount
+    )
       ? totalAmount.toFixed(0)
       : totalAmount.toFixed(2);
     totalBalanceKept = totalAmount + prevBalance;
     document.getElementById("customer-total-balance").textContent =
       totalBalanceKept;
-    document.getElementById(id + "price").textContent = Number.isInteger(changedPrice)
-    ? changedPrice.toFixed(0)
-    : changedPrice.toFixed(2);;
+    document.getElementById(id + "price").textContent = Number.isInteger(
+      changedPrice
+    )
+      ? changedPrice.toFixed(0)
+      : changedPrice.toFixed(2);
   }
 }
 
@@ -492,7 +504,7 @@ function priceClickChange(id, qty) {
   var price = parseFloat(document.getElementById(id + "price").textContent);
   var Qty = parseInt(qty, 10);
   var changed = parseFloat(prompt("Enter " + id + "'s New Price", price));
-  if (changed != null) {
+  if (!isNaN(changed)) {
     totalAmount -= price;
     totalAmount += changed;
     document.getElementById("total-amount-bill").textContent = totalAmount;
@@ -523,9 +535,11 @@ function setShop(shopName, shopPhone) {
           shopCustomer.balance;
         prevBalance = shopCustomer.balance;
         totalBalanceKept = shopCustomer.balance + totalAmount;
-        document.getElementById("total-amount-bill").textContent = totalAmount,
-        document.getElementById("customer-total-balance").textContent = totalBalanceKept
-          alert(shopName + " Set");
+        (document.getElementById("total-amount-bill").textContent =
+          totalAmount),
+          (document.getElementById("customer-total-balance").textContent =
+            totalBalanceKept);
+        alert(shopName + " Set");
       } else {
         // doc.data() will be undefined in this case
         console.log("No such document!");
@@ -592,37 +606,41 @@ function checkIdExists(elementId) {
   return document.getElementById(elementId) !== null;
 }
 
-
-function addTransaction(shopName,billid,amt,blnce) {
+function addTransaction(shopName, billid, amt, blnce) {
   var shopRef = db.collection("shops").doc(shopName);
 
-  return db.runTransaction(function(transaction) {
-      return transaction.get(shopRef).then(function(doc) {
-          if (!doc.exists) {
-              throw "Document does not exist!";
-          }
+  return db
+    .runTransaction(function (transaction) {
+      return transaction.get(shopRef).then(function (doc) {
+        if (!doc.exists) {
+          throw "Document does not exist!";
+        }
 
-          var transactions = doc.data().payment || [];
+        var transactions = doc.data().payment || [];
 
-          // Check if the transactions array length is 20 or more
-          if (transactions.length >= 20) {
-              // Remove the oldest transaction (first element)
-              transactions.shift();
-          }
+        // Check if the transactions array length is 20 or more
+        if (transactions.length >= 15) {
+          // Remove the oldest transaction (first element)
+          transactions.shift();
+        }
 
-          // Add the new transaction to the array
-          transactions.push({
-            [billid]: amt,
-          });
+        // Add the new transaction to the array
+        transactions.push({
+          [billid]: amt,
+        });
 
-          // Update the document with the modified transactions array
-          transaction.update(shopRef, { payment: transactions, balance: blnce });
+        // Update the document with the modified transactions array
+        transaction.update(shopRef, { payment: transactions, balance: blnce });
       });
-  }).then(function() {
+    })
+    .then(function () {
       console.log("Transaction added successfully.");
-      alert("Transaction added successfully");
-  }).catch(function(error) {
+      document
+        .getElementById("page-alert-transaction")
+        .classList.remove("invisible");
+    })
+    .catch(function (error) {
       alert("Transaction Error");
       console.error("Transaction failed: ", error);
-  });
+    });
 }

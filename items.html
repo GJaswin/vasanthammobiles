@@ -5,9 +5,6 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
 
     <title>Items Management</title>
-    <meta content="" name="description" />
-    <meta content="" name="keywords" />
-
     <!-- Favicons -->
     <link href="assets/img/favicon.png" rel="icon" />
     <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon" />
@@ -49,33 +46,11 @@
       </div>
       <!-- End Logo -->
 
-      <!-- <div class="search-bar">
-        <form
-          class="search-form d-flex align-items-center"
-          method="POST"
-          action="#"
-        >
-          <input
-            type="text"
-            name="query"
-            placeholder="Search"
-            title="Enter search keyword"
-          />
-          <button type="submit" title="Search">
-            <i class="bi bi-search"></i>
-          </button>
-        </form>
-      </div> -->
-      <!-- End Search Bar -->
+      
 
       <nav class="header-nav ms-auto">
         <ul class="d-flex align-items-center">
-          <!-- <li class="nav-item d-block d-lg-none">
-            <a class="nav-link nav-icon search-bar-toggle" href="#">
-              <i class="bi bi-search"></i>
-            </a>
-          </li> -->
-          <!-- End Search Icon-->
+         
 
           <li class="nav-item">
             <a class="nav-link nav-icon search-bar-toggle" href="add-item.html">
@@ -95,19 +70,17 @@
               href="#"
               data-bs-toggle="dropdown"
             >
-              <img
-                src="assets/img/profile-img.jpg"
-                alt="Profile"
-                class="rounded-circle"
-              /> </a
+              <i
+                class="bi bi-person-fill-check"
+                style="font-size: 2rem"
+              ></i> </a
             ><!-- End Profile Iamge Icon -->
 
             <ul
               class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile"
             >
               <li class="dropdown-header">
-                <h6>Kevin Anderson</h6>
-                <span>Web Designer</span>
+                <h6 id="userName"></h6>
               </li>
               <li>
                 <hr class="dropdown-divider" />
@@ -116,10 +89,10 @@
               <li>
                 <a
                   class="dropdown-item d-flex align-items-center"
-                  href="users-profile.html"
+                  href="my-account.html"
                 >
                   <i class="bi bi-person"></i>
-                  <span>My Profile</span>
+                  <span>My Account</span>
                 </a>
               </li>
               <li>
@@ -127,7 +100,7 @@
               </li>
 
               <li>
-                <a class="dropdown-item d-flex align-items-center" href="#">
+                <a class="dropdown-item d-flex align-items-center" href="javascript:signOut()">
                   <i class="bi bi-box-arrow-right"></i>
                   <span>Sign Out</span>
                 </a>
@@ -146,6 +119,18 @@
     <aside id="sidebar" class="sidebar">
       <ul class="sidebar-nav" id="sidebar-nav">
         <li class="nav-heading">Sections</li>
+
+        <li class="nav-item">
+          <a class="nav-link collapsed" href="index.html">
+            <span>Home</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link collapsed" href="admin.html">
+            <span>Admin</span>
+          </a>
+        </li>
 
         <li class="nav-item">
           <a class="nav-link collapsed" href="stock-in.html">
@@ -245,7 +230,7 @@
                     type="text"
                     class="form-control"
                     placeholder="Search items"
-                    onkeyup="filterRows(this.value)"
+                    onkeydown="if (event.keyCode === 13) filterRows(this.value)"
                   />
                 </div>
               </div>
@@ -395,7 +380,7 @@
         var trs = tbody.getElementsByTagName("tr");
 
         var visibleRows = 0; // Counter for visible rows
-        var rowsPerPage = 10; // Number of rows to display per page
+        var rowsPerPage = 5; // Number of rows to display per page
         for (var i = 0; i < trs.length; i++) {
           var tds = trs[i].getElementsByTagName("td");
           var found = false;

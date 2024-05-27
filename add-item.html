@@ -75,7 +75,7 @@
                           name="item-name"
                           class="form-control"
                           id="item-name"
-                          onkeyup="filterRows(this.value)"
+                          onkeydown="if (event.keyCode === 13) filterRows(this.value)"
                           required
                         />
                         <div class="invalid-feedback">
@@ -147,6 +147,22 @@
                         />
                         <div class="invalid-feedback">
                           Please, Enter Wholesale Rate!
+                        </div>
+                      </div>
+
+                      <div class="col-12">
+                        <label for="master-rate" class="form-label"
+                          >Master Wholesale Rate</label
+                        >
+                        <input
+                          type="number"
+                          name=master-rate"
+                          class="form-control"
+                          id="master-rate"
+                          required
+                        />
+                        <div class="invalid-feedback">
+                          Please, Enter Master Rate!
                         </div>
                       </div>
 

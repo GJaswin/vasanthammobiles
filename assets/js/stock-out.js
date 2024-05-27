@@ -55,8 +55,9 @@ docRef
       // const nestedField2 = nestedMap1.field2;
       // const nestedField3 = nestedMap2.field3;
       var entrys = Object.keys(data).length;
-      var stockoutids = Object.keys(data);
-
+      document.getElementById("stock-out-date-length").textContent = entrys;
+      var stockoutids = Object.keys(data).sort();
+      var stockOuthtml = ``;
       stockoutids.forEach((id) => {
         var items = data[id].items;
         var rate = data[id].rate;
@@ -72,17 +73,18 @@ docRef
           <td>${price[i]}</td>
         </tr>`;
         }
-        document.getElementById("stockout-section").innerHTML += `
+
+        stockOuthtml += `
         <div class="card top-selling overflow-auto" id='${id}'>
               <div class="card-body pb-0">
                 <h5 class="card-title head">
-                  ${data[id].time} &nbsp;&nbsp;|&nbsp;&nbsp;<a href="javascript:editStockOut()">Edit</a
-                  >&nbsp;&nbsp;|&nbsp;&nbsp;<a href="javascript:deleteStockOut('${id}')">Delete</a>
+                  ${data[id].time} &nbsp;|&nbsp;<a href="javascript:deleteStockOut('${id}')">Delete</a>
                 </h5>
                 <h5 class="card-title">Seller: ${data[id].sellerName}</h5>
                 <h5 class="card-title">Buyer: ${data[id].buyerName} | ${data[id].buyerPhone}</h5>
                 <h5 class="card-title">Paid: ${data[id].paid}</h5>
                 <h5 class="card-title">Amount: ${data[id].amount}</h5>
+                <h5 class="card-title">Paid Amt: ${data[id].customerPaid}</h5>
                 <br />
                 <table class="table table-borderless">
                   <thead>
@@ -101,6 +103,7 @@ docRef
             </div>
         `;
       });
+      document.getElementById("stockout-section").innerHTML = stockOuthtml;
     } else {
       console.log("No such document!");
     }
@@ -128,11 +131,15 @@ function deleteStockOut(billid) {
   }
 }
 
-function searchDate() {
-  date = document.getElementById("searchDateStockOut").value;
-  if (date.length == 10) {
-    const docRef = db.collection("stockout").doc(date);
-
+function searchDate(dateString) {
+  const date = dateString;
+  const year = date.slice(0, 4);
+  const month = date.slice(5, 7);
+  const day = date.slice(8, 10);
+  fetchingDate = `${day}-${month}-${year}`;
+  
+  if (fetchingDate.length == 10) {
+    const docRef = db.collection("stockout").doc(fetchingDate);
     // Get the document
     docRef
       .get()
@@ -151,7 +158,9 @@ function searchDate() {
           // const nestedField2 = nestedMap1.field2;
           // const nestedField3 = nestedMap2.field3;
           var entrys = Object.keys(data).length;
-          var stockoutids = Object.keys(data);
+          document.getElementById("stock-out-date-length").textContent = entrys;
+          var stockoutids = Object.keys(data).sort();
+          var stockOuthtml = ``;
 
           stockoutids.forEach((id) => {
             var items = data[id].items;
@@ -168,17 +177,17 @@ function searchDate() {
           <td>${price[i]}</td>
         </tr>`;
             }
-            document.getElementById("stockout-section").innerHTML += `
+            stockOuthtml += `
         <div class="card top-selling overflow-auto" id='${id}'>
               <div class="card-body pb-0">
                 <h5 class="card-title head">
-                  ${data[id].time} &nbsp;&nbsp;|&nbsp;&nbsp;<a href="javascript:editStockOut()">Edit</a
-                  >&nbsp;&nbsp;|&nbsp;&nbsp;<a href="javascript:deleteStockOut('${id}')">Delete</a>
+                  ${data[id].time} &nbsp;&nbsp;|&nbsp;&nbsp;<a href="javascript:deleteStockOut('${id}')">Delete</a>
                 </h5>
                 <h5 class="card-title">Seller: ${data[id].sellerName}</h5>
                 <h5 class="card-title">Buyer: ${data[id].buyerName} | ${data[id].buyerPhone}</h5>
                 <h5 class="card-title">Paid: ${data[id].paid}</h5>
                 <h5 class="card-title">Amount: ${data[id].amount}</h5>
+                <h5 class="card-title">Paid Amt: ${data[id].customerPaid}</h5>
                 <br />
                 <table class="table table-borderless">
                   <thead>
@@ -197,6 +206,7 @@ function searchDate() {
             </div>
         `;
           });
+          document.getElementById("stockout-section").innerHTML = stockOuthtml;
         } else {
           console.log("No such document!");
           Alert("Enter Correct Date");

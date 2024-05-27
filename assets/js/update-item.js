@@ -23,6 +23,7 @@ const urlParams = new URLSearchParams(queryString);
 const item = urlParams.get("item");
 
 // Get a reference to the document
+function getItem(){
 var docRef = db.collection("items").doc(item);
 var data;
 // Retrieve the document
@@ -36,6 +37,7 @@ docRef
       document.getElementById("item-category").value = data.category;
       document.getElementById("item-retail-rate").value = data.retailRate;
       document.getElementById("item-wholesale-rate").value = data.wholesaleRate;
+      document.getElementById("master-rate").value = data.master;
       document.getElementById("item-stock-avl").value = data.stock;
     } else {
       console.log("No such document!");
@@ -44,6 +46,7 @@ docRef
   .catch(function (error) {
     console.log("Error getting document:", error);
   });
+}
 
 function capitalize(string) {
   return string.replace(/\w\S*/g, function (txt) {
@@ -60,6 +63,7 @@ function updateItem() {
   );
   var retailRate = parseInt(document.getElementById("item-retail-rate").value,10);
   var wholesaleRate = parseInt(document.getElementById("item-wholesale-rate").value,10);
+  var masterRate = parseInt(document.getElementById("master-rate").value,10);
   var stockAvl = parseInt(document.getElementById("item-stock-avl").value,10);
 
   const docRef = db.collection("items").doc(itemName);
@@ -75,6 +79,7 @@ function updateItem() {
             category: itemCategory,
             retailRate: retailRate,
             wholesaleRate: wholesaleRate,
+            master: masterRate,
             stock: data.stock,
           })
           .then(() => {
@@ -91,6 +96,7 @@ function updateItem() {
             category: itemCategory,
             retailRate: retailRate,
             wholesaleRate: wholesaleRate,
+            master: masterRate,
             stock: data.stock,
           })
           .then(() => {
@@ -127,3 +133,27 @@ function updateItem() {
         "Error Occured, Try Again!";
     });
 }
+
+firebase.auth().onAuthStateChanged((user) => {
+  if (user) {
+    var uid = user.uid;
+    var displayName = user.displayName;
+    if (displayName != null) {
+      console.log("Name: " + displayName);
+    } else {
+      alert("Set your Name in the 'My Account' section");
+      window.location.href = "my-account.html";
+    }
+    var emailVerified = user.emailVerified;
+    if (emailVerified) {
+      getItem();
+    } else {
+      alert("Verify your mail in the 'My account' section");
+      window.location.href = "my-account.html";
+    }
+  } else {
+    // User is signed out
+    // ...
+    window.location.href = 'login.html';
+  }
+});

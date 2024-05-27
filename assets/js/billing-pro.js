@@ -19,79 +19,115 @@ var database = firebase.database();
 
 itemsTablehtml = ``;
 
-// Showing the items for adding them to the Billing Section
-const dbRef = database.ref();
-dbRef
-  .child("items")
-  .get()
-  .then((snapshot) => {
-    if (snapshot.exists()) {
-      snapshot.forEach((childSnapshot) => {
-        const key = childSnapshot.key;
-        const value = childSnapshot.val();
-        itemsTablehtml += `
-          <tr id='${key}'>
-            <td>${key}</td>
-            <td>${value}</td>
-            <td>
-            <span class="text-primary"
-                ><a href="update-item.html?item=${key}"><i class="bi bi-pencil-fill"></i
-            ></a></span>
-            </td>
-            <td>
-            <span class="text-danger"
-                ><a href="javascript:itemToBill('${key}')"><i class="bi bi-bag-plus-fill"></i></a>
-            </span>
-            </td>
-        </tr>
-            `;
-      });
-      document.getElementById("table-body-items").innerHTML = itemsTablehtml;
-      filterRows("");
-      document.getElementById("totalPages").textContent = countPages();
-    } else {
-      console.log("No data available");
-    }
-  })
-  .catch((error) => {
-    console.error(error);
-  });
+// document.addEventListener('DOMContentLoaded', () => {
+//   // Function to retrieve and display items from local storage
+//   function displayItems() {
+//       // Retrieve items from local storage
+//       const localItems = localStorage.getItem('items');
 
-shopsTablehtml = ``;
-dbRef
-  .child("shops")
-  .get()
-  .then((snapshot) => {
-    if (snapshot.exists()) {
-      snapshot.forEach((childSnapshot) => {
-        const key = childSnapshot.key;
-        const value = childSnapshot.val();
-        shopsTablehtml += `
-        <tr id='${key}'>
-        <td>${key}</td>
-        <td>${value}</td>
-        <td>
-          <span class="text-primary"
-            ><a href="update-shop.html?shop=${key}"><i class="bi bi-pencil-fill"></i
-          ></a></span>
-        </td>
-        <td>
-          <span class="text-danger"
-            ><a href="javascript:setShop('${key}','${value}')"><i class="bi bi-check2-circle"></i></a>
-          </span>
-        </td>
-      </tr>
-      `;
-      });
-      document.getElementById("table-body-shops").innerHTML = shopsTablehtml;
-      filterRowsShops("");
-    } else {
-      console.log("No data available");
-    }
-  })
-  .catch((error) => {
-    console.error(error);
-  });
+//       if (localItems) {
+//           // Parse the JSON string to get the object
+//           const items = JSON.parse(localItems);
+//           console.log('Items retrieved from local storage:', items);
+
+//           // Iterate over the object properties to access each item
+//           for (const [itemName, itemCategory] of Object.entries(items)) {
+//               console.log(`Item: ${itemName}, Category: ${itemCategory}`);
+//               // Example: Append each item to a list in the HTML
+//               const itemElement = document.createElement('li');
+//               itemElement.textContent = `Item: ${itemName}, Category: ${itemCategory}`;
+//               document.getElementById('items-list').appendChild(itemElement);
+//           }
+//       } else {
+//           console.log('No items found in local storage.');
+//       }
+//   }
+
+//   // Call the function to display items
+//   displayItems();
+// });
+
+document.addEventListener("DOMContentLoaded", () => {
+  const localItems = JSON.parse(localStorage.getItem("items"));
+
+  // Reference to the table body element
+  const tableBody = document.getElementById("table-body-items");
+
+  // Iterate over the items and append rows to the table
+  for (const [key, value] of Object.entries(localItems)) {
+    // Create a new row element
+    const row = document.createElement("tr");
+    row.id = key; // Set the id attribute to the key
+
+    // Create table data cells and set their content
+    const keyCell = document.createElement("td");
+    keyCell.textContent = key;
+
+    const valueCell = document.createElement("td");
+    valueCell.textContent = value;
+
+    const updateCell = document.createElement("td");
+    const updateLink = document.createElement("a");
+    updateLink.href = `update-item.html?item=${key}`;
+    updateLink.innerHTML = '<i class="bi bi-pencil-fill"></i>';
+    updateCell.appendChild(updateLink);
+
+    const deleteCell = document.createElement("td");
+    const deleteLink = document.createElement("a");
+    deleteLink.href = `javascript:itemToBill('${key}')`;
+    deleteLink.innerHTML = '<i class="bi bi-bag-plus-fill"></i>';
+    deleteCell.appendChild(deleteLink);
+
+    // Append table data cells to the row
+    row.appendChild(keyCell);
+    row.appendChild(valueCell);
+    row.appendChild(updateCell);
+    row.appendChild(deleteCell);
+
+    // Append the row to the table body
+    tableBody.appendChild(row);
+  }
+  filterRows("");
+  document.getElementById("totalPages").textContent = countPages();
+});
+
+// Showing the items for adding them to the Billing Section
+// const dbRef = database.ref();
+// dbRef
+//   .child("items")
+//   .get()
+//   .then((snapshot) => {
+//     if (snapshot.exists()) {
+//       snapshot.forEach((childSnapshot) => {
+//         const key = childSnapshot.key;
+//         const value = childSnapshot.val();
+//         itemsTablehtml += `
+//           <tr id='${key}'>
+//             <td>${key}</td>
+//             <td>${value}</td>
+//             <td>
+//             <span class="text-primary"
+//                 ><a href="update-item.html?item=${key}"><i class="bi bi-pencil-fill"></i
+//             ></a></span>
+//             </td>
+//             <td>
+//             <span class="text-danger"
+//                 ><a href="javascript:itemToBill('${key}')"><i class="bi bi-bag-plus-fill"></i></a>
+//             </span>
+//             </td>
+//         </tr>
+//             `;
+//       });
+//       document.getElementById("table-body-items").innerHTML = itemsTablehtml;
+//       filterRows("");
+//       document.getElementById("totalPages").textContent = countPages();
+//     } else {
+//       console.log("No data available");
+//     }
+//   })
+//   .catch((error) => {
+//     console.error(error);
+//   });
 
 // Global Variables
 var totalItems = 0;
@@ -100,7 +136,6 @@ var totalBalanceKept = 0;
 var prevBalance = 0;
 var customerAvl = false;
 var whatsappLink;
-var shopCustomer;
 
 function itemToBill(itemName) {
   if (checkIdExists(itemName + "bill")) {
@@ -112,7 +147,7 @@ function itemToBill(itemName) {
     var priceid = itemName + "price";
 
     var price;
-    if (qty != null) {
+    if (!isNaN(qty)) {
       var docRef = db.collection("items").doc(itemName);
       docRef
         .get()
@@ -137,7 +172,7 @@ function itemToBill(itemName) {
               <td id='${priceid}' onclick="priceClickChange('${itemName}',${qty})">${price}</td>
               <td class="delete-ico-bill">
                 <span class="text-danger"
-                  ><a href="javascript:removeItemFromBill('${id}',${price})"><i class="bi bi-trash-fill"></i></a>
+                  ><a href="javascript:removeItemFromBill('${id}','${priceid}')"><i class="bi bi-trash-fill"></i></a>
                 </span>
               </td>
             </tr>
@@ -155,15 +190,16 @@ function itemToBill(itemName) {
   }
 }
 
-function removeItemFromBill(id, price) {
-  document.getElementById(id).remove();
+function removeItemFromBill(id, priceid) {
   totalItems--;
+  var price = parseFloat(document.getElementById(priceid).textContent);
   totalAmount -= price;
   document.getElementById("total-items-bill").textContent = totalItems;
   document.getElementById("total-amount-bill").textContent = totalAmount;
   totalBalanceKept = totalAmount + prevBalance;
   document.getElementById("customer-total-balance").textContent =
     totalBalanceKept;
+  document.getElementById(id).remove();
 }
 
 function searchCustomer() {
@@ -243,7 +279,7 @@ function updateClock() {
   // Construct the formatted date and time string
   const formattedDate = `${day}-${month}-${year}`;
   const formattedDateTime = `${day}-${month}-${year} ${formattedHours}:${minutes}:${seconds} ${period}`;
-  const formattedBillId = `${day}-${month}-${year}-${hours}-${minutes}-${seconds}`;
+  const formattedBillId = `${day}-${month}-${year}-${hours}-${minutes}-${seconds}-${milliseconds}`;
 
   document.getElementById("customer-date-time").textContent = formattedDateTime;
   document.getElementById("customer-billid").textContent = formattedBillId;
@@ -283,7 +319,9 @@ function whatsappBill() {
   totalBalanceKept = 0;
   prevBalance = 0;
   customerAvl = false;
-  shopCustomer = '';
+
+  document.getElementById("customer-name-input").value = "";
+  document.getElementById("customer-ph-input").value = "";
   document.getElementById("customer-name").textContent = "";
   document.getElementById("customer-ph").textContent = "";
   document.getElementById("customer-billid").textContent = "";
@@ -348,12 +386,14 @@ async function sendStockOut() {
     var buyerName = document.getElementById("customer-name").textContent;
     var buyerPh = document.getElementById("customer-ph").textContent;
     var sellerName = document.getElementById("seller-name").textContent;
-    var buyerAmount = parseFloat(
-      document.getElementById("total-amount-bill").textContent
-    ).toFixed(0);
-    var balanceKept = parseFloat(
-      document.getElementById("customer-balance-kept").textContent
-    ).toFixed(0);
+    var buyerAmount = parseInt(
+      document.getElementById("total-amount-bill").textContent,
+      10
+    );
+    var balanceKept = parseInt(
+      document.getElementById("customer-balance-kept").textContent,
+      10
+    );
     var paid = false;
     if (customerPaying >= buyerAmount) {
       paid = true;
@@ -384,7 +424,6 @@ async function sendStockOut() {
             buyerPhone: buyerPh,
             sellerName: sellerName,
             amount: buyerAmount,
-            customerPaid: customerPaying,
             items: items,
             qty: itemsQty,
             rate: itemsRate,
@@ -404,8 +443,12 @@ async function sendStockOut() {
         }
       })
       .then(() => {
-        var balance = totalBalanceKept - customerPaying;
-        addTransaction(buyerName,timeid,customerPaying,balance)
+        var customerRef = db.collection("customers");
+        customerRef
+          .doc(buyerPh)
+          .update({
+            balance: totalBalanceKept - customerPaying,
+          })
           .then(() => {
             let table = ``;
             for (i = 0; i < items.length; i++) {
@@ -469,22 +512,26 @@ function rateClickChange(id, qty) {
   var price = parseFloat(document.getElementById(id + "price").textContent);
   var Qty = parseInt(qty, 10);
   var changed = parseFloat(prompt("Enter " + id + "'s New Rate", rate));
-  if (changed != null) {
-    totalAmount = totalAmount-price;
+  if (!isNaN(changed)) {
+    totalAmount = totalAmount - price;
     document.getElementById(id + "rate").textContent = Number.isInteger(changed)
       ? changed.toFixed(0)
       : changed.toFixed(2);
     changedPrice = changed * Qty;
     totalAmount += changedPrice;
-    document.getElementById("total-amount-bill").textContent = Number.isInteger(totalAmount)
+    document.getElementById("total-amount-bill").textContent = Number.isInteger(
+      totalAmount
+    )
       ? totalAmount.toFixed(0)
       : totalAmount.toFixed(2);
     totalBalanceKept = totalAmount + prevBalance;
     document.getElementById("customer-total-balance").textContent =
       totalBalanceKept;
-    document.getElementById(id + "price").textContent = Number.isInteger(changedPrice)
-    ? changedPrice.toFixed(0)
-    : changedPrice.toFixed(2);;
+    document.getElementById(id + "price").textContent = Number.isInteger(
+      changedPrice
+    )
+      ? changedPrice.toFixed(0)
+      : changedPrice.toFixed(2);
   }
 }
 
@@ -492,7 +539,7 @@ function priceClickChange(id, qty) {
   var price = parseFloat(document.getElementById(id + "price").textContent);
   var Qty = parseInt(qty, 10);
   var changed = parseFloat(prompt("Enter " + id + "'s New Price", price));
-  if (changed != null) {
+  if (!isNaN(changed)) {
     totalAmount -= price;
     totalAmount += changed;
     document.getElementById("total-amount-bill").textContent = totalAmount;
@@ -508,121 +555,6 @@ function priceClickChange(id, qty) {
   }
 }
 
-function setShop(shopName, shopPhone) {
-  document.getElementById("customer-name").textContent = shopName;
-  document.getElementById("customer-ph").textContent = shopPhone;
-  customerAvl = true;
-  var docRef = db.collection("shops").doc(shopName);
-
-  docRef
-    .get()
-    .then((doc) => {
-      if (doc.exists) {
-        shopCustomer = doc.data();
-        document.getElementById("customer-prev-balance").textContent =
-          shopCustomer.balance;
-        prevBalance = shopCustomer.balance;
-        totalBalanceKept = shopCustomer.balance + totalAmount;
-        document.getElementById("total-amount-bill").textContent = totalAmount,
-        document.getElementById("customer-total-balance").textContent = totalBalanceKept
-          alert(shopName + " Set");
-      } else {
-        // doc.data() will be undefined in this case
-        console.log("No such document!");
-      }
-    })
-    .catch((error) => {
-      console.log("Error getting document:", error);
-    });
-}
-
-function capitalize(string) {
-  return string.replace(/\w\S*/g, function (txt) {
-    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-  });
-}
-
-function addShop() {
-  var shopName = capitalize(
-    document.getElementById("shopName").value.trim().toLowerCase()
-  );
-  var shopPhone = parseInt(document.getElementById("shopNumber").value, 10);
-
-  const docRef = db.collection("shops").doc(shopName);
-
-  docRef
-    .get()
-    .then((doc) => {
-      if (doc.exists) {
-        // Document exists, handle notification here
-
-        console.log("Shop already exists!");
-        document.getElementById("addShopModal-alert").textContent =
-          "Shop Already Exists!";
-      } else {
-        db.collection("shops")
-          .doc(shopName)
-          .set({
-            name: shopName,
-            phone: shopPhone,
-            balance: 0,
-            payment: [],
-          })
-          .then(() => {
-            database.ref("/shops").update({ [shopName]: shopPhone });
-            console.log("Document(shop) successfully written!");
-            document.getElementById("addShopModal-alert").textContent =
-              shopName + " - Shop Added!";
-          })
-          .catch((error) => {
-            console.error("Error writing document: ", error);
-            document.getElementById("addShopModal-alert").textContent =
-              "Error Occured, Try Again!";
-          });
-      }
-    })
-    .catch((error) => {
-      console.error("Error getting document: ", error);
-      document.getElementById("addShopModal-alert").textContent =
-        "Error Occured, Try Again!";
-    });
-}
-
 function checkIdExists(elementId) {
   return document.getElementById(elementId) !== null;
-}
-
-
-function addTransaction(shopName,billid,amt,blnce) {
-  var shopRef = db.collection("shops").doc(shopName);
-
-  return db.runTransaction(function(transaction) {
-      return transaction.get(shopRef).then(function(doc) {
-          if (!doc.exists) {
-              throw "Document does not exist!";
-          }
-
-          var transactions = doc.data().payment || [];
-
-          // Check if the transactions array length is 20 or more
-          if (transactions.length >= 3) {
-              // Remove the oldest transaction (first element)
-              transactions.shift();
-          }
-
-          // Add the new transaction to the array
-          transactions.push({
-            [billid]: amt,
-          });
-
-          // Update the document with the modified transactions array
-          transaction.update(shopRef, { payment: transactions, balance: blnce });
-      });
-  }).then(function() {
-      console.log("Transaction added successfully.");
-      alert("Transaction added successfully");
-  }).catch(function(error) {
-      alert("Transaction Error");
-      console.error("Transaction failed: ", error);
-  });
 }

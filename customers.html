@@ -75,24 +75,7 @@
             </a>
           </li> -->
           <!-- End Search Icon-->
-          <div id="addItemToShopLink">
-          </div>
-
-          <li class="nav-item">
-            <a
-              class="nav-link nav-icon search-bar-toggle"
-              data-bs-toggle="modal"
-              data-bs-target="#addShop"
-            >
-              <i class="bi bi-houses-fill"></i>
-            </a>
-          </li>
-
-          <li class="nav-item">
-            <a class="nav-link nav-icon search-bar-toggle" href="add-item.html">
-              <i class="bi bi-plus-circle-fill text-primary"></i>
-            </a>
-          </li>
+          
 
           <!-- <li class="nav-item">
             <a class="nav-link nav-icon search-bar-toggle" href="#">
@@ -272,9 +255,6 @@
                         <th scope="col">
                           <i class="bi bi-pencil-fill"></i>
                         </th>
-                        <th scope="col">
-                          <i class="bi bi-check2-circle"></i>
-                        </th>
                       </tr>
                     </thead>
                     <tbody id="table-body-shops"></tbody>
@@ -285,98 +265,6 @@
           </div>
         </div>
       </section>
-
-      <section class="section contact">
-        <div class="row gy-4">
-          <div class="col-xl-12">
-            <div class="row">
-              <div class="col-lg-4">
-                <div class="info-box card">
-                  <h3>Shop Name</h3>
-                  <p id="shopName"></p>
-                </div>
-              </div>
-              <div class="col-lg-4">
-                <div class="info-box card">
-                  <h3>Shop Phone</h3>
-                  <p id="shopPhone"></p>
-                </div>
-              </div>
-              <div class="col-lg-4">
-                <div class="info-box card">
-                  <h3>Balance</h3>
-                  <p id="shopBalance"></p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      <!-- Modal - addShop -->
-      <div
-        class="modal fade"
-        id="addShop"
-        tabindex="-1"
-        aria-labelledby="addShop"
-        aria-hidden="true"
-      >
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h1 class="modal-title fs-5">Add Shop</h1>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div class="modal-body d-flex justify-content-center">
-              <form
-                id="addShopForm"
-                class="col-10 d-flex flex-column justify-content-center p-3 iteminputs"
-                action="javascript:addShop()"
-              >
-                <input
-                  class="form-control"
-                  type="text"
-                  name="shopName"
-                  placeholder="Shop Name"
-                  id="shopName"
-                  required
-                />
-                <br />
-                <input
-                  class="form-control"
-                  type="number"
-                  name="shopNumber"
-                  placeholder="Phone"
-                  id="shopNumber"
-                  minlength="10"
-                  maxlength="10"
-                  required
-                />
-                <br />
-                <button type="submit" class="btn btn-primary">Add Shop</button>
-              </form>
-            </div>
-            <div class="modal-footer p-4">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                Close
-              </button>
-              <div class="col-12">
-                <p class="small mb-0 text-success" id="addShopModal-alert"></p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </main>
     <!-- End #main -->
 

@@ -320,3 +320,10 @@ amount = 1000;
 var newTransaction = {
   [timeid]: amount,
 };
+
+
+var value = parseFloat(prompt("Enter Content", 9))
+if(!isNaN(value)){
+  console.log(value);
+  console.log(typeof(value))
+}

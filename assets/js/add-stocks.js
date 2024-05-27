@@ -18,7 +18,6 @@ const db = firebase.firestore();
 
 var database = firebase.database();
 
-
 function capitalize(string) {
   return string.replace(/\w\S*/g, function (txt) {
     return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
@@ -32,6 +31,7 @@ function capitalize(string) {
 //      ->Rate
 //      ->Category
 
+var itemsHTML = ``;
 // Showing the items for adding them to the Billing Section
 const dbRef = database.ref();
 dbRef
@@ -42,7 +42,7 @@ dbRef
       snapshot.forEach((childSnapshot) => {
         const key = childSnapshot.key;
         const value = childSnapshot.val();
-        document.getElementById("table-body-items").innerHTML += `
+        itemsHTML += `
                           <tr id='${key}'>
                             <td>${key}</td>
                             <td>${value}</td>
@@ -59,6 +59,7 @@ dbRef
                           </tr>
         `;
       });
+      document.getElementById("table-body-items").innerHTML = itemsHTML;
       filterRows("");
       document.getElementById("totalPages").textContent = countPages();
     } else {
@@ -70,19 +71,19 @@ dbRef
   });
 
 function getItem(itemName, itemCat) {
-
   stockName = capitalize(itemName.trim().toLowerCase()).toString();
   stockCat = itemCat;
   console.log(stockName, stockCat);
 
-  document.querySelector("#addToStock .modal-title").innerHTML = `Add to Stock - ${stockName}`;
-
+  document.querySelector(
+    "#addToStock .modal-title"
+  ).textContent = `Add to Stock - ${stockName}`;
 }
 
-const paidButton = document.getElementById('paid');
+const paidButton = document.getElementById("paid");
 var stockPaid = false;
 
-paidButton.addEventListener('change', function () {
+paidButton.addEventListener("change", function () {
   if (this.checked) {
     stockPaid = true;
     console.log(stockPaid);
@@ -96,10 +97,11 @@ paidButton.addEventListener('change', function () {
 function addItem() {
   // var stockName = stockName
   // var stockCat = stockCat
-  var stockSeller = capitalize(document.getElementById("stockSeller").value.trim().toLowerCase());
+  var stockSeller = capitalize(
+    document.getElementById("stockSeller").value.trim().toLowerCase()
+  );
   var stockQty = parseInt(document.getElementById("stockQty").value, 10);
   var stockPrice = parseInt(document.getElementById("stockPrice").value, 10);
-
 
   var stockPaidVal = stockPaid.toString();
 
@@ -107,18 +109,29 @@ function addItem() {
     //fulltime = new Date();
     const date = new Date();
     const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    const seconds = date.getSeconds().toString().padStart(2, '0');
-    const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
-    dateID = `${day}-${month}-${year}`
-    fulltime = `${day}-${month}-${year}-${hours}-${minutes}-${seconds}-${milliseconds}`
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    const seconds = date.getSeconds().toString().padStart(2, "0");
+    const milliseconds = date.getMilliseconds().toString().padStart(3, "0");
+
+    // Determine if it's AM or PM
+    const period = hours >= 12 ? "PM" : "AM";
+
+    // Convert hours to 12-hour format
+    const formattedHours = (hours % 12 || 12).toString().padStart(2, "0"); // If hours is 0, convert to 12
+
+    // Construct the formatted date and time string
+    const formattedDate = `${day}-${month}-${year}`;
+    const formattedDateTime = `${day}-${month}-${year} ${formattedHours}:${minutes}:${seconds} ${period}`;
+    const formattedBillId = `${day}-${month}-${year}-${hours}-${minutes}-${seconds}-${milliseconds}`;
+
+    dateID = `${day}-${month}-${year}`;
+    fulltime = `${day}-${month}-${year}-${hours}-${minutes}-${seconds}-${milliseconds}`;
     readableTime = date.toISOString();
     return dateID;
   }
-
 
   const docRef = db.collection("stockin").doc(getTimestamp());
 
@@ -129,37 +142,23 @@ function addItem() {
         category: stockCat,
         qty: stockQty,
         price: stockPrice,
-        time: readableTime
-
+        time: readableTime,
       },
       seller: stockSeller,
-      paid: stockPaidVal
-    }
-  }
-
-  // const docData = {
-  //     [Date.now().toString()]: {
-  //         items: [stockName],
-  //         rates: [stockRate],
-  //         qty: [stockQty],
-  //         price: [stockPrice],
-  //         balance: stockBalance,
-  //         seller: stockSeller,
-  //         paid: stockPaid
-  //     }
-
-  // }
+      paid: stockPaidVal,
+    },
+  };
 
   docRef
     .get()
     .then(() => {
-
       db.collection("stockin")
         .doc(getTimestamp())
         .set(docData, { merge: true })
         .then(() => {
           console.log("Document(Item) successfully written!");
-          document.getElementById("alert-msg").textContent = stockName + " - Item Added!";
+          document.getElementById("alert-msg").textContent =
+            stockName + " - Item Added!";
           alert(stockname + " - Stock added");
         })
         .catch((error) => {
@@ -167,7 +166,6 @@ function addItem() {
           document.getElementById("alert-msg").textContent =
             "Error Occured, Try Again!";
         });
-
     })
     .catch((error) => {
       console.error("Error getting document: ", error);

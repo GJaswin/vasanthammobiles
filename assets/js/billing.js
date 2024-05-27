@@ -75,7 +75,7 @@ function itemToBill(itemName) {
     var priceid = itemName + "price";
 
     var price;
-    if (qty != null) {
+    if (!isNaN(qty)) {
       var docRef = db.collection("items").doc(itemName);
       docRef
         .get()
@@ -100,7 +100,7 @@ function itemToBill(itemName) {
               <td id='${priceid}' onclick="priceClickChange('${itemName}',${qty})">${price}</td>
               <td class="delete-ico-bill">
                 <span class="text-danger"
-                  ><a href="javascript:removeItemFromBill('${id}',${price})"><i class="bi bi-trash-fill"></i></a>
+                  ><a href="javascript:removeItemFromBill('${id}',${priceid})"><i class="bi bi-trash-fill"></i></a>
                 </span>
               </td>
             </tr>
@@ -118,15 +118,16 @@ function itemToBill(itemName) {
   }
 }
 
-function removeItemFromBill(id, price) {
-  document.getElementById(id).remove();
+function removeItemFromBill(id, priceid) {
   totalItems--;
+  var price = parseFloat(document.getElementById(priceid).textContent);
   totalAmount -= price;
   document.getElementById("total-items-bill").textContent = totalItems;
   document.getElementById("total-amount-bill").textContent = totalAmount;
   totalBalanceKept = totalAmount + prevBalance;
   document.getElementById("customer-total-balance").textContent =
     totalBalanceKept;
+    document.getElementById(id).remove();
 }
 
 function searchCustomer() {
@@ -206,7 +207,7 @@ function updateClock() {
   // Construct the formatted date and time string
   const formattedDate = `${day}-${month}-${year}`;
   const formattedDateTime = `${day}-${month}-${year} ${formattedHours}:${minutes}:${seconds} ${period}`;
-  const formattedBillId = `${day}-${month}-${year}-${hours}-${minutes}-${seconds}`;
+  const formattedBillId = `${day}-${month}-${year}-${hours}-${minutes}-${seconds}-${milliseconds}`;
 
   document.getElementById("customer-date-time").textContent = formattedDateTime;
   document.getElementById("customer-billid").textContent = formattedBillId;
@@ -439,7 +440,7 @@ function rateClickChange(id, qty) {
   var price = parseFloat(document.getElementById(id + "price").textContent);
   var Qty = parseInt(qty, 10);
   var changed = parseFloat(prompt("Enter " + id + "'s New Rate", rate));
-  if (changed != null) {
+  if (!isNaN(changed)) {
     totalAmount = totalAmount - price;
     document.getElementById(id + "rate").textContent = Number.isInteger(changed)
       ? changed.toFixed(0)
@@ -466,7 +467,7 @@ function priceClickChange(id, qty) {
   var price = parseFloat(document.getElementById(id + "price").textContent);
   var Qty = parseInt(qty, 10);
   var changed = parseFloat(prompt("Enter " + id + "'s New Price", price));
-  if (changed != null) {
+  if (!isNaN(changed)) {
     totalAmount -= price;
     totalAmount += changed;
     document.getElementById("total-amount-bill").textContent = totalAmount;

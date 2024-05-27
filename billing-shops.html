@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
 
-    <title>Regular Billing</title>
+    <title>Shops Billing</title>
 
     <!-- Favicons -->
     <link href="assets/img/favicon.png" rel="icon" />
@@ -78,7 +78,7 @@
 
           <li class="nav-item">
             <a
-              class="nav-link nav-icon search-bar-toggle"
+              class="nav-link nav-icon"
               data-bs-toggle="modal"
               data-bs-target="#addShop"
             >
@@ -87,7 +87,7 @@
           </li>
 
           <li class="nav-item">
-            <a class="nav-link nav-icon search-bar-toggle" href="add-item.html">
+            <a class="nav-link nav-icon" href="add-item.html">
               <i class="bi bi-plus-circle-fill text-primary"></i>
             </a>
           </li>
@@ -605,6 +605,14 @@
           <!-- My Table Code Ends-->
         </div>
       </section>
+      <br>
+      <center>
+      <a id="page-alert-out" class="invisible">Stock Out added successfully!</a>
+      <br>
+      <div id="billLoopItems">
+      </div>
+      <a id="page-alert-transaction" class="invisible">Transaction added successfully!</a>
+      </center>
       <section>
         <div class="row">
           <div class="col">
@@ -612,6 +620,7 @@
           </div>
         </div>
       </section>
+      
       <!-- Billing Section End -->
     </main>
     <!-- End #main -->

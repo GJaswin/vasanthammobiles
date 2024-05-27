@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
 
-    <title>Stock out</title>
+    <title>Handle Shop Items</title>
 
     <!-- Favicons -->
     <link href="assets/img/favicon.png" rel="icon" />
@@ -34,10 +34,10 @@
 
     <!-- Template Main CSS File -->
     <link href="assets/css/style.css" rel="stylesheet" />
+
   </head>
 
   <body>
-    <!-- ======= Header ======= -->
     <header id="header" class="header fixed-top d-flex align-items-center">
       <div class="d-flex align-items-center justify-content-between">
         <a href="index.html" class="logo d-flex align-items-center">
@@ -49,35 +49,41 @@
       <!-- End Logo -->
 
       <!-- <div class="search-bar">
-        <form
-          class="search-form d-flex align-items-center"
-          method="POST"
-          action="javascript:searchDate()"
-        >
-          <input
-            type="date"
-            name="query"
-            placeholder="Enter Date"
-            title="Enter search keyword"
-            minlength="10"
-            maxlength="10"
-            id="searchDateStockOut"
+          <form
+            class="search-form d-flex align-items-center"
+            method="POST"
+            action="#"
+          >
+            <input
+              type="text"
+              name="query"
+              placeholder="Search"
+              title="Enter search keyword"
             />
-          <button type="submit" title="Search">
-            <i class="bi bi-search"></i>
-          </button>
-        </form>
-      </div> -->
+            <button type="submit" title="Search">
+              <i class="bi bi-search"></i>
+            </button>
+          </form>
+        </div> -->
       <!-- End Search Bar -->
 
       <nav class="header-nav ms-auto">
         <ul class="d-flex align-items-center">
           <!-- <li class="nav-item d-block d-lg-none">
-            <a class="nav-link nav-icon search-bar-toggle" href="#">
-              <i class="bi bi-search"></i>
-            </a>
-          </li> -->
+              <a class="nav-link nav-icon search-bar-toggle" href="#">
+                <i class="bi bi-search"></i>
+              </a>
+            </li> -->
           <!-- End Search Icon-->
+          
+          <li class="nav-item">
+            <a
+              class="nav-link nav-icon"
+              href="#" data-bs-toggle="modal" data-bs-target="#transModal"
+            >
+            <i class="bi bi-coin text-primary"></i>
+            </a>
+          </li>
 
           <li class="nav-item dropdown pe-3">
             <a
@@ -153,7 +159,6 @@
         </li>
         <!-- End Profile Page Nav -->
 
-
         <li class="nav-item">
           <a class="nav-link collapsed" href="customers.html">
             <!-- <i class="bi bi-person"></i> -->
@@ -181,7 +186,7 @@
             <span>Items</span>
           </a>
         </li>
-        <!-- End Profile Page Nav --> 
+        <!-- End Profile Page Nav -->
 
         <li class="nav-item">
           <a class="nav-link collapsed" href="notifications.html">
@@ -212,74 +217,129 @@
 
     <main id="main" class="main">
       <div class="pagetitle">
-        <h1>Stock Out</h1>
+        <h1>Handle Shop</h1>
         <nav>
           <ol class="breadcrumb">
-            <li class="breadcrumb-item active" id="stock-out-date">Date</li>
-            <li class="breadcrumb-item" id="stock-out-date-length"></li>
+            <li class="breadcrumb-item"><a href="customers.html">Customers</a></li>
           </ol>
         </nav>
       </div>
       <!-- End Page Title -->
 
-      <section class="section">
-        <div class="row mb-3">
-          <div class="col-auto">
-            <!-- Top Search Bar without button -->
-            <div class="input-group d-flex align-items-center">
-              <!-- <input type="text" class="form-control" placeholder="Search Stocks" onkeyup="filterStocks(this.value.toString())" /> -->
-              <label for="dateStocks" class="mx-3">Search by Date</label>
-              <input
-                type="date"
-                name="dateStocks"
-                class="form-control"
-                onchange="searchDate(this.value.toString())"
-              />
-            </div>
-          </div>
-        </div>
-        <div class="row align-items-top">
-          <!-- <div class="col-lg-3">
-            <div class="card">
-              <div class="card-body">
-                <h5 class="card-title">Date</h5>
-                <h6 class="card-subtitle mb-2 text-muted">Account</h6>
-                <p class="card-text">
-                  <b>Iphone 15 pro max</b><br />
-                  Quantity: 100<br />
-                  Price/Piece: 1,60,000<br />
-                  Price: 16,000,000<br />
-                  Seller
-                </p>
-                <p class="card-text">
-                  <a href="#" class="btn btn-primary">Edit</a>
-                  <a href="#" class="btn btn-primary">Delete</a>
-                </p>
+      <section class="section contact">
+        <div class="row gy-4">
+          <div class="col-xl-12">
+            <div class="row">
+              <div class="col-lg-4">
+                <div class="info-box card">
+                  <h3>Shop Name</h3>
+                  <p id="shopName"></p>
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <div class="info-box card">
+                  <h3>Shop Phone</h3>
+                  <p id="shopPhone"></p>
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <div class="info-box card">
+                  <h3>Shop Balance</h3>
+                  <p id="shopBalance"></p>
+                </div>
+              </div>
+              <div class="col-lg-12">
+                <div class="row">
+                    <div class="col">
+                      <div class="table-responsive">
+                        <table class="table table-bordered" id="shopTransactionsTable">
+                          <thead>
+                            <tr>
+                              <th scope="col">Date-Time</th>
+                              <th scope="col">Amount</th>
+                              <th scope="col"><i class="bi bi-trash-fill"></i></th>
+                            </tr>
+                          </thead>
+                          <tbody id="table-body-shop-transactions">
+                           
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
               </div>
             </div>
-          </div> -->
-
-          <div class="col-12" id="stockout-section">
-            
-
           </div>
-          <!-- End Top Selling -->
+
         </div>
       </section>
+      <!-- Transaction Modal -->
+      <div
+              class="modal fade"
+              id="transModal"
+              tabindex="-1"
+              aria-labelledby="transModal"
+              aria-hidden="true"
+            >
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h1 class="modal-title fs-5">Add Payment</h1>
+                    <button
+                      type="button"
+                      class="btn-close"
+                      data-bs-dismiss="modal"
+                      aria-label="Close"
+                    ></button>
+                  </div>
+                  <div class="modal-body d-flex justify-content-center">
+                    <form
+                      class="col-10 d-flex flex-column justify-content-center p-3 iteminputs"
+                      action="javascript:addTransaction()"
+                    >
+                      <input
+                        type="number"
+                        name="Payment"
+                        placeholder="Amount"
+                        id="pay-trans"
+                        class="form-control"
+                      />
+                      <br>
+                      <button type="submit" class="btn btn-primary">
+                        <a href="#"></a>Add Payment
+                      </button>
+                    </form>
+                  </div>
+                  <div class="modal-footer p-4">
+                    <button
+                      type="button"
+                      class="btn btn-secondary"
+                      data-bs-dismiss="modal"
+                    >
+                      Close
+                    </button>
+                    <div class="col-12">
+                      <p class="small mb-0 text-success" id="alert-msg"></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
     </main>
     <!-- End #main -->
 
     <!-- ======= Footer ======= -->
-    <footer id="footer" class="footer">
-      <div class="copyright">
-        &copy; Copyright <strong><span>Vasantham Mobiles</span></strong
-        >. All Rights Reserved
-      </div>
-      <div class="credits">
-        Developed by <a href="https://syncmi.web.app/">Syncmi Web Solutions</a
-        ><br /><br />
-      </div>
-    </footer>
+      <!-- ======= Footer ======= -->
+      <footer id="footer" class="footer">
+        <div class="copyright">
+          &copy; Copyright <strong><span>Vasantham Mobiles</span></strong
+          >. All Rights Reserved
+        </div>
+        <div class="credits">
+          Developed by <a href="https://syncmi.web.app/">Syncmi Web Solutions</a
+          ><br /><br />
+        </div>
+      </footer>
     <!-- End Footer -->
 
     <a
@@ -318,6 +378,6 @@
       src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"
     ></script>
 
-    <script defer src="assets/js/stock-out.js"></script>
+    <script defer src="assets/js/handle-shop.js"></script>
   </body>
 </html>
