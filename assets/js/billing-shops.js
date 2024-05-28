@@ -452,7 +452,7 @@ function dummyPrint() {
      </head>
    
      <body>`;
-  var postContent = `<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script></body></html>`;
+  var postContent = `</body></html>`;
   var iframe = preContent;
   var contentDiv = document.getElementById("printing-bill");
   var contentHTML = contentDiv.innerHTML;
@@ -461,6 +461,7 @@ function dummyPrint() {
   var modifiedHTML = contentHTML; //.replace(/ id="[^"]*"/g, "");
 
   iframe += modifiedHTML;
+  iframe += postContent;
   // iframe += postContent
   // Set the modified HTML as the srcdoc of the iframe
   var previewFrame = document.getElementById("iframePrint");

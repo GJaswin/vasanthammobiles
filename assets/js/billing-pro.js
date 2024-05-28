@@ -17,37 +17,34 @@ const db = firebase.firestore();
 
 var database = firebase.database();
 
-itemsTablehtml = ``;
+function initialiseItems() {
+  // Check if items are already in local storage
+  const localItems = localStorage.getItem("items");
+  if (localItems) {
+    //console.log('Items already in local storage:', JSON.parse(localItems));
+    console.log("Local Storage - Items Available");
+  } else {
+    // Fetch items from Firebase Realtime Database
+    const itemsRef = database.ref("/items");
+    itemsRef
+      .once("value")
+      .then((snapshot) => {
+        const items = snapshot.val();
+        if (items) {
+          // Store items in local storage
+          localStorage.setItem("items", JSON.stringify(items));
+          console.log("Local Storage - Items Loaded");
+        } else {
+          console.log("No items found in database.");
+        }
+      })
+      .catch((error) => {
+        alert("Items Loading: " + error);
+      });
+  }
+}
 
-// document.addEventListener('DOMContentLoaded', () => {
-//   // Function to retrieve and display items from local storage
-//   function displayItems() {
-//       // Retrieve items from local storage
-//       const localItems = localStorage.getItem('items');
-
-//       if (localItems) {
-//           // Parse the JSON string to get the object
-//           const items = JSON.parse(localItems);
-//           console.log('Items retrieved from local storage:', items);
-
-//           // Iterate over the object properties to access each item
-//           for (const [itemName, itemCategory] of Object.entries(items)) {
-//               console.log(`Item: ${itemName}, Category: ${itemCategory}`);
-//               // Example: Append each item to a list in the HTML
-//               const itemElement = document.createElement('li');
-//               itemElement.textContent = `Item: ${itemName}, Category: ${itemCategory}`;
-//               document.getElementById('items-list').appendChild(itemElement);
-//           }
-//       } else {
-//           console.log('No items found in local storage.');
-//       }
-//   }
-
-//   // Call the function to display items
-//   displayItems();
-// });
-
-document.addEventListener("DOMContentLoaded", () => {
+function loadItems() {
   const localItems = JSON.parse(localStorage.getItem("items"));
 
   // Reference to the table body element
@@ -72,62 +69,25 @@ document.addEventListener("DOMContentLoaded", () => {
     updateLink.innerHTML = '<i class="bi bi-pencil-fill"></i>';
     updateCell.appendChild(updateLink);
 
-    const deleteCell = document.createElement("td");
-    const deleteLink = document.createElement("a");
-    deleteLink.href = `javascript:itemToBill('${key}')`;
-    deleteLink.innerHTML = '<i class="bi bi-bag-plus-fill"></i>';
-    deleteCell.appendChild(deleteLink);
+    const addItemCell = document.createElement("td");
+    const addItemLink = document.createElement("a");
+    addItemLink.href = `javascript:itemToBill('${key}')`;
+    addItemLink.innerHTML = '<i class="bi bi-bag-plus-fill"></i>';
+    addItemCell.appendChild(addItemLink);
 
     // Append table data cells to the row
     row.appendChild(keyCell);
     row.appendChild(valueCell);
     row.appendChild(updateCell);
-    row.appendChild(deleteCell);
+    row.appendChild(addItemCell);
 
     // Append the row to the table body
     tableBody.appendChild(row);
   }
   filterRows("");
   document.getElementById("totalPages").textContent = countPages();
-});
+}
 
-// Showing the items for adding them to the Billing Section
-// const dbRef = database.ref();
-// dbRef
-//   .child("items")
-//   .get()
-//   .then((snapshot) => {
-//     if (snapshot.exists()) {
-//       snapshot.forEach((childSnapshot) => {
-//         const key = childSnapshot.key;
-//         const value = childSnapshot.val();
-//         itemsTablehtml += `
-//           <tr id='${key}'>
-//             <td>${key}</td>
-//             <td>${value}</td>
-//             <td>
-//             <span class="text-primary"
-//                 ><a href="update-item.html?item=${key}"><i class="bi bi-pencil-fill"></i
-//             ></a></span>
-//             </td>
-//             <td>
-//             <span class="text-danger"
-//                 ><a href="javascript:itemToBill('${key}')"><i class="bi bi-bag-plus-fill"></i></a>
-//             </span>
-//             </td>
-//         </tr>
-//             `;
-//       });
-//       document.getElementById("table-body-items").innerHTML = itemsTablehtml;
-//       filterRows("");
-//       document.getElementById("totalPages").textContent = countPages();
-//     } else {
-//       console.log("No data available");
-//     }
-//   })
-//   .catch((error) => {
-//     console.error(error);
-//   });
 
 // Global Variables
 var totalItems = 0;
@@ -439,8 +399,13 @@ async function sendStockOut() {
         for (let i = 0; i < items.length; i++) {
           itemsRef.doc(items[i]).update({
             stock: firebase.firestore.FieldValue.increment(-itemsQty[i]),
+          }).then(() => {
+            document.getElementById(
+              "billLoopItems"
+            ).innerHTML += `<a>${items[i]} - stock reduced by ${itemsQty[i]}</a><br>`;
           });
         }
+        document.getElementById("page-alert-out").classList.remove("invisible");
       })
       .then(() => {
         var customerRef = db.collection("customers");
@@ -469,8 +434,6 @@ async function sendStockOut() {
 }
 
 function dummyPrint(billid) {
-  document.title = billid;
-
   var preContent = `<!DOCTYPE html>
    <html lang="en">
      <head>
@@ -487,7 +450,7 @@ function dummyPrint(billid) {
      </head>
    
      <body>`;
-  var postContent = `<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script></body></html>`;
+  var postContent = `</body></html>`;
   var iframe = preContent;
   var contentDiv = document.getElementById("printing-bill");
   var contentHTML = contentDiv.innerHTML;
@@ -496,7 +459,7 @@ function dummyPrint(billid) {
   var modifiedHTML = contentHTML; //.replace(/ id="[^"]*"/g, "");
 
   iframe += modifiedHTML;
-  // iframe += postContent
+  iframe += postContent
   // Set the modified HTML as the srcdoc of the iframe
   var previewFrame = document.getElementById("iframePrint");
   previewFrame.srcdoc = iframe;
@@ -557,4 +520,42 @@ function priceClickChange(id, qty) {
 
 function checkIdExists(elementId) {
   return document.getElementById(elementId) !== null;
+}
+
+firebase.auth().onAuthStateChanged((user) => {
+  if (user) {
+    var uid = user.uid;
+    var displayName = user.displayName;
+    if (displayName != null) {
+      console.log("Name: " + displayName);
+    } else {
+      alert("Set your Name in the 'My Account' section");
+      window.location.href = "my-account.html";
+    }
+    var emailVerified = user.emailVerified;
+    if (emailVerified) {
+      document.getElementById("userName").textContent = displayName;
+      initialiseItems();
+      loadItems();
+    } else {
+      alert("Verify your mail in the 'My account' section");
+      window.location.href = "my-account.html";
+    }
+  } else {
+    // User is signed out
+    // ...
+    window.location.href = 'login.html';
+  }
+});
+
+function signOut() {
+  firebase
+    .auth()
+    .signOut()
+    .then(() => {
+      alert("Signed Out Successfully!");
+    })
+    .catch((error) => {
+      alert(error);
+    });
 }
