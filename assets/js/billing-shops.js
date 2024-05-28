@@ -728,6 +728,8 @@ firebase.auth().onAuthStateChanged((user) => {
       loadItems();
       initialiseShops();
       loadShops();
+      const preloader = document.querySelector('#preloader');
+      preloader.remove();
     } else {
       alert("Verify your mail in the 'My account' section");
       window.location.href = "my-account.html";

@@ -76,3 +76,8 @@ function forgotPWD() {
       });
   }
 }
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const preloader = document.querySelector('#preloader');
+  preloader.remove();
+})

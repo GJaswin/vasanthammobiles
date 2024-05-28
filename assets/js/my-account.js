@@ -53,6 +53,10 @@ firebase.auth().onAuthStateChanged((user) => {
       document.getElementById("userUMail").textContent = email;
       document.getElementById("mailVerify").classList.remove("invisible");
     }
+
+    const preloader = document.querySelector('#preloader');
+      preloader.remove();
+
   } else {
     // User is signed out
     // ...

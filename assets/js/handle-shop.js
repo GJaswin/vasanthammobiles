@@ -24,53 +24,69 @@ const shopName = urlParams.get("shop");
 
 var shopData;
 
-function loadShop(){
+function loadShop() {
+  var shopRef = db.collection("shops").doc(shopName);
 
-var shopRef = db.collection("shops").doc(shopName);
+  shopRef
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        shopData = doc.data();
+        document.getElementById("shopName").textContent = shopName;
+        document.getElementById("shopPhone").textContent = shopData.phone;
+        document.getElementById("shopBalance").textContent = shopData.balance;
+        var transactionsHTML = ``;
+        if (doc.data().hasOwnProperty("payment")) {
+          doc.data().payment.forEach((transaction, index) => {
+            var timeid = Object.keys(transaction)[0] + "time";
+            var trans = Object.values(transaction)[0];
+            const tr = document.createElement("tr");
+            tr.id = `${timeid}`;
 
-shopRef
-  .get()
-  .then((doc) => {
-    if (doc.exists) {
-      shopData = doc.data();
-      document.getElementById("shopName").textContent = shopName;
-      document.getElementById("shopPhone").textContent = shopData.phone;
-      document.getElementById("shopBalance").textContent = shopData.balance;
-      var transactionsHTML = ``;
-      if (doc.data().hasOwnProperty("payment")) {
-        doc.data().payment.forEach((transaction, index) => {
-          var timeid = Object.keys(transaction)[0] + "time";
-          var trans = Object.values(transaction)[0];
-          transactionsHTML += `
-            <tr id='${timeid}'>
-                <td>${Object.keys(transaction)[0]}</td>
-                <td>${trans}</td>
-                <td>
-                    <span class="text-danger"
-                    ><a href="javascript:deleteTransaction('${index}')"><i class="bi bi-trash-fill"></i></a>
-                    </span>
-                </td>
-            </tr>                
-           `;
-        });
-        document.getElementById("table-body-shop-transactions").innerHTML =
-          transactionsHTML;
-      } else {
-        document.getElementById("table-body-shop-transactions").innerHTML = `
+            const td1 = document.createElement("td");
+            td1.textContent = `${Object.keys(transaction)[0]}`;
+            tr.appendChild(td1);
+
+            const td2 = document.createElement("td");
+            td2.textContent = `${trans}`;
+            tr.appendChild(td2);
+
+            const td3 = document.createElement("td");
+            const span = document.createElement("span");
+            span.className = "text-danger";
+
+            const a = document.createElement("a");
+            a.href = `javascript:deleteTransaction('${index}')`;
+
+            const i = document.createElement("i");
+            i.className = "bi bi-trash-fill";
+
+            a.appendChild(i);
+            span.appendChild(a);
+            td3.appendChild(span);
+            tr.appendChild(td3);
+
+            // Now append the tr element to the desired parent element in the DOM
+            // For example, if you want to append it to a tbody with id 'transactions-tbody':
+            document
+              .getElementById("table-body-shop-transactions")
+              .appendChild(tr);
+          });
+        } else {
+          document.getElementById("table-body-shop-transactions").innerHTML = `
             <tr>
                 <td colspan='4'>No items</td>
             </tr>
             `;
+        }
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
       }
-    } else {
-      // doc.data() will be undefined in this case
-      console.log("No such document!");
-    }
-  })
-  .catch((error) => {
-    alert("Error getting document:", error);
-  });
-
+    })
+    .catch((error) => {
+      alert("Error getting document:", error);
+    });
 }
 function addTransaction() {
   var shopRef = db.collection("shops").doc(shopName);
@@ -150,38 +166,40 @@ function updateClock() {
 // Function to delete a transaction
 function deleteTransaction(transactionIndex) {
   var shopRef = db.collection("shops").doc(shopName);
+  var confirmation = confirm("Are you sure to delete this Transaction");
+  if (confirmation) {
+    return db
+      .runTransaction(function (transaction) {
+        return transaction.get(shopRef).then(function (doc) {
+          if (!doc.exists) {
+            throw "Document does not exist!";
+          }
 
-  return db
-    .runTransaction(function (transaction) {
-      return transaction.get(shopRef).then(function (doc) {
-        if (!doc.exists) {
-          throw "Document does not exist!";
-        }
+          var data = doc.data();
+          var transactions = data.payment || [];
 
-        var data = doc.data();
-        var transactions = data.payment || [];
+          // Remove the transaction at the specified index
+          if (transactionIndex >= 0 && transactionIndex < transactions.length) {
+            transactions.splice(transactionIndex, 1);
 
-        // Remove the transaction at the specified index
-        if (transactionIndex >= 0 && transactionIndex < transactions.length) {
-          transactions.splice(transactionIndex, 1);
-
-          // Update the document with the modified transactions array
-          transaction.update(shopRef, {
-            payment: transactions,
-          });
-        } else {
-          throw "Invalid transaction index!";
-        }
+            // Update the document with the modified transactions array
+            transaction.update(shopRef, {
+              payment: transactions,
+            });
+          } else {
+            throw "Invalid transaction index!";
+          }
+        });
+      })
+      .then(function () {
+        alert("Deleted Transaction!");
+        console.log("Transaction deleted successfully.");
+        window.location.reload();
+      })
+      .catch(function (error) {
+        console.error("Transaction deletion failed: ", error);
       });
-    })
-    .then(function () {
-      alert("Deleted Transaction!");
-      console.log("Transaction deleted successfully.");
-      window.location.reload();
-    })
-    .catch(function (error) {
-      console.error("Transaction deletion failed: ", error);
-    });
+  }
 }
 
 firebase.auth().onAuthStateChanged((user) => {
@@ -198,6 +216,8 @@ firebase.auth().onAuthStateChanged((user) => {
     if (emailVerified) {
       document.getElementById("userName").textContent = displayName;
       loadShop();
+      const preloader = document.querySelector("#preloader");
+      preloader.remove();
     } else {
       alert("Verify your mail in the 'My account' section");
       window.location.href = "my-account.html";
@@ -205,7 +225,7 @@ firebase.auth().onAuthStateChanged((user) => {
   } else {
     // User is signed out
     // ...
-    window.location.href = 'login.html';
+    window.location.href = "login.html";
   }
 });
 

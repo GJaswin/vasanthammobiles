@@ -111,3 +111,9 @@ function monitorEmailVerification(user) {
         });
     }, 2000); // Check every 2 seconds
 }
+
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const preloader = document.querySelector('#preloader');
+  preloader.remove();
+})

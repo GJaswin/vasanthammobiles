@@ -158,6 +158,8 @@ firebase.auth().onAuthStateChanged((user) => {
     if (emailVerified) {
       initialiseItems();
       loadItems();
+      const preloader = document.querySelector('#preloader');
+      preloader.remove();
     } else {
       alert("Verify your mail in the 'My account' section");
       window.location.href = "my-account.html";
