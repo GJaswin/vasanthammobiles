@@ -17,7 +17,7 @@ const db = firebase.firestore();
 
 var database = firebase.database();
 
-function initialiseItems() {
+async function initialiseItems() {
   // Check if items are already in local storage
   const localItems = localStorage.getItem("items");
   if (localItems) {
@@ -26,7 +26,7 @@ function initialiseItems() {
   } else {
     // Fetch items from Firebase Realtime Database
     const itemsRef = database.ref("/items");
-    itemsRef
+    await itemsRef
       .once("value")
       .then((snapshot) => {
         const items = snapshot.val();
@@ -45,7 +45,7 @@ function initialiseItems() {
 }
 
 
-function initialiseShops() {
+async function initialiseShops() {
   // Check if items are already in local storage
   const localShops = localStorage.getItem("shops");
   if (localShops) {
@@ -54,7 +54,7 @@ function initialiseShops() {
   } else {
     // Fetch items from Firebase Realtime Database
     const shopsRef = database.ref("/shops");
-    shopsRef
+    await shopsRef
       .once("value")
       .then((snapshot) => {
         const shops = snapshot.val();
@@ -113,7 +113,7 @@ function updateShops() {
     });
 }
 
-firebase.auth().onAuthStateChanged((user) => {
+firebase.auth().onAuthStateChanged(async (user) => {
   if (user) {
     var uid = user.uid;
     var displayName = user.displayName;
@@ -126,8 +126,8 @@ firebase.auth().onAuthStateChanged((user) => {
     var emailVerified = user.emailVerified;
     if (emailVerified) {
       document.getElementById("userName").textContent = displayName;
-      initialiseItems();
-      initialiseShops();
+      await initialiseItems();
+      await initialiseShops();
       const preloader = document.querySelector('#preloader');
       preloader.remove();
     } else {

@@ -35,11 +35,12 @@ function updateClock() {
   return formattedDate;
 }
 
+async function loadStockOut(){
+
 // Assuming you have a Firestore document reference
 const docRef = db.collection("stockout").doc(formattedDate);
 
-// Get the document
-docRef
+await docRef
   .get()
   .then((doc) => {
     if (doc.exists) {
@@ -111,10 +112,6 @@ docRef
   .catch((error) => {
     console.error("Error getting document:", error);
   });
-
-function editStockOut() {
-  //var paid = prompt("Paid")
-  alert("Functionality not defined");
 }
 
 function deleteStockOut(billid) {
@@ -209,13 +206,52 @@ function searchDate(dateString) {
           document.getElementById("stockout-section").innerHTML = stockOuthtml;
         } else {
           console.log("No such document!");
-          Alert("Enter Correct Date");
+          alert("No Stock outgoings in "+ fetchingDate + " !");
         }
       })
       .catch((error) => {
         console.error("Error getting document:", error);
       });
   } else {
-    document.getElementById("searchDateStockOut").value = "Enter Correct Date";
+    alert("Something is wrong!");
   }
+}
+
+firebase.auth().onAuthStateChanged(async (user) => {
+  if (user) {
+    var uid = user.uid;
+    var displayName = user.displayName;
+    if (displayName != null) {
+      console.log("Name: " + displayName);
+    } else {
+      alert("Set your Name in the 'My Account' section");
+      window.location.href = "my-account.html";
+    }
+    var emailVerified = user.emailVerified;
+    if (emailVerified) {
+      document.getElementById("userName").textContent = displayName;
+      await loadStockOut();
+      const preloader = document.querySelector('#preloader');
+      preloader.remove();
+    } else {
+      alert("Verify your mail in the 'My account' section");
+      window.location.href = "my-account.html";
+    }
+  } else {
+    // User is signed out
+    // ...
+    window.location.href = 'login.html';
+  }
+});
+
+function signOut() {
+  firebase
+    .auth()
+    .signOut()
+    .then(() => {
+      alert("Signed Out Successfully!");
+    })
+    .catch((error) => {
+      alert(error);
+    });
 }

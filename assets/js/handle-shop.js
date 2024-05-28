@@ -24,10 +24,10 @@ const shopName = urlParams.get("shop");
 
 var shopData;
 
-function loadShop() {
+async function loadShop() {
   var shopRef = db.collection("shops").doc(shopName);
 
-  shopRef
+  await shopRef
     .get()
     .then((doc) => {
       if (doc.exists) {
@@ -202,7 +202,7 @@ function deleteTransaction(transactionIndex) {
   }
 }
 
-firebase.auth().onAuthStateChanged((user) => {
+firebase.auth().onAuthStateChanged(async (user) => {
   if (user) {
     var uid = user.uid;
     var displayName = user.displayName;
@@ -215,7 +215,7 @@ firebase.auth().onAuthStateChanged((user) => {
     var emailVerified = user.emailVerified;
     if (emailVerified) {
       document.getElementById("userName").textContent = displayName;
-      loadShop();
+      await loadShop();
       const preloader = document.querySelector("#preloader");
       preloader.remove();
     } else {

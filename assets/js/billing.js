@@ -293,7 +293,6 @@ function whatsappBill() {
   document.getElementById("customer-pay-input").value = "";
   
   document.getElementById("page-alert-out").classList.add("invisible");
-  document.getElementById("page-alert-transaction").classList.add("invisible");
   document.getElementById("billLoopItems").innerHTML = ``;
 
   document.getElementById("whatsappLink").classList.add("invisible");
