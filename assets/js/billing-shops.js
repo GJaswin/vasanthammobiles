@@ -157,42 +157,6 @@ function loadShops() {
   filterRowsShops("");
 }
 
-// shopsTablehtml = ``;
-// dbRef
-//   .child("shops")
-//   .get()
-//   .then((snapshot) => {
-//     if (snapshot.exists()) {
-//       snapshot.forEach((childSnapshot) => {
-//         const key = childSnapshot.key;
-//         const value = childSnapshot.val();
-//         shopsTablehtml += `
-//         <tr id='${key}'>
-//         <td>${key}</td>
-//         <td>${value}</td>
-//         <td>
-//           <span class="text-primary"
-//             ><a href="update-shop.html?shop=${key}"><i class="bi bi-pencil-fill"></i
-//           ></a></span>
-//         </td>
-//         <td>
-//           <span class="text-danger"
-//             ><a href="javascript:setShop('${key}','${value}')"><i class="bi bi-check2-circle"></i></a>
-//           </span>
-//         </td>
-//       </tr>
-//       `;
-//       });
-//       document.getElementById("table-body-shops").innerHTML = shopsTablehtml;
-//       filterRowsShops("");
-//     } else {
-//       console.log("No data available");
-//     }
-//   })
-//   .catch((error) => {
-//     console.error(error);
-//   });
-
 // Global Variables
 var totalItems = 0;
 var totalAmount = 0;

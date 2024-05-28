@@ -24,6 +24,8 @@ const shopName = urlParams.get("shop");
 
 var shopData;
 
+function loadShop(){
+
 var shopRef = db.collection("shops").doc(shopName);
 
 shopRef
@@ -66,9 +68,10 @@ shopRef
     }
   })
   .catch((error) => {
-    console.log("Error getting document:", error);
+    alert("Error getting document:", error);
   });
 
+}
 function addTransaction() {
   var shopRef = db.collection("shops").doc(shopName);
   var amountPaying = parseInt(document.getElementById("pay-trans").value, 10);
@@ -87,7 +90,7 @@ function addTransaction() {
           var transactions = doc.data().payment || [];
 
           // Check if the transactions array length is 20 or more
-          if (transactions.length >= 20) {
+          if (transactions.length >= 15) {
             // Remove the oldest transaction (first element)
             transactions.shift();
           }
@@ -178,5 +181,42 @@ function deleteTransaction(transactionIndex) {
     })
     .catch(function (error) {
       console.error("Transaction deletion failed: ", error);
+    });
+}
+
+firebase.auth().onAuthStateChanged((user) => {
+  if (user) {
+    var uid = user.uid;
+    var displayName = user.displayName;
+    if (displayName != null) {
+      console.log("Name: " + displayName);
+    } else {
+      alert("Set your Name in the 'My Account' section");
+      window.location.href = "my-account.html";
+    }
+    var emailVerified = user.emailVerified;
+    if (emailVerified) {
+      document.getElementById("userName").textContent = displayName;
+      loadShop();
+    } else {
+      alert("Verify your mail in the 'My account' section");
+      window.location.href = "my-account.html";
+    }
+  } else {
+    // User is signed out
+    // ...
+    window.location.href = 'login.html';
+  }
+});
+
+function signOut() {
+  firebase
+    .auth()
+    .signOut()
+    .then(() => {
+      alert("Signed Out Successfully!");
+    })
+    .catch((error) => {
+      alert(error);
     });
 }
