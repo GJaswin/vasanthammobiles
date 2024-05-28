@@ -233,6 +233,7 @@ firebase.auth().onAuthStateChanged(async (user) => {
       await loadStockOut();
       const preloader = document.querySelector('#preloader');
       preloader.remove();
+      await deleteOldDocuments();
     } else {
       alert("Verify your mail in the 'My account' section");
       window.location.href = "my-account.html";
@@ -254,4 +255,55 @@ function signOut() {
     .catch((error) => {
       alert(error);
     });
+}
+
+function getFormattedDate(date) {
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-based
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`;
+}
+
+// Calculate the date 31 days ago
+function getCutoffDate() {
+  const today = new Date();
+  const cutoffDate = new Date(today);
+  cutoffDate.setDate(today.getDate() - 31);
+  return cutoffDate;
+}
+
+// Delete old documents
+async function deleteOldDocuments() {
+  const cutoffDate = getCutoffDate();
+  const todayFormatted = getFormattedDate(new Date());
+
+  // Get localStorage data
+  const stockOutDeletion = JSON.parse(localStorage.getItem('stockOutDeletion')) || {};
+
+  // Check if the deletion for today has already been done
+  if (stockOutDeletion.date === todayFormatted && stockOutDeletion.deleted) {
+      console.log('Deletion already performed today.');
+      return;
+  }
+
+  // Delete documents older than the cutoff date
+  let deletionOccurred = false;
+  for (let i = 0; i < 31; i++) {
+      const dateToDelete = new Date(cutoffDate);
+      dateToDelete.setDate(cutoffDate.getDate() - i);
+      const dateToDeleteFormatted = getFormattedDate(dateToDelete);
+
+      try {
+          await db.collection('stockout').doc(dateToDeleteFormatted).delete();
+          console.log(`Deleted document with ID: ${dateToDeleteFormatted}`);
+          deletionOccurred = true;
+      } catch (error) {
+          console.error(`Error deleting document (ID: ${dateToDeleteFormatted}): `, error);
+      }
+  }
+
+  // Update localStorage
+  stockOutDeletion.date = todayFormatted;
+  stockOutDeletion.deleted = deletionOccurred;
+  localStorage.setItem('stockOutDeletion', JSON.stringify(stockOutDeletion));
 }

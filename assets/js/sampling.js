@@ -267,12 +267,10 @@ function addShop(shopName, shopPhone) {
       name: shopName,
       phone: shopPhone,
       balance: 0,
-      payment: []
+      payment: [],
     })
     .then(() => {
-      database
-        .ref("/shops")
-        .update({ [shopName]: shopPhone });
+      database.ref("/shops").update({ [shopName]: shopPhone });
       console.log(shopName + " successfully written!");
     })
     .catch((error) => {
@@ -282,48 +280,166 @@ function addShop(shopName, shopPhone) {
     });
 }
 
-
-
 function addTransaction() {
   var shopRef = db.collection("shops").doc("Aaliyah Shop");
 
-  return db.runTransaction(function(transaction) {
-      return transaction.get(shopRef).then(function(doc) {
-          if (!doc.exists) {
-              throw "Document does not exist!";
-          }
+  return db
+    .runTransaction(function (transaction) {
+      return transaction.get(shopRef).then(function (doc) {
+        if (!doc.exists) {
+          throw "Document does not exist!";
+        }
 
-          var transactions = doc.data().payment || [];
+        var transactions = doc.data().payment || [];
 
-          // Check if the transactions array length is 20 or more
-          if (transactions.length >= 3) {
-              // Remove the oldest transaction (first element)
-              transactions.shift();
-          }
+        // Check if the transactions array length is 20 or more
+        if (transactions.length >= 3) {
+          // Remove the oldest transaction (first element)
+          transactions.shift();
+        }
 
-          // Add the new transaction to the array
-          transactions.push(newTransaction);
+        // Add the new transaction to the array
+        transactions.push(newTransaction);
 
-          // Update the document with the modified transactions array
-          transaction.update(shopRef, { payment: transactions });
+        // Update the document with the modified transactions array
+        transaction.update(shopRef, { payment: transactions });
       });
-  }).then(function() {
+    })
+    .then(function () {
       console.log("Transaction added successfully.");
-  }).catch(function(error) {
+    })
+    .catch(function (error) {
       console.error("Transaction failed: ", error);
-  });
+    });
 }
 
-timeid = "25-05-2024-05-59-56-PM"
+timeid = "25-05-2024-05-59-56-PM";
 amount = 1000;
 
 var newTransaction = {
   [timeid]: amount,
 };
 
+// var value = parseFloat(prompt("Enter Content", 9))
+// if(!isNaN(value)){
+//   console.log(value);
+//   console.log(typeof(value))
+// }
 
-var value = parseFloat(prompt("Enter Content", 9))
-if(!isNaN(value)){
-  console.log(value);
-  console.log(typeof(value))
+// function getFormattedDate(date) {
+//   const day = date.getDate().toString().padStart(2, "0");
+//   const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Months are 0-based
+//   const year = date.getFullYear();
+//   return `${day}-${month}-${year}`;
+// }
+
+// // Calculate the date 31 days ago
+// function getCutoffDate() {
+//   const today = new Date();
+//   const cutoffDate31 = new Date(today);
+//   cutoffDate31.setDate(today.getDate() - 31);
+//   const cutoffDate32 = new Date(today);
+//   cutoffDate31.setDate(today.getDate() - 32);
+//   const cutoffDate33 = new Date(today);
+//   cutoffDate33.setDate(today.getDate() - 33);
+//   const cutoffDate34 = new Date(today);
+//   cutoffDate34.setDate(today.getDate() - 34);
+//   const cutoffDate35 = new Date(today);
+//   cutoffDate35.setDate(today.getDate() - 35);
+//   return [cutoffDate31, cutoffDate32, cutoffDate33, cutoffDate34, cutoffDate35];
+// }
+
+// // Delete old documents
+// async function deleteOldDocuments() {
+//   const cutoffDate31 = getCutoffDate()[0];
+//   const cutoffDate32 = getCutoffDate()[1];
+//   const cutoffDate33 = getCutoffDate()[2];
+//   const cutoffDate34 = getCutoffDate()[3];
+//   const cutoffDate35 = getCutoffDate()[4];
+//   const todayFormatted = getFormattedDate(new Date());
+
+//   // Get localStorage data
+//   const stockOutDeletion =
+//     JSON.parse(localStorage.getItem("stockOutDeletion")) || {};
+
+//   // Check if the deletion for today has already been done
+//   if (stockOutDeletion.date === todayFormatted && stockOutDeletion.deleted) {
+//     console.log("Deletion already performed today.");
+//     return;
+//   }
+
+//   // Delete documents older than the cutoff date
+//   let deletionOccurred = false;
+//   const deleteBefore31days = getFormattedDate(cutoffDate31);
+//   const deleteBefore32days = getFormattedDate(cutoffDate32);
+//   const deleteBefore33days = getFormattedDate(cutoffDate33);
+//   const deleteBefore34days = getFormattedDate(cutoffDate34);
+//   const deleteBefore35days = getFormattedDate(cutoffDate35);
+  
+//     try {
+//       await db.collection("stockout").doc(deleteBefore31days).delete();
+//       console.log(`Deleted document with ID: ${deleteBefore31days}`);
+//       deletionOccurred = true;
+//     } catch (error) {
+//       console.error(
+//         `Error deleting document (ID: ${deleteBefore31days}): `,
+//         error
+//       );
+//     }
+  
+//   // Update localStorage
+//   stockOutDeletion.date = todayFormatted;
+//   stockOutDeletion.deleted = deletionOccurred;
+//   localStorage.setItem("stockOutDeletion", JSON.stringify(stockOutDeletion));
+// }
+
+function getFormattedDate(date) {
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-based
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`;
+}
+
+// Calculate the date 31 days ago
+function getCutoffDate() {
+  const today = new Date();
+  const cutoffDate = new Date(today);
+  cutoffDate.setDate(today.getDate() - 31);
+  return cutoffDate;
+}
+
+// Delete old documents
+async function deleteOldDocuments() {
+  const cutoffDate = getCutoffDate();
+  const todayFormatted = getFormattedDate(new Date());
+
+  // Get localStorage data
+  const stockOutDeletion = JSON.parse(localStorage.getItem('stockOutDeletion')) || {};
+
+  // Check if the deletion for today has already been done
+  if (stockOutDeletion.date === todayFormatted && stockOutDeletion.deleted) {
+      console.log('Deletion already performed today.');
+      return;
+  }
+
+  // Delete documents older than the cutoff date
+  let deletionOccurred = false;
+  for (let i = 0; i < 31; i++) {
+      const dateToDelete = new Date(cutoffDate);
+      dateToDelete.setDate(cutoffDate.getDate() - i);
+      const dateToDeleteFormatted = getFormattedDate(dateToDelete);
+
+      try {
+          await db.collection('stockout').doc(dateToDeleteFormatted).delete();
+          console.log(`Deleted document with ID: ${dateToDeleteFormatted}`);
+          deletionOccurred = true;
+      } catch (error) {
+          console.error(`Error deleting document (ID: ${dateToDeleteFormatted}): `, error);
+      }
+  }
+
+  // Update localStorage
+  stockOutDeletion.date = todayFormatted;
+  stockOutDeletion.deleted = deletionOccurred;
+  localStorage.setItem('stockOutDeletion', JSON.stringify(stockOutDeletion));
 }
