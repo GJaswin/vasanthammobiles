@@ -291,6 +291,10 @@ function whatsappBill() {
   document.getElementById("customer-currently-paid").textContent = 0;
   document.getElementById("customer-balance-kept").textContent = 0;
   document.getElementById("customer-pay-input").value = "";
+  
+  document.getElementById("page-alert-out").classList.add("invisible");
+  document.getElementById("page-alert-transaction").classList.add("invisible");
+  document.getElementById("billLoopItems").innerHTML = ``;
 
   document.getElementById("whatsappLink").classList.add("invisible");
   document.getElementById("printBtn").classList.remove("disabled");
@@ -384,6 +388,7 @@ async function sendStockOut() {
             buyerPhone: buyerPh,
             sellerName: sellerName,
             amount: buyerAmount,
+            customerPaid: customerPaying,
             items: items,
             qty: itemsQty,
             rate: itemsRate,
@@ -535,6 +540,7 @@ firebase.auth().onAuthStateChanged((user) => {
     var emailVerified = user.emailVerified;
     if (emailVerified) {
       document.getElementById("userName").textContent = displayName;
+      document.getElementById("seller-name").textContent = displayName;
       initialiseItems();
       loadItems();
     } else {

@@ -17,81 +17,181 @@ const db = firebase.firestore();
 
 var database = firebase.database();
 
-itemsTablehtml = ``;
-
-// Showing the items for adding them to the Billing Section
-const dbRef = database.ref();
-dbRef
-  .child("items")
-  .get()
-  .then((snapshot) => {
-    if (snapshot.exists()) {
-      snapshot.forEach((childSnapshot) => {
-        const key = childSnapshot.key;
-        const value = childSnapshot.val();
-        itemsTablehtml += `
-          <tr id='${key}'>
-            <td>${key}</td>
-            <td>${value}</td>
-            <td>
-            <span class="text-primary"
-                ><a href="update-item.html?item=${key}"><i class="bi bi-pencil-fill"></i
-            ></a></span>
-            </td>
-            <td>
-            <span class="text-danger"
-                ><a href="javascript:itemToBill('${key}')"><i class="bi bi-bag-plus-fill"></i></a>
-            </span>
-            </td>
-        </tr>
-            `;
+function initialiseItems() {
+  // Check if items are already in local storage
+  const localItems = localStorage.getItem("items");
+  if (localItems) {
+    //console.log('Items already in local storage:', JSON.parse(localItems));
+    console.log("Local Storage - Items Available");
+  } else {
+    // Fetch items from Firebase Realtime Database
+    const itemsRef = database.ref("/items");
+    itemsRef
+      .once("value")
+      .then((snapshot) => {
+        const items = snapshot.val();
+        if (items) {
+          // Store items in local storage
+          localStorage.setItem("items", JSON.stringify(items));
+          console.log("Local Storage - Items Loaded");
+        } else {
+          console.log("No items found in database.");
+        }
+      })
+      .catch((error) => {
+        alert("Items Loading: " + error);
       });
-      document.getElementById("table-body-items").innerHTML = itemsTablehtml;
-      filterRows("");
-      document.getElementById("totalPages").textContent = countPages();
-    } else {
-      console.log("No data available");
-    }
-  })
-  .catch((error) => {
-    console.error(error);
-  });
+  }
+}
 
-shopsTablehtml = ``;
-dbRef
-  .child("shops")
-  .get()
-  .then((snapshot) => {
-    if (snapshot.exists()) {
-      snapshot.forEach((childSnapshot) => {
-        const key = childSnapshot.key;
-        const value = childSnapshot.val();
-        shopsTablehtml += `
-        <tr id='${key}'>
-        <td>${key}</td>
-        <td>${value}</td>
-        <td>
-          <span class="text-primary"
-            ><a href="update-shop.html?shop=${key}"><i class="bi bi-pencil-fill"></i
-          ></a></span>
-        </td>
-        <td>
-          <span class="text-danger"
-            ><a href="javascript:setShop('${key}','${value}')"><i class="bi bi-check2-circle"></i></a>
-          </span>
-        </td>
-      </tr>
-      `;
+function loadItems() {
+  const localItems = JSON.parse(localStorage.getItem("items"));
+
+  // Reference to the table body element
+  const tableBody = document.getElementById("table-body-items");
+
+  // Iterate over the items and append rows to the table
+  for (const [key, value] of Object.entries(localItems)) {
+    // Create a new row element
+    const row = document.createElement("tr");
+    row.id = key; // Set the id attribute to the key
+
+    // Create table data cells and set their content
+    const keyCell = document.createElement("td");
+    keyCell.textContent = key;
+
+    const valueCell = document.createElement("td");
+    valueCell.textContent = value;
+
+    const updateCell = document.createElement("td");
+    const updateLink = document.createElement("a");
+    updateLink.href = `update-item.html?item=${key}`;
+    updateLink.innerHTML = '<i class="bi bi-pencil-fill"></i>';
+    updateCell.appendChild(updateLink);
+
+    const addItemCell = document.createElement("td");
+    const addItemLink = document.createElement("a");
+    addItemLink.href = `javascript:itemToBill('${key}')`;
+    addItemLink.innerHTML = '<i class="bi bi-bag-plus-fill"></i>';
+    addItemCell.appendChild(addItemLink);
+
+    // Append table data cells to the row
+    row.appendChild(keyCell);
+    row.appendChild(valueCell);
+    row.appendChild(updateCell);
+    row.appendChild(addItemCell);
+
+    // Append the row to the table body
+    tableBody.appendChild(row);
+  }
+  filterRows("");
+  document.getElementById("totalPages").textContent = countPages();
+}
+
+function initialiseShops() {
+  // Check if items are already in local storage
+  const localShops = localStorage.getItem("shops");
+  if (localShops) {
+    console.log("Local Storage - Shops Available");
+  } else {
+    // Fetch items from Firebase Realtime Database
+    const shopsRef = database.ref("/shops");
+    shopsRef
+      .once("value")
+      .then((snapshot) => {
+        const items = snapshot.val();
+        if (items) {
+          // Store items in local storage
+          localStorage.setItem("shops", JSON.stringify(items));
+          console.log("Local Storage - Shops Loaded");
+        } else {
+          console.log("No shops found in database.");
+        }
+      })
+      .catch((error) => {
+        alert("Shops Loading: " + error);
       });
-      document.getElementById("table-body-shops").innerHTML = shopsTablehtml;
-      filterRowsShops("");
-    } else {
-      console.log("No data available");
-    }
-  })
-  .catch((error) => {
-    console.error(error);
-  });
+  }
+}
+
+function loadShops() {
+  const localshops = JSON.parse(localStorage.getItem("shops"));
+
+  // Reference to the table body element
+  const tableBody = document.getElementById("table-body-shops");
+
+  // Iterate over the items and append rows to the table
+  for (const [key, value] of Object.entries(localshops)) {
+    // Create a new row element
+    const row = document.createElement("tr");
+    row.id = key; // Set the id attribute to the key
+
+    // Create table data cells and set their content
+    const keyCell = document.createElement("td");
+    keyCell.textContent = key;
+
+    const valueCell = document.createElement("td");
+    valueCell.textContent = value;
+
+    const updateCell = document.createElement("td");
+    const updateLink = document.createElement("a");
+    updateLink.href = `update-shop.html?shop=${key}`;
+    updateLink.innerHTML = '<i class="bi bi-pencil-fill"></i>';
+    updateCell.appendChild(updateLink);
+
+    const setShopCell = document.createElement("td");
+    const setShopLink = document.createElement("a");
+    setShopLink.href = `javascript:setShop('${key}','${value}')`;
+    setShopLink.innerHTML = '<i class="bi bi-check2-circle"></i>';
+    setShopCell.appendChild(setShopLink);
+
+    // Append table data cells to the row
+    row.appendChild(keyCell);
+    row.appendChild(valueCell);
+    row.appendChild(updateCell);
+    row.appendChild(setShopCell);
+
+    // Append the row to the table body
+    tableBody.appendChild(row);
+  }
+  filterRowsShops("");
+}
+
+// shopsTablehtml = ``;
+// dbRef
+//   .child("shops")
+//   .get()
+//   .then((snapshot) => {
+//     if (snapshot.exists()) {
+//       snapshot.forEach((childSnapshot) => {
+//         const key = childSnapshot.key;
+//         const value = childSnapshot.val();
+//         shopsTablehtml += `
+//         <tr id='${key}'>
+//         <td>${key}</td>
+//         <td>${value}</td>
+//         <td>
+//           <span class="text-primary"
+//             ><a href="update-shop.html?shop=${key}"><i class="bi bi-pencil-fill"></i
+//           ></a></span>
+//         </td>
+//         <td>
+//           <span class="text-danger"
+//             ><a href="javascript:setShop('${key}','${value}')"><i class="bi bi-check2-circle"></i></a>
+//           </span>
+//         </td>
+//       </tr>
+//       `;
+//       });
+//       document.getElementById("table-body-shops").innerHTML = shopsTablehtml;
+//       filterRowsShops("");
+//     } else {
+//       console.log("No data available");
+//     }
+//   })
+//   .catch((error) => {
+//     console.error(error);
+//   });
 
 // Global Variables
 var totalItems = 0;
@@ -643,5 +743,46 @@ function addTransaction(shopName, billid, amt, blnce) {
     .catch(function (error) {
       alert("Transaction Error");
       console.error("Transaction failed: ", error);
+    });
+}
+
+firebase.auth().onAuthStateChanged((user) => {
+  if (user) {
+    var uid = user.uid;
+    var displayName = user.displayName;
+    if (displayName != null) {
+      console.log("Name: " + displayName);
+    } else {
+      alert("Set your Name in the 'My Account' section");
+      window.location.href = "my-account.html";
+    }
+    var emailVerified = user.emailVerified;
+    if (emailVerified) {
+      document.getElementById("userName").textContent = displayName;
+      document.getElementById("seller-name").textContent = displayName;
+      initialiseItems();
+      loadItems();
+      initialiseShops();
+      loadShops();
+    } else {
+      alert("Verify your mail in the 'My account' section");
+      window.location.href = "my-account.html";
+    }
+  } else {
+    // User is signed out
+    // ...
+    window.location.href = 'login.html';
+  }
+});
+
+function signOut() {
+  firebase
+    .auth()
+    .signOut()
+    .then(() => {
+      alert("Signed Out Successfully!");
+    })
+    .catch((error) => {
+      alert(error);
     });
 }
