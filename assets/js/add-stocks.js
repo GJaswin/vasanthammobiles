@@ -197,3 +197,14 @@ firebase.auth().onAuthStateChanged((user) => {
     window.location.href = "login.html";
   }
 });
+function signOut() {
+  firebase
+    .auth()
+    .signOut()
+    .then(() => {
+      alert("Signed Out Successfully!");
+    })
+    .catch((error) => {
+      alert(error);
+    });
+}
