@@ -5,8 +5,6 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
 
     <title>Stock In</title>
-    <meta content="" name="description" />
-    <meta content="" name="keywords" />
 
     <!-- Favicons -->
     <link href="assets/img/favicon.png" rel="icon" />
@@ -50,25 +48,7 @@
       </div>
       <!-- End Logo -->
 
-      <!-- <div class="search-bar">
-        <form
-          class="search-form d-flex align-items-center"
-          method="POST"
-          action="#"
-        >
-          <input
-            type="text"
-            name="query"
-            placeholder="Search"
-            title="Enter search keyword"
-          />
-          <button type="submit" title="Search">
-            <i class="bi bi-search"></i>
-          </button>
-        </form>
-      </div> -->
-      <!-- End Search Bar -->
-
+      
       <nav class="header-nav ms-auto">
         <ul class="d-flex align-items-center">
           <!-- <li class="nav-item d-block d-lg-none">
@@ -87,31 +67,23 @@
             </a>
           </li>
 
-          <!-- <li class="nav-item">
-            <a class="nav-link nav-icon search-bar-toggle" href="#">
-              <i class="bi bi-tags-fill text-primary"></i>
-            </a>
-          </li> -->
-
           <li class="nav-item dropdown pe-3">
             <a
               class="nav-link nav-profile d-flex align-items-center pe-0"
               href="#"
               data-bs-toggle="dropdown"
             >
-              <img
-                src="assets/img/profile-img.jpg"
-                alt="Profile"
-                class="rounded-circle"
-              /> </a
+              <i
+                class="bi bi-person-fill-check"
+                style="font-size: 2rem"
+              ></i> </a
             ><!-- End Profile Iamge Icon -->
 
             <ul
               class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile"
             >
               <li class="dropdown-header">
-                <h6>Kevin Anderson</h6>
-                <span>Web Designer</span>
+                <h6 id="userName"></h6>
               </li>
               <li>
                 <hr class="dropdown-divider" />
@@ -120,10 +92,10 @@
               <li>
                 <a
                   class="dropdown-item d-flex align-items-center"
-                  href="users-profile.html"
+                  href="my-account.html"
                 >
                   <i class="bi bi-person"></i>
-                  <span>My Profile</span>
+                  <span>My Account</span>
                 </a>
               </li>
               <li>
@@ -131,7 +103,10 @@
               </li>
 
               <li>
-                <a class="dropdown-item d-flex align-items-center" href="#">
+                <a
+                  class="dropdown-item d-flex align-items-center"
+                  href="javascript:signOut()"
+                >
                   <i class="bi bi-box-arrow-right"></i>
                   <span>Sign Out</span>
                 </a>
@@ -139,8 +114,7 @@
             </ul>
             <!-- End Profile Dropdown Items -->
           </li>
-          <!-- End Profile Nav -->
-        </ul>
+          <!-- End Profile Nav -->        </ul>
       </nav>
       <!-- End Icons Navigation -->
     </header>
@@ -150,6 +124,18 @@
     <aside id="sidebar" class="sidebar">
       <ul class="sidebar-nav" id="sidebar-nav">
         <li class="nav-heading">Sections</li>
+
+        <li class="nav-item">
+          <a class="nav-link collapsed" href="index.html">
+            <span>Home</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link collapsed" href="admin.html">
+            <span>Admin</span>
+          </a>
+        </li>
 
         <li class="nav-item">
           <a class="nav-link collapsed" href="stock-in.html">
@@ -229,6 +215,7 @@
         <nav>
           <ol class="breadcrumb">
             <li class="breadcrumb-item active" id="stock-in-date">Date</li>
+            <li class="breadcrumb-item" id="stock-in-date-length"></li>
           </ol>
         </nav>
       </div>
@@ -389,6 +376,9 @@
       ><i class="bi bi-arrow-up-short"></i
     ></a>
 
+    <!-- Preloader -->
+    <div id="preloader"></div>
+    
     <!-- Vendor JS Files -->
     <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
     <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -421,150 +411,6 @@
     ></script>
 
     <script defer src="assets/js/stockin.js"></script>
-    <script>
-      function filterRows(searchTerm) {
-        var filter = searchTerm.toUpperCase();
-        var table = document.getElementById("productsTable");
-        var tbody = table.getElementsByTagName("tbody")[0]; // Get the tbody element
-        var trs = tbody.getElementsByTagName("tr");
-
-        var visibleRows = 0; // Counter for visible rows
-        var rowsPerPage = 30; // Number of rows to display per page
-        for (var i = 0; i < trs.length; i++) {
-          var tds = trs[i].getElementsByTagName("td");
-          var found = false;
-          for (var j = 0; j < tds.length; j++) {
-            var txtValue = tds[j].textContent || tds[j].innerText;
-            if (txtValue.toUpperCase().indexOf(filter) > -1) {
-              found = true;
-              break;
-            }
-          }
-          if (found) {
-            trs[i].style.display = ""; // Show the row if found
-            visibleRows++;
-          } else {
-            trs[i].style.display = "none"; // Hide the row if not found
-          }
-
-          // Show only rows up to the page limit
-          if (visibleRows >= rowsPerPage) {
-            break;
-          }
-        }
-
-        if (searchTerm == "") {
-          changePage(1);
-        }
-      }
-
-      curPage = 1;
-
-      function countPages() {
-        var table = document.getElementById("productsTable");
-        var tbody = table.getElementsByTagName("tbody")[0];
-        var trs = tbody.getElementsByTagName("tr");
-        var rowsPerPage = 3; // Number of rows to display per page
-        var totalPages = Math.ceil(trs.length / rowsPerPage); // Calculate total number of pages
-        return totalPages;
-      }
-
-      // Pagination function
-      function paginateTable(pageNum) {
-        var table = document.getElementById("productsTable");
-        var tbody = table.getElementsByTagName("tbody")[0];
-        var trs = tbody.getElementsByTagName("tr");
-        var rowsPerPage = 3; // Number of rows to display per page
-        var startIndex = (pageNum - 1) * rowsPerPage;
-        var endIndex = startIndex + rowsPerPage;
-
-        for (var i = 0; i < trs.length; i++) {
-          if (i >= startIndex && i < endIndex) {
-            trs[i].style.display = ""; // Show rows within the page range
-          } else {
-            trs[i].style.display = "none"; // Hide rows beyond the page range
-          }
-        }
-      }
-
-      // Function to handle pagination button clicks
-      function changePage(pageNum) {
-        totalPages = countPages();
-        if (pageNum == 1) {
-          paginateTable(pageNum);
-          curPage = pageNum;
-          document.getElementById("pagination-active-page").textContent =
-            pageNum;
-          document.getElementById("pagination-prev").classList.add("disabled");
-          if (totalPages > 1) {
-            document
-              .getElementById("pagination-next")
-              .classList.remove("disabled");
-          } else {
-            document
-              .getElementById("pagination-next")
-              .classList.add("disabled");
-          }
-        } else if (pageNum < totalPages) {
-          paginateTable(pageNum);
-          curPage = pageNum;
-          document.getElementById("pagination-active-page").textContent =
-            pageNum;
-          document
-            .getElementById("pagination-prev")
-            .classList.remove("disabled");
-          document
-            .getElementById("pagination-next")
-            .classList.remove("disabled");
-        } else if (pageNum == totalPages) {
-          paginateTable(pageNum);
-          curPage = pageNum;
-          document.getElementById("pagination-active-page").textContent =
-            pageNum;
-          document.getElementById("pagination-next").classList.add("disabled");
-          document
-            .getElementById("pagination-prev")
-            .classList.remove("disabled");
-        }
-      }
-
-      function nextPage() {
-        changePage(++curPage);
-      }
-
-      function prevPage() {
-        changePage(--curPage);
-      }
-
-      // Initial pagination when the page loads
-      document.addEventListener("DOMContentLoaded", function () {
-        paginateTable(1); // Show the first page initially
-        totalPages = countPages();
-        document.getElementById("totalPages").textContent = totalPages;
-        if (
-          parseInt(
-            document.getElementById("pagination-active-page").textContent,
-            10
-          ) == 1
-        ) {
-          document.getElementById("pagination-prev").classList.add("disabled");
-        } else if (
-          parseInt(
-            document.getElementById("pagination-active-page").textContent,
-            10
-          ) == countPages
-        ) {
-          document.getElementById("pagination-next").classList.add("disabled");
-        }
-      });
-
-      document
-        .getElementById("page-search-btn")
-        .addEventListener("click", function () {
-          changePage(
-            parseInt(document.getElementById("page-search-input").value, 10)
-          );
-        });
-    </script>
+    
   </body>
 </html>
